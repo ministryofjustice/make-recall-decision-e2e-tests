@@ -1,8 +1,0 @@
-{
-  "trailingComma": "es5",
-  "singleQuote": true,
-  "printWidth": 150,
-  "semi": false,
-  "arrowParens": "avoid",
-  "singleAttributePerLine": false
-}
