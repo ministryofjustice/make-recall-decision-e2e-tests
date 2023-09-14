@@ -1,0 +1,95 @@
+{% extends "../../partials/layout.njk" %}
+
+{% set pageTitle = makePageTitle({ pageHeading: pageTitles[page.id], hasErrors: errors }) %}
+
+{% block beforeContent %}
+    {{ backLink() }}
+{% endblock %}
+
+{% block content %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds-from-desktop">
+            {% include '../../partials/error-summary.njk' %}
+
+                <h1 class='govuk-heading-l'>{{ pageHeadings[page.id] }}</h1>
+                {% include '../../partials/notificationBanners/convictionsLicencesBanner.njk' %}
+                {% if caseSummary.hasAllConvictionsReleasedOnLicence %}
+                {{ deliusDetailsMessage() }}
+                <dl class="govuk-summary-list govuk-!-margin-bottom-4">
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Main offence
+                        </dt>
+                        <dd class="govuk-summary-list__value" data-qa='indexOffenceDescription'>
+                            {{ recommendation.convictionDetail.indexOffenceDescription | defaultValue | safe }}
+                        </dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Date of offence
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ formatDateTimeFromIsoString({isoDate: recommendation.convictionDetail.dateOfOriginalOffence, dateOnly: true}) | defaultValue | safe }}
+                        </dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Date of sentence
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ formatDateTimeFromIsoString({isoDate: recommendation.convictionDetail.dateOfSentence, dateOnly: true}) | defaultValue | safe }}
+                        </dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Custodial term
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ recommendation.convictionDetail.custodialTerm | defaultValue | safe }}
+                        </dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Extended term
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ recommendation.convictionDetail.extendedTerm | defaultValue | safe }}
+                        </dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Length of sentence
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {% if recommendation.convictionDetail.lengthOfSentence and recommendation.convictionDetail.lengthOfSentenceUnits %}
+                            {{ recommendation.convictionDetail.lengthOfSentence + " " + recommendation.convictionDetail.lengthOfSentenceUnits }}
+                            {% else %}
+                            {{ "" | defaultValue | safe }}
+                            {% endif %}
+                        </dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Licence expiry date
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ formatDateTimeFromIsoString({isoDate: recommendation.convictionDetail.licenceExpiryDate, dateOnly: true}) | defaultValue | safe }}
+                        </dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Sentence expiry date
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ formatDateTimeFromIsoString({isoDate: recommendation.convictionDetail.sentenceExpiryDate, dateOnly: true}) | defaultValue | safe }}
+                        </dd>
+                    </div>
+                </dl>
+            {% endif %}
+            <div class='govuk-!-margin-top-6'>
+                <a class='govuk-button' href='{{ urlInfo.basePath }}task-list#heading-person-details'>Continue</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

@@ -1,0 +1,53 @@
+{% extends "../../partials/layout.njk" %}
+
+{% set pageTitle = makePageTitle({ pageHeading: pageTitles[page.id], hasErrors: errors }) %}
+
+{% block beforeContent %}
+    {{ backLink() }}
+{% endblock %}
+
+{% block content %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds-from-desktop">
+            {% include '../../partials/error-summary.njk' %}
+            {% set yesDetailHtml %}
+                {{ govukTextarea({
+                    name: "hasContrabandRiskDetailsYes",
+                    id: "hasContrabandRiskDetailsYes",
+                    label: {
+                        text: "Give details. Also tell your local police contact about your concerns.",
+                        classes: "govuk-label--s"
+                    },
+                    value: inputDisplayValues.details,
+                    errorMessage: errorMessage(errors.hasContrabandRiskDetailsYes)
+                }) }}
+            {% endset %}
+            <form novalidate method="post">
+                <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+
+
+                {{ govukRadios({
+                    idPrefix: "hasContrabandRisk",
+                    name: "hasContrabandRisk",
+                    fieldset: {
+                        legend: {
+                            text: pageHeadings[page.id],
+                            classes: "govuk-fieldset__legend--l",
+                            isPageHeading: true
+                        }
+                    },
+                    items: radioCheckboxItems({
+                        items: formOptions.yesNo,
+                        currentValues: inputDisplayValues.value,
+                        conditionalContent: {
+                            YES: yesDetailHtml
+                        }
+                    }),
+                    errorMessage: errorMessage(errors.hasContrabandRisk)
+                }) }}
+                {{ formSubmitButton() }}
+            </form>
+        </div>
+    </div>
+{% endblock %}
+

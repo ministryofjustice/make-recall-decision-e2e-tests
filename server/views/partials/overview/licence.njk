@@ -1,0 +1,24 @@
+{% if caseSummary.hasAllConvictionsReleasedOnLicence %}
+    {% set licenceHtml %}
+        <div class='flex flex--space-between'>
+            <div class='flex__item-half-width'>
+                <h3 class="govuk-caption-m govuk-!-margin-top-0 govuk-!-margin-bottom-2">Last release date</h3>
+                <div class='govuk-heading-m govuk-!-margin-top-0' data-qa='lastReleaseDate'>
+                    {{ formatDateTimeFromIsoString({isoDate: caseSummary.lastRelease.releaseDate}) if (not caseSummary.licenceConvictions.hasMultipleActiveCustodial) and caseSummary.licenceConvictions.activeCustodial.length and caseSummary.lastRelease.releaseDate else 'Not available' }}
+                </div>
+            </div>
+            <div class='flex__item-half-width'>
+                <h3 class="govuk-caption-m govuk-!-margin-top-0 govuk-!-margin-bottom-2">Licence expiry
+                    date</h3>
+                <div class='govuk-heading-m govuk-!-margin-top-0' data-qa='licenceExpiryDate'>
+                    {{ formatDateTimeFromIsoString({isoDate: caseSummary.licenceConvictions.activeCustodial[0].sentence.licenceExpiryDate }) if (not caseSummary.licenceConvictions.hasMultipleActiveCustodial) and caseSummary.licenceConvictions.activeCustodial[0].sentence.licenceExpiryDate else 'Not available' }}</li>
+                </div>
+            </div>
+        </div>
+    {% endset %}
+    {{ appSummaryCard({
+        titleText: 'Licence',
+        classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
+        html: licenceHtml
+    }) }}
+{% endif %}

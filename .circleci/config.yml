@@ -1,0 +1,627 @@
+version: 2.1
+
+orbs:
+  browser-tools: circleci/browser-tools@1.4.4
+  hmpps: ministryofjustice/hmpps@5.0.4
+  node: circleci/node@4.9.0
+  slack: circleci/slack@4.12.5
+  sonarcloud: sonarsource/sonarcloud@1.1.1
+
+parameters:
+  alerts-slack-channel:
+    type: string
+    default: make-recall-decisions-pipeline
+  releases-slack-channel:
+    type: string
+    default: make-recall-decisions-pipeline
+  node-version:
+    type: string
+    default: 18.11-browsers
+  redis-version:
+    type: string
+    default: "6.2"
+  e2e-check-local:
+    type: boolean
+    default: false
+  e2e-check-dev:
+    type: boolean
+    default: false
+  e2e-check-preprod:
+    type: boolean
+    default: false
+  e2e-parallelism:
+    type: integer
+    default: 6
+  e2e-parallelism-env:
+    type: integer
+    default: 1
+    
+
+slack-fail-post-step: &slack-fail-post-step
+  post-steps:
+    - slack/notify:
+        event: fail
+        branch_pattern: main
+        channel: << pipeline.parameters.alerts-slack-channel >>
+        custom: |
+          {
+            "text": "",
+            "blocks": [
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "❌ *Failure* `${CIRCLE_PROJECT_REPONAME}` - `${CIRCLE_JOB}` (Build: #${CIRCLE_BUILD_NUM}) on `${CIRCLE_BRANCH}`"
+                }
+              },
+              {
+                "type": "actions",
+                "elements": [
+                  {
+                    "type": "button",
+                    "text": { "type": "plain_text", "text": "View Job" },
+                    "url": "${CIRCLE_BUILD_URL}"
+                  }
+                ]
+              }
+            ]
+          }
+
+jobs:
+  build:
+    executor:
+      name: hmpps/node
+      tag: << pipeline.parameters.node-version >>
+    steps:
+      - checkout
+      - run:
+          name: Update npm
+          # Temporarily pinning the node version to allow pipeline builds to run.
+          # Can move back to npm@latest after upgrading to v10
+          command: 'sudo npm install -g npm@8'
+      - node/install-packages
+      - run:
+          command: |
+            npm run build
+            DATE=$(date '+%Y-%m-%d')
+            export BUILD_NUMBER=${DATE}.${CIRCLE_BUILD_NUM}
+            export GIT_REF="$CIRCLE_SHA1"
+            npm run record-build-info
+      - run: # Run linter after build because the integration test code depend on compiled typescript...
+          name: Linter check
+          command: npm run lint
+      - persist_to_workspace:
+          root: .
+          paths:
+            - node_modules
+            - build-info.json
+            - build
+            - dist
+            - .cache/Cypress
+
+  check_outdated:
+    executor:
+      name: hmpps/node
+      tag: << pipeline.parameters.node-version >>
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+      - run:
+          name: install-npm
+          command: 'npm ci --no-audit'
+      - run:
+          name: Check version
+          command: 'npm --version'
+      - run:
+          name: Run check
+          command: 'npm outdated typescript govuk-frontend'
+      - slack/notify:
+          event: fail
+          channel: << pipeline.parameters.alerts-slack-channel >>
+          template: basic_fail_1
+
+  unit_test:
+    executor:
+      name: hmpps/node
+      tag: << pipeline.parameters.node-version >>
+    resource_class: xlarge
+    steps:
+      - checkout
+      - node/install-packages
+      - run:
+          name: unit tests
+          command: npm run test:coverage
+      - sonarcloud/scan
+      - store_test_results:
+          path: test_results
+      - store_artifacts:
+          path: test_results/unit-test-reports.html
+      - store_artifacts:
+          path: coverage
+
+  integration_test:
+    executor:
+      name: hmpps/node_redis
+      node_tag: << pipeline.parameters.node-version >>
+      redis_tag: << pipeline.parameters.redis-version >>
+    steps:
+      - checkout
+      - run: sudo apt-get update
+      - browser-tools/install-chrome:
+          chrome-version: "114.0.5735.90" # TODO - workaround for circle ci/chromedriver issue, remove when fixed
+      - browser-tools/install-chromedriver
+      - node/install-packages
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Install missing OS dependency
+          command: sudo apt-get install libxss1
+      - run:
+          name: Get wiremock
+          command: curl -o wiremock.jar https://repo1.maven.org/maven2/com/github/tomakehurst/wiremock-standalone/2.27.1/wiremock-standalone-2.27.1.jar
+      - run:
+          name: Run wiremock
+          command: java -jar wiremock.jar --port 9999
+          background: true
+      - run:
+          name: Build the node app.
+          command: npm run build
+      - run:
+          name: Run the node app.
+          command: npm run start-feature
+          background: true
+      - run:
+          name: Wait for node app to start
+          command: |
+            until curl -s --fail "http://localhost:3007/ping"; do
+              printf "."
+              sleep 2
+            done
+      - run:
+          name: integration tests
+          command: npm run int-test
+      - store_test_results:
+          path: test_results
+      - store_artifacts:
+          path: integration_tests/videos
+      - store_artifacts:
+          path: integration_tests/screenshots
+
+  accessibility_test:
+    executor:
+      name: hmpps/node_redis
+      node_tag: << pipeline.parameters.node-version >>
+      redis_tag: << pipeline.parameters.redis-version >>
+    steps:
+      - checkout
+      - run: sudo apt-get update
+      - browser-tools/install-chrome:
+          chrome-version: "114.0.5735.90" # TODO - workaround for circle ci/chromedriver issue, remove when fixed
+      - browser-tools/install-chromedriver
+      - node/install-packages
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Install missing OS dependency
+          command: sudo apt-get install libxss1
+      - run:
+          name: Get wiremock
+          command: curl -o wiremock.jar https://repo1.maven.org/maven2/com/github/tomakehurst/wiremock-standalone/2.27.1/wiremock-standalone-2.27.1.jar
+      - run:
+          name: Run wiremock
+          command: java -jar wiremock.jar --port 9999 --root-dir fake-manage-recalls-api/stubs
+          background: true
+      - run:
+          name: Build the node app.
+          command: npm run build
+      - run:
+          name: Run the node app.
+          command: npm run start-feature
+          background: true
+      - run:
+          name: Wait for node app to start
+          command: |
+            until curl -s --fail "http://localhost:3007/ping"; do
+              printf "."
+              sleep 2
+            done
+      - run:
+          name: accessibility tests
+          command: |
+            npx cypress run \
+              --env USERNAME=${CYPRESS_USERNAME_local},PASSWORD=${CYPRESS_PASSWORD_local},CRN=${CRN_local} \
+              --config-file integration_tests/cypress.config.ts \
+              --config specPattern=integration_tests/accessibility/*.spec.ts \
+              --browser chrome \
+              --record false
+      - store_test_results:
+          path: test_results
+      - store_artifacts:
+          path: integration_tests/videos
+      - store_artifacts:
+          path: integration_tests/screenshots
+
+  e2e_environment_test:
+    circleci_ip_ranges: true # opt-in to jobs running on a restricted set of IPs
+    docker:
+      - image: cypress/browsers:node16.14.2-slim-chrome100-ff99-edge
+
+    parallelism: << pipeline.parameters.e2e-parallelism-env >>
+    resource_class: large
+    parameters:
+      environment:
+        type: string
+        default: dev
+      e2e-tags:
+        type: string
+        default: "@E2E"
+    steps:
+      - checkout
+      - run:
+          name: Update npm
+          # Temporarily pinning the node version to allow pipeline builds to run.
+          # Can move back to npm@latest after upgrading to v10
+          command: 'npm install -g npm@8'
+      - node/install-packages
+      - run:
+          environment:
+            FEATURE_FLAG_QUERY_PARAMETERS_ENABLED: 'true'
+          name: E2E Check - << parameters.environment >>
+          command: |
+            shopt -s globstar
+            
+            SPECS=$(circleci tests glob "e2e_tests/features/e2eJourneyTests/*.feature" | circleci tests split --show-counts)
+            echo $SPECS
+
+            npx cypress run \
+              --env TAGS='<< parameters.e2e-tags >>',USERNAME=${CYPRESS_USERNAME_<< parameters.environment >>},PASSWORD=${CYPRESS_PASSWORD_<< parameters.environment >>},USERNAME_SPO=${CYPRESS_USERNAME_SPO_<< parameters.environment >>},PASSWORD_SPO=${CYPRESS_PASSWORD_SPO_<< parameters.environment >>},USERNAME_ACO=${CYPRESS_USERNAME_ACO_<< parameters.environment >>},PASSWORD_ACO=${CYPRESS_PASSWORD_ACO_<< parameters.environment >>},CRN=${CRN_<< parameters.environment >>},CRN2=${CRN2_<< parameters.environment >>},CRN3=${CRN3_<< parameters.environment >>},CRN4=${CRN4_<< parameters.environment >>},CRN5=${CRN5_<< parameters.environment >>},ENV=<< parameters.environment >> \
+              --config-file e2e_tests/cypress.config.ts \
+              --config baseUrl=https://make-recall-decision-<< parameters.environment >>.hmpps.service.justice.gov.uk \
+              --spec $SPECS \
+              --browser chrome \
+              --record false
+            node scripts/fix-junit-reports.js
+      - store_artifacts:
+          path: e2e_tests/screenshots
+          destination: screenshots
+      - store_artifacts:
+          path: e2e_tests/videos
+          destination: videos
+      - store_artifacts:
+          path: e2e_tests/logs
+          destination: test-logs
+      - store_artifacts:
+          path: e2e_tests/junit
+          destination: junit
+      - store_test_results:
+          path: e2e_tests/junit
+
+  e2e_local_test:
+    machine:
+      image: ubuntu-2004:2022.10.1
+    resource_class: large
+    parallelism: << pipeline.parameters.e2e-parallelism >>
+    steps:
+      - run:
+          name: Checkout/clone make-recall-decision-ui
+          command: |
+            git clone https://github.com/ministryofjustice/make-recall-decision-ui.git
+            cd make-recall-decision-ui
+            git checkout $CIRCLE_BRANCH
+      - run:
+          name: Checkout/clone make-recall-decision-api
+          command: git clone https://github.com/ministryofjustice/make-recall-decision-api.git
+      - run:
+          name: Start components
+          working_directory: make-recall-decision-ui
+          command: ./scripts/start-services-for-e2e-tests.sh -p
+      - run:
+          name: Run E2E tests
+          working_directory: make-recall-decision-ui
+          environment:
+            FEATURE_FLAG_QUERY_PARAMETERS_ENABLED: 'true'
+          command: |
+            npm ci --no-audit
+            
+            shopt -s globstar
+            
+            SPECS=$(circleci tests glob "e2e_tests/features/e2eLocalTests/*.feature" | circleci tests split --split-by=timings --show-counts)
+            echo "Running feature file(s): $SPECS"
+
+            set +e
+
+            npx cypress run \
+              --env TAGS='not @E2E and not @smoke',USERNAME=${CYPRESS_USERNAME_local},PASSWORD=${CYPRESS_PASSWORD_local},USERNAME_SPO=${CYPRESS_USERNAME_SPO_local},PASSWORD_SPO=${CYPRESS_PASSWORD_SPO_local},USERNAME_ACO=${CYPRESS_USERNAME_ACO_local},PASSWORD_ACO=${CYPRESS_PASSWORD_ACO_local} \
+              --config-file e2e_tests/cypress.config.ts \
+              --browser chrome \
+              --record false \
+              --spec $SPECS
+
+            export E2E_RESULT=$?
+            node scripts/fix-junit-reports.js
+
+            set -e
+            exit $E2E_RESULT
+      - run:
+          when: on_fail
+          name: make-recall-decision-api - docker logs
+          working_directory: make-recall-decision-api
+          command: docker-compose logs
+      - run:
+          when: on_fail
+          name: make-recall-decision-ui - docker logs
+          working_directory: make-recall-decision-ui
+          command: docker-compose logs
+      - store_artifacts:
+          path: make-recall-decision-ui/e2e_tests/screenshots
+          destination: screenshots
+      - store_artifacts:
+          path: make-recall-decision-ui/e2e_tests/junit
+          destination: junit
+      - store_artifacts:
+          path: make-recall-decision-ui/e2e_tests/logs
+          destination: test-logs
+      - store_test_results:
+          path: make-recall-decision-ui/e2e_tests/junit
+
+# E2E tests using the dev and pre-prod environments have been commented out.
+# They were actingas a 'gate' to prevent a broken production deployment, this has been superceded by a 'manual' gate step.
+# Deactivating these tests also removes flakiness caused by drifting test fixtures.
+# the E2E local test is still in place, it tests te FE/BE contract and assumes contracts between MRD and other external systems.
+workflows:
+  version: 2
+  build-test-and-deploy:
+    when:
+      not:
+        or:
+          - << pipeline.parameters.e2e-check-local >>
+          - << pipeline.parameters.e2e-check-dev >>
+          - << pipeline.parameters.e2e-check-preprod >>
+    jobs:
+      - e2e_local_test:
+          filters:
+            branches:
+              only:
+                - main
+          context:
+            - hmpps-common-vars
+          <<: *slack-fail-post-step
+
+      - build:
+          filters:
+            tags:
+              ignore: /.*/
+          context:
+            - hmpps-common-vars
+          <<: *slack-fail-post-step
+
+      - unit_test:
+          requires:
+            - build
+          context:
+            - hmpps-common-vars
+          <<: *slack-fail-post-step
+
+      - integration_test:
+          requires:
+            - build
+          context:
+            - hmpps-common-vars
+          <<: *slack-fail-post-step
+
+      - accessibility_test:
+          requires:
+            - build
+          context:
+            - hmpps-common-vars
+          <<: *slack-fail-post-step
+
+      - hmpps/helm_lint:
+          name: helm_lint
+          context:
+            - hmpps-common-vars
+          <<: *slack-fail-post-step
+
+      - hmpps/build_docker:
+          name: build_docker
+          filters:
+            branches:
+              only:
+                - main
+          context:
+            - hmpps-common-vars
+          <<: *slack-fail-post-step
+
+      - hmpps/deploy_env:
+          name: deploy_dev
+          env: dev
+          context:
+            - hmpps-common-vars
+          filters:
+            branches:
+              only:
+                - main
+          requires:
+            - helm_lint
+            - unit_test
+            - integration_test
+            - e2e_local_test
+            - build_docker
+          <<: *slack-fail-post-step
+      - hmpps/sentry_release_and_deploy:
+          name: notify_sentry_dev
+          sentry_project: make-recall-decision-ui
+          sentry_environment: DEV
+          sentry_create_release: true
+          requires:
+            - deploy_dev
+          context:
+            - hmpps-common-vars
+          <<: *slack-fail-post-step
+      - e2e_environment_test:
+          name: e2e_test_dev
+          environment: dev
+          filters:
+            branches:
+              only:
+                - main
+          requires:
+            - deploy_dev
+          context:
+            - hmpps-common-vars
+          <<: *slack-fail-post-step
+
+      - hmpps/deploy_env:
+          name: deploy_preprod
+          env: preprod
+          filters:
+            branches:
+              only:
+                - main
+          context:
+            - hmpps-common-vars
+            - make-recall-decision-ui-preprod
+          requires:
+            - deploy_dev
+            - e2e_test_dev
+          <<: *slack-fail-post-step
+      - hmpps/sentry_release_and_deploy:
+          name: notify_sentry_preprod
+          sentry_project: make-recall-decision-ui
+          sentry_environment: PRE-PROD
+          sentry_create_release: true
+          requires:
+            - deploy_preprod
+          context:
+            - hmpps-common-vars
+          <<: *slack-fail-post-step
+      - e2e_environment_test:
+          name: e2e_test_preprod
+          environment: preprod
+          e2e-tags: "@smoke"
+          filters:
+            branches:
+              only:
+                - main
+          requires:
+            - deploy_preprod
+          context:
+            - hmpps-common-vars
+          <<: *slack-fail-post-step
+  
+      - request-prod-approval:
+          type: approval 
+          requires:
+            - deploy_preprod
+            - e2e_test_preprod
+      - hmpps/deploy_env:
+          name: deploy_prod
+          env: prod
+          slack_notification: true
+          slack_channel_name: << pipeline.parameters.releases-slack-channel >>
+          context:
+            - hmpps-common-vars
+            - make-recall-decision-ui-prod
+          requires:
+            - request-prod-approval
+          <<: *slack-fail-post-step
+      - hmpps/sentry_release_and_deploy:
+          name: notify_sentry_prod
+          sentry_project: make-recall-decision-ui
+          sentry_environment: PROD
+          sentry_create_release: true
+          requires:
+            - deploy_prod
+          context:
+            - hmpps-common-vars
+          <<: *slack-fail-post-step
+
+  e2e-check-local:
+    when: << pipeline.parameters.e2e-check-local >>
+    jobs:
+      - e2e_local_test:
+          name: e2e_local_test
+          context:
+            - hmpps-common-vars
+          <<: *slack-fail-post-step
+
+  e2e-check-dev:
+    when: << pipeline.parameters.e2e-check-dev >>
+    jobs:
+      - e2e_environment_test:
+          name: e2e_test_dev
+          environment: dev
+          e2e-tags: "@E2E"
+          context:
+            - hmpps-common-vars
+          <<: *slack-fail-post-step
+
+  e2e-check-preprod:
+    when: << pipeline.parameters.e2e-check-preprod >>
+    jobs:
+      - e2e_environment_test:
+          name: e2e_test_preprod
+          environment: preprod
+          e2e-tags: "@smoke"
+          context:
+            - hmpps-common-vars
+          <<: *slack-fail-post-step
+
+# Disabling it as this is also triggered from CircleCI Scheduler UI
+#  e2e-check-dev-daily:
+#    triggers:
+#      - schedule:
+#          cron: "00 20 * * 1-5"
+#          filters:
+#            branches:
+#              only:
+#                - main
+#    jobs:
+#      - e2e_environment_test:
+#          name: e2e_test_dev
+#          environment: dev
+#          context:
+#            - hmpps-common-vars
+#          <<: *slack-fail-post-step
+
+  security:
+    triggers:
+      - schedule:
+          cron: "24 4 * * 1-5"
+          filters:
+            branches:
+              only:
+                - main
+    jobs:
+      - check_outdated:
+          context:
+            - hmpps-common-vars
+      - hmpps/npm_security_audit:
+          slack_channel: << pipeline.parameters.alerts-slack-channel >>
+          context:
+            - hmpps-common-vars
+      - hmpps/trivy_latest_scan:
+          slack_channel: << pipeline.parameters.alerts-slack-channel >>
+          context:
+            - hmpps-common-vars
+      - hmpps/veracode_pipeline_scan:
+          slack_channel: << pipeline.parameters.alerts-slack-channel >>
+          context:
+            - veracode-credentials
+            - hmpps-common-vars
+
+  security-weekly:
+    triggers:
+      - schedule:
+          cron: "48 4 * * 1"
+          filters:
+            branches:
+              only:
+                - main
+    jobs:
+      - hmpps/veracode_policy_scan:
+          slack_channel: << pipeline.parameters.alerts-slack-channel >>
+          context:
+            - veracode-credentials
+            - hmpps-common-vars

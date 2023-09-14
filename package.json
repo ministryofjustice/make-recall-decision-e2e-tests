@@ -1,0 +1,227 @@
+{
+  "name": "make-recall-decision-e2e-tests",
+  "version": "1.0.0",
+  "description": "E2E Tests for Make Recall Decision",
+  "author": "",
+  "license": "ISC",
+  "scripts": {
+    "prepare": "husky install",
+    "copy-views": "cp -R server/views dist/server/",
+    "compile-sass": "sass --quiet-deps --no-source-map --load-path=node_modules/govuk-frontend --load-path=node_modules/@ministryofjustice/frontend --load-path=. ./assets/sass/application.sass:./assets/stylesheets/application.css ./assets/sass/application-ie8.sass:./assets/stylesheets/application-ie8.css --style compressed",
+    "watch-ts": "tsc -w",
+    "watch-views": "nodemon --watch server/views -e html,njk -x npm run copy-views",
+    "watch-node": "DEBUG=gov-starter-server* nodemon --watch dist/ --inspect=0.0.0.0 dist/server.js | bunyan -o short",
+    "watch-sass": "npm run compile-sass -- --watch",
+    "build": "npm run compile-sass && tsc && npm run copy-views",
+    "start": "node $NODE_OPTIONS dist/server.js | bunyan -o short",
+    "start:dev": "export $(cat .env) && npm run build && concurrently -k -p \"[{name}]\" -n \"Views,TypeScript,Node,Sass\" -c \"yellow.bold,cyan.bold,green.bold,blue.bold\" \"npm run watch-views\" \"npm run watch-ts\" \"npm run watch-node\" \"npm run watch-sass\"",
+    "start-feature": "export $(cat feature.env) && node $NODE_DEBUG_OPTION dist/server.js",
+    "start:e2e": "export $(cat e2e.env) && export NOTIFICATION_HEADER='Scheduled Maintenance' && export NOTIFICATION_BODY='This application will be unavailable between 12.00pm and 2.00pm on September 18th 2023, please save your work ahead of time.' && npm run build && concurrently -k -p \"[{name}]\" -n \"Views,TypeScript,Node,Sass\" -c \"yellow.bold,cyan.bold,green.bold,blue.bold\" \"npm run watch-views\" \"npm run watch-ts\" \"npm run watch-node\" \"npm run watch-sass\"",
+    "watch-node-feature": "export $(cat feature.env) && nodemon --watch dist/ --inspect=0.0.0.0 $NODE_DEBUG_OPTION dist/server.js | bunyan -o short",
+    "start-feature:dev": "export $(cat feature.env) && npm run build && concurrently -k -p \"[{name}]\" -n \"Views,TypeScript,Node,Sass\" -c \"yellow.bold,cyan.bold,green.bold,blue.bold\" \"npm run watch-views\" \"npm run watch-ts\" \"npm run watch-node-feature\" \"npm run watch-sass\"",
+    "record-build-info": "node ./bin/record-build-info",
+    "lint": "eslint . --cache --max-warnings 0",
+    "lint:fix": "eslint . --cache --max-warnings 0 --fix",
+    "swagger-to-ts": "node ./scripts/swagger-to-ts.js",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p integration_tests && tsc --noEmit -p e2e_tests",
+    "test": "jest --forceExit",
+    "test:coverage": "jest --coverage --runInBand",
+    "security_audit": "npx audit-ci --config audit-ci.json",
+    "int-test": "cypress run --browser chrome --config-file integration_tests/cypress.config.ts",
+    "int-test-ui": "cypress open --config-file integration_tests/cypress.config.ts",
+    "e2e": "export $(cat .env) && npx cypress run --config-file e2e_tests/cypress.config.ts",
+    "e2e-ui": "export $(cat .env) && npx cypress open --config-file e2e_tests/cypress.config.ts",
+    "e2e:report": "node e2e_tests/cucumber-report.js",
+    "accessibility-test": "cypress run --browser chrome --config specPattern=integration_tests/accessibility/*.spec.ts --config-file integration_tests/cypress.config.ts",
+    "accessibility-test-ui": "cypress open --config specPattern=integration_tests/accessibility/*.spec.ts --config-file integration_tests/cypress.config.ts",
+    "clean": "rm -rf dist build node_modules stylesheets"
+  },
+  "engines": {
+    "node": "^18",
+    "npm": "^8"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "transform": {
+      "^.+\\.tsx?$": [
+        "ts-jest",
+        {
+          "isolatedModules": true
+        }
+      ]
+    },
+    "collectCoverageFrom": [
+      "server/**/*.{ts,js,jsx,mjs}"
+    ],
+    "coveragePathIgnorePatterns": [
+      "@types"
+    ],
+    "coverageReporters": [
+      "text",
+      "html"
+    ],
+    "testMatch": [
+      "<rootDir>/(server|job)/**/?(*.)(spec|test).{ts,js,jsx,mjs}"
+    ],
+    "testEnvironment": "node",
+    "reporters": [
+      "default",
+      [
+        "jest-junit",
+        {
+          "outputDirectory": "test_results/jest/"
+        }
+      ]
+    ],
+    "moduleFileExtensions": [
+      "web.js",
+      "js",
+      "json",
+      "node",
+      "ts"
+    ],
+    "resetMocks": true
+  },
+  "nodemonConfig": {
+    "ignore": [
+      ".circleci/*",
+      "migrations/*",
+      "node_modules/*",
+      "test/*",
+      "integration_tests/*",
+      "e2e_tests/*"
+    ],
+    "delay": 2500,
+    "ext": "js,json,html,njk"
+  },
+  "lint-staged": {
+    "*.{ts,js,css}": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.json": [
+      "prettier --write"
+    ]
+  },
+  "cypress-cucumber-preprocessor": {
+    "stepDefinitions": "e2e_tests/stepDefinitions/*.ts",
+    "nonGlobalStepDefinitions": false,
+    "json": {
+      "enabled": false
+    }
+  },
+  "dependencies": {
+    "@aws-sdk/client-sqs": "^3.363.0",
+    "@ministryofjustice/frontend": "^1.6.4",
+    "@sentry/node": "^7.29.0",
+    "@sentry/tracing": "^7.29.0",
+    "@types/express-serve-static-core": "^4.17.33",
+    "@types/qs": "^6.9.7",
+    "agentkeepalive": "^4.2.1",
+    "applicationinsights": "^2.3.6",
+    "body-parser": "^1.20.1",
+    "bunyan": "^1.8.15",
+    "bunyan-format": "^0.2.1",
+    "compression": "^1.7.4",
+    "connect-flash": "^0.1.1",
+    "connect-redis": "^6.1.3",
+    "cookie-parser": "^1.4.6",
+    "cookie-session": "^2.0.0",
+    "csurf": "^1.11.0",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-prom-bundle": "^6.6.0",
+    "express-session": "^1.17.3",
+    "google-libphonenumber": "^3.2.31",
+    "govuk-frontend": "^4.5.0",
+    "helmet": "^6.0.1",
+    "http-errors": "^2.0.0",
+    "jquery": "^3.6.3",
+    "jwt-decode": "^3.1.2",
+    "luxon": "^3.2.1",
+    "mammoth": "^1.5.1",
+    "nocache": "^3.0.4",
+    "nunjucks": "^3.2.3",
+    "passport": "^0.6.0",
+    "passport-oauth2": "^1.6.1",
+    "prom-client": "^14.1.1",
+    "redis": "^4.6.4",
+    "striptags": "3.2.0",
+    "superagent": "^8.0.8",
+    "ts-loader": "^9.4.2",
+    "url-value-parser": "^2.2.0",
+    "uuid": "^9.0.0",
+    "web-vitals": "^3.1.0"
+  },
+  "devDependencies": {
+    "@alfonso-presa/soft-assert": "^0.6.0",
+    "@aws-sdk/types": "^3.226.0",
+    "@badeball/cypress-cucumber-preprocessor": "^15.1.0",
+    "@bahmutov/cypress-esbuild-preprocessor": "^2.1.5",
+    "@faker-js/faker": "^7.6.0",
+    "@types/bunyan": "^1.8.8",
+    "@types/bunyan-format": "^0.2.5",
+    "@types/compression": "^1.7.2",
+    "@types/connect-flash": "0.0.37",
+    "@types/connect-redis": "^0.0.20",
+    "@types/cookie-parser": "^1.4.3",
+    "@types/cookie-session": "^2.0.44",
+    "@types/csurf": "^1.11.2",
+    "@types/cypress-cucumber-preprocessor": "^4.0.1",
+    "@types/express": "^4.17.15",
+    "@types/express-session": "^1.17.5",
+    "@types/google-libphonenumber": "^7.4.23",
+    "@types/http-errors": "^2.0.1",
+    "@types/jest": "^29.2.5",
+    "@types/jsonwebtoken": "^9.0.0",
+    "@types/luxon": "^3.2.0",
+    "@types/node": "^18.11.18",
+    "@types/nunjucks": "^3.2.1",
+    "@types/passport": "^1.0.11",
+    "@types/passport-oauth2": "^1.4.11",
+    "@types/redis": "^4.0.11",
+    "@types/superagent": "^4.1.16",
+    "@types/supertest": "^2.0.12",
+    "@types/uuid": "^9.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.48.1",
+    "@typescript-eslint/parser": "^5.48.1",
+    "audit-ci": "^6.6.0",
+    "axe-core": "4.7.2",
+    "concurrently": "^7.6.0",
+    "cypress": "^12.3.0",
+    "cypress-axe": "^1.3.0",
+    "cypress-multi-reporters": "^1.6.2",
+    "cypress-terminal-report": "^5.2.0",
+    "eslint": "^8.31.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-import-resolver-typescript": "^3.5.2",
+    "eslint-plugin-cypress": "^2.12.1",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-no-only-tests": "^3.1.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "husky": "^8.0.3",
+    "jest": "^29.3.1",
+    "jest-html-reporter": "^3.7.0",
+    "jest-junit": "^15.0.0",
+    "jsonwebtoken": "^9.0.0",
+    "lint-staged": "^13.1.0",
+    "mocha-junit-reporter": "^2.2.0",
+    "multiple-cucumber-html-reporter": "^3.0.2",
+    "nock": "^13.2.9",
+    "nodemon": "^2.0.20",
+    "openapi-typescript-codegen": "^0.25.0",
+    "pdf-parse": "^1.1.1",
+    "prettier": "^2.8.2",
+    "sass": "^1.57.1",
+    "supertest": "^6.3.3",
+    "ts-jest": "^29.0.3",
+    "typescript": "^4.9.5",
+    "wait-for-expect": "^3.0.2",
+    "xml2js": "^0.6.0"
+  },
+  "overrides": {
+    "minimatch": "3.1.2",
+    "json5": "2.2.3"
+  }
+}

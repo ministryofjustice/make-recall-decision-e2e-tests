@@ -1,0 +1,53 @@
+{% set html %}
+    {% if caseSummary.risk.riskManagementPlan.assessmentStatusComplete === false %}
+        {% include '../notificationBanners/contingencyIncompleteAssessment.njk' %}
+    {% endif %}
+    <div class="govuk-!-margin-bottom-2 text-secondary">
+        OASys 11.9 Contingency plan
+    </div>
+    {% if caseSummary.risk.riskManagementPlan.error or not caseSummary.risk.riskManagementPlan.contingencyPlans %}
+        {% set html %}
+            <p class="govuk-notification-banner__heading">
+                {% if caseSummary.risk.riskManagementPlan.error %}
+                This information cannot be found in OASys. Double-check OASys for the latest contingency plan.
+                {% else %}
+                This information cannot be found in OASys. Double-check OASys.
+                {% endif %}
+            </p>
+        {% endset %}
+        {{ govukNotificationBanner({
+            html: html,
+            attributes: {
+                'data-qa': 'contingency-plan-error'
+            },
+            classes: "govuk-notification-banner--error govuk-!-margin-bottom-0",
+            titleId: "contingency-plan-error-title"
+        }) }}
+    {% else %}
+        <div class="govuk-!-padding-bottom-4 govuk-!-margin-bottom-4 govuk-section-break--visible text-secondary">
+        {% if caseSummary.risk.riskManagementPlan.assessmentStatusComplete === true %}
+            Last updated: {{ formatDateTimeFromIsoString({ isoDate: caseSummary.risk.riskManagementPlan.lastUpdatedDate, dateOnly: true }) }}
+        {% else %}
+            Started on: {{ formatDateTimeFromIsoString({ isoDate: caseSummary.risk.riskManagementPlan.initiationDate, dateOnly: true }) }}
+        {% endif %}
+        </div>
+        {% set contentHtml %}
+            <pre class='govuk-body'>{{ caseSummary.risk.riskManagementPlan.contingencyPlans }}</pre>
+        {% endset %}
+        {{ govukDetails({
+            summaryHtml: "View more detail<span class='govuk-visually-hidden'> on contingency plan</span>",
+            html: contentHtml,
+            open: false
+        }) }}
+    {% endif %}
+{% endset %}
+
+{{ appSummaryCard({
+    titleText: 'Contingency plan',
+    classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
+    attributes: {
+        'data-qa': 'contingency-plan',
+        'data-analytics-event-scroll': 'Contingency plan'
+    },
+    html: html
+}) }}

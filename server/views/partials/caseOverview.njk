@@ -1,0 +1,16 @@
+<h1 class='govuk-heading-m govuk-visually-hidden'>Overview<span
+            class='govuk-visually-hidden'> for {{ caseSummary.personalDetailsOverview.name }}</span></h1>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        {% include './notificationBanners/convictionsLicencesBanner.njk' %}
+        {% include './notificationBanners/oasysLastUpdatedBanner.njk' %}
+
+        {% include './overview/licence.njk' %}
+        {% include './overview/offence-sentence.njk' %}
+        {% include './overview/offence-description.njk' %}
+        {% include './overview/contingency-plan.njk' %}
+    </div>
+    <div class="govuk-grid-column-one-third-from-desktop" data-qa='riskFlags'>
+        {{ riskFlagWidget(caseSummary.risk.flags) }}
+    </div>
+</div>

@@ -1,0 +1,59 @@
+{% extends "../../partials/layout.njk" %}
+
+{% set pageTitle = makePageTitle({ pageHeading: pageTitles[page.id], hasErrors: errors }) %}
+
+{% block beforeContent %}
+    {{ backLink() }}
+{% endblock %}
+
+{% block content %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds-from-desktop">
+            {% include '../../partials/error-summary.njk' %}
+            <h1 class='govuk-heading-l'>{{ pageTitles[page.id] }}</h1>
+            <p class='govuk-body govuk-!-margin-bottom-6'>
+                Tell the probation practitioner your decision. They can then complete the Part A or decision not to recall letter.
+            </p>
+            <p class='govuk-body'>Check you have considered:</p>
+            <ul class='govuk-list govuk-list--bullet'>
+                <li>the immediate risk</li>
+                <li>who is vulnerable</li>
+                <li>the person on probation’s current circumstances</li>
+                <li>alternatives to recall</li>
+                <li>protective factors</li>
+            </ul>
+            <form novalidate method="post">
+                <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+                <input type="hidden" name="crn" value="{{ recommendation.crn }}" />
+
+                {{ govukTextarea({
+                    name: "recallTypeManagerDetail",
+                    id: "recallTypeManagerDetail",
+                    label: {
+                        text: "Explain your decision",
+                        classes: 'govuk-label--s'
+                    },
+                    value: inputDisplayValues.detail,
+                    errorMessage: errorMessage(errors.recallTypeManagerDetail)
+                }) }}
+                {{ govukRadios({
+                    idPrefix: "recallTypeManager",
+                    name: "recallTypeManager",
+                    fieldset: {
+                        legend: {
+                            text: 'Select a recall decision',
+                            classes: "govuk-visually-hidden"
+                        }
+                    },
+                    items: radioCheckboxItems({
+                        items: formOptions.recallTypeManager,
+                        currentValues: inputDisplayValues.value
+                    }),
+                    errorMessage: errorMessage(errors.recallTypeManager)
+                }) }}
+                {{ formSubmitButton() }}
+            </form>
+        </div>
+    </div>
+{% endblock %}
+

@@ -1,0 +1,99 @@
+<h1 class='govuk-heading-m govuk-visually-hidden'>Vulnerabilities<span
+            class='govuk-visually-hidden'> for {{ caseSummary.personalDetailsOverview.name }}</span></h1>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        {% include './notificationBanners/vulnerabilities.njk' %}
+        {% if caseSummary.vulnerabilities.error %}
+            {% include './notificationBanners/vulnerabilitiesError.njk' %}
+        {% endif %}
+        {% if not caseSummary.vulnerabilities.error %}
+            {% set vulnerability = caseSummary.vulnerabilities.vulnerability %}
+            {% set vulnerabilityHtml %}
+                <h3 class='govuk-heading-s govuk-!-margin-bottom-2'>Current circumstances, issues and needs</h3>
+                <p class='govuk-body'>Current concerns: {{ roshYesNoLabel(vulnerability.current or vulnerability.risk) }}</p>
+                {% if vulnerability.currentConcernsText %}
+                    <pre class='govuk-body govuk-!-margin-top-2'>{{ vulnerability.currentConcernsText }}</pre>
+                {% endif %}
+                <h3 class='govuk-heading-s govuk-!-margin-top-3 govuk-!-margin-bottom-2'>Past circumstances, issues
+                    and needs</h3>
+                <p class='govuk-body'>Previous concerns: {{ roshYesNoLabel(vulnerability.previous or vulnerability.risk) }}</p>
+                {% if vulnerability.previousConcernsText %}
+                    <pre class='govuk-body govuk-!-margin-top-2'>{{ vulnerability.previousConcernsText }}</pre>
+                {% endif %}
+            {% endset %}
+            {{ oasysCard({
+                cardHeading: 'Concerns about vulnerability',
+                oasysHeading: 'OASys R8.3 Vulnerability',
+                error: caseSummary.vulnerabilities.error,
+                notifications: notifications,
+                content: { html: vulnerabilityHtml },
+                lastUpdated: caseSummary.vulnerabilities.lastUpdatedDate,
+                attributes: {
+                    'data-analytics-event-category': caseSummary.vulnerabilities.lastUpdatedDate,
+                    'data-analytics-event-label': 'Concerns about vulnerability'
+                },
+                dataQaAttr: 'concernsAboutVulnerability'
+            }) }}
+            {% set suicide = caseSummary.vulnerabilities.suicide %}
+            {% set selfHarm = caseSummary.vulnerabilities.selfHarm %}
+            {% set suicideSelfHarmHtml %}
+                <h3 class='govuk-heading-s govuk-!-margin-bottom-2'>Current circumstances, issues and needs</h3>
+                <p class='govuk-body'>Current concerns (suicide): {{ roshYesNoLabel(suicide.current or suicide.risk) }}</p>
+                <p class='govuk-body'>Current concerns (self-harm): {{ roshYesNoLabel(selfHarm.current or selfHarm.risk) }}</p>
+                {% if suicide.currentConcernsText or selfHarm.currentConcernsText %}
+                    <pre class='govuk-body govuk-!-margin-top-2'>{{ suicide.currentConcernsText or selfHarm.currentConcernsText }}</pre>
+                {% endif %}
+                <h3 class='govuk-heading-s govuk-!-margin-top-3 govuk-!-margin-bottom-2'>Past circumstances, issues
+                    and needs</h3>
+                <p class='govuk-body'>Previous concerns (suicide): {{ roshYesNoLabel(suicide.previous or suicide.risk) }}</p>
+                <p class='govuk-body'>Previous concerns (self-harm): {{ roshYesNoLabel(selfHarm.previous or selfHarm.risk) }}</p>
+                {% if suicide.previousConcernsText or selfHarm.previousConcernsText %}
+                    <pre class='govuk-body govuk-!-margin-top-2'>{{ suicide.previousConcernsText or selfHarm.previousConcernsText }}</pre>
+                {% endif %}
+            {% endset %}
+            {{ oasysCard({
+                cardHeading: 'Suicide and/or self-harm',
+                oasysHeading: 'OASys R8.1 Suicide and/or self-harm',
+                error: caseSummary.vulnerabilities.error,
+                notifications: notifications,
+                content: { html: suicideSelfHarmHtml },
+                lastUpdated: caseSummary.vulnerabilities.lastUpdatedDate,
+                attributes: {
+                    'data-analytics-event-category': caseSummary.vulnerabilities.lastUpdatedDate,
+                    'data-analytics-event-label': 'Suicide and/or self-harm'
+                },
+                dataQaAttr: 'suicideSelfHarm'
+            }) }}
+            {% set custody = caseSummary.vulnerabilities.custody %}
+            {% set hostelSetting = caseSummary.vulnerabilities.hostelSetting %}
+            {% set copingHtml %}
+                <h3 class='govuk-heading-s govuk-!-margin-bottom-2'>Current circumstances, issues and needs</h3>
+                <p class='govuk-body'>Current concerns (custody): {{ roshYesNoLabel(custody.current or custody.risk) }}</p>
+                <p class='govuk-body'>Current concerns (hostel): {{ roshYesNoLabel(hostelSetting.current or hostelSetting.risk) }}</p>
+                {% if custody.currentConcernsText or hostelSetting.currentConcernsText %}
+                    <pre class='govuk-body govuk-!-margin-top-2'>{{ custody.currentConcernsText or hostelSetting.currentConcernsText }}</pre>
+                {% endif %}
+                <h3 class='govuk-heading-s govuk-!-margin-top-3 govuk-!-margin-bottom-2'>Past circumstances, issues
+                    and needs</h3>
+                <p class='govuk-body'>Previous concerns (custody): {{ roshYesNoLabel(custody.previous or custody.risk) }}</p>
+                <p class='govuk-body'>Previous concerns (hostel): {{ roshYesNoLabel(hostelSetting.previous or hostelSetting.risk) }}</p>
+                {% if custody.previousConcernsText or hostelSetting.previousConcernsText %}
+                    <pre class='govuk-body govuk-!-margin-top-2'>{{ custody.previousConcernsText or hostelSetting.previousConcernsText }}</pre>
+                {% endif %}
+            {% endset %}
+            {{ oasysCard({
+                cardHeading: 'Coping in custody or a hostel',
+                oasysHeading: 'OASys R8.2 Coping in custody or a hostel',
+                error: caseSummary.vulnerabilities.error,
+                notifications: notifications,
+                content: { html: copingHtml },
+                lastUpdated: caseSummary.vulnerabilities.lastUpdatedDate,
+                attributes: {
+                    'data-analytics-event-category': caseSummary.vulnerabilities.lastUpdatedDate,
+                    'data-analytics-event-label': 'Coping in custody or a hostel'
+                },
+                dataQaAttr: 'copingCustodyHostel'
+            }) }}
+        {% endif %}
+    </div>
+</div>

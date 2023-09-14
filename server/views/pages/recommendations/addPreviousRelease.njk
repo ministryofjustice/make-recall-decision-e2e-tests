@@ -1,0 +1,36 @@
+{% extends "../../partials/layout.njk" %}
+
+{% set pageTitle = makePageTitle({ pageHeading: pageTitles[page.id], hasErrors: errors }) %}
+
+{% block beforeContent %}
+    {{ backLink() }}
+{% endblock %}
+
+{% block content %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds-from-desktop">
+            {% include '../../partials/error-summary.njk' %}
+            <form novalidate method="post">
+                <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+                {% if recommendation.previousReleases.previousReleaseDates.length %}
+                <input type="hidden" name="previousReleaseDates" value="{% for date in recommendation.previousReleases.previousReleaseDates %}{{ date }}|{% endfor %}" />
+                {% endif %}
+                <h1 class='govuk-heading-l'>{{ pageHeadings[page.id] }}</h1>
+                {{ govukDateInput({
+                    id: "previousReleaseDate",
+                    namePrefix: "previousReleaseDate",
+                    fieldset: {
+                        legend: {
+                            html: "Previous release date",
+                            classes: "govuk-fieldset__legend--s"
+                        }
+                    },
+                    items: dateTimeItems("previousReleaseDate", inputDisplayValues.value),
+                    errorMessage: errorMessage(errors.previousReleaseDate)
+                }) }}
+                {{ formSubmitButton() }}
+            </form>
+        </div>
+    </div>
+{% endblock %}
+

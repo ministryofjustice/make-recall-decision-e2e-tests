@@ -1,0 +1,16 @@
+<li>
+    <h2 class="moj-task-list__section" id='heading-recommendation'>
+        Make your recommendation
+    </h2>
+    <ul class="moj-task-list__items">
+        <li class="moj-task-list__item">
+            <span class="moj-task-list__task-name">
+                <a aria-describedby='task-list-status-recallType'
+                href="{{ changeLinkUrl({ pageUrlSlug: 'recall-type-indeterminate' if recommendation.isIndeterminateSentence or recommendation.isExtendedSentence else 'recall-type',
+                urlInfo: urlInfo, fromAnchor: 'heading-recommendation' }) }}">What you recommend</a>
+            </span>
+            <span id='task-list-status-recallType'>{{ taskStatus({ hasData: hasData(recommendation.recallType.selected) }) }}</span>
+        </li>
+    </ul>
+
+</li>

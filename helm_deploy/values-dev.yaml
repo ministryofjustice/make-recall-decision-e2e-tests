@@ -1,0 +1,27 @@
+---
+# Per environment values which override defaults in make-recall-decision-ui/values.yaml
+
+generic-service:
+  replicaCount: 2
+
+  ingress:
+    host: consider-a-recall-dev.hmpps.service.justice.gov.uk
+    contextColour: green
+
+  env:
+    INGRESS_URL: "https://consider-a-recall-dev.hmpps.service.justice.gov.uk"
+    HMPPS_AUTH_URL: "https://sign-in-dev.hmpps.service.justice.gov.uk/auth"
+    TOKEN_VERIFICATION_API_URL: "https://token-verification-api-dev.prison.service.justice.gov.uk"
+    MAKE_RECALL_DECISION_API_URL: "https://make-recall-decision-api-dev.hmpps.service.justice.gov.uk"
+    MAKE_RECALL_DECISIONS_AND_DELIUS_API_URL: "https://make-recall-decisions-and-delius-dev.hmpps.service.justice.gov.uk"
+    SENTRY_ENVIRONMENT: "DEV"
+    ENVIRONMENT: "DEVELOPMENT"
+    FEATURE_FLAG_QUERY_PARAMETERS_ENABLED: true
+
+  scheduledDowntime:
+    enabled: true
+
+generic-prometheus-alerts:
+  businessHoursOnly: true
+  alertSeverity: make-recall-decision-nonprod
+
