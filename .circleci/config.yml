@@ -13,7 +13,7 @@ parameters:
     default: make-recall-decisions-pipeline
   e2e-parallelism:
     type: integer
-    default: 3
+    default: 6
 
 slack-fail-post-step: &slack-fail-post-step
   post-steps:
@@ -115,7 +115,6 @@ jobs:
           working_directory: make-recall-decision-e2e-tests
           command: |
             npm ci --no-audit
-            echo PWD:: $PWD
             shopt -s globstar
             
             SPECS=$(circleci tests glob "e2e_tests/features/**/*.feature" | circleci tests split --split-by=timings --show-counts)
