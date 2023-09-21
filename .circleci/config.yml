@@ -146,16 +146,16 @@ jobs:
           working_directory: make-recall-decision-ui
           command: docker-compose logs
       - store_artifacts:
-          path: make-recall-decision-ui/e2e_tests/screenshots
+          path: make-recall-decision-e2e-tests/e2e_tests/screenshots
           destination: screenshots
       - store_artifacts:
-          path: make-recall-decision-ui/e2e_tests/reports
+          path: make-recall-decision-e2e-tests/e2e_tests/reports
           destination: reports
       - store_artifacts:
-          path: make-recall-decision-ui/e2e_tests/junit
+          path: make-recall-decision-e2e-tests/e2e_tests/junit
           destination: junit
       - store_test_results:
-          path: make-recall-decision-ui/e2e_tests/junit
+          path: make-recall-decision-e2e-tests/e2e_tests/junit
 
 # E2E tests using the dev and pre-prod environments have been commented out.
 # They were actingas a 'gate' to prevent a broken production deployment, this has been superceded by a 'manual' gate step.
