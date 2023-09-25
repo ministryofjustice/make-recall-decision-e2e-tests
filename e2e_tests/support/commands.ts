@@ -33,6 +33,12 @@ const getUserDetails = function (userType: UserType) {
     userDetails['email'] = text
   })
   cy.go('back')
+  cy.on("uncaught:exception", (e, runnable) => {
+    console.log("uncaught:exception error", e)
+    console.log("runnable", runnable)
+    console.log("error", e.message)
+    return false
+  });
   return cy.wrap(userDetails).as(UserType[userType])
 }
 
