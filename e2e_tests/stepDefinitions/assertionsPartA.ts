@@ -509,6 +509,7 @@ export const q27SPOEndorsement = function (contents: string, details: Record<str
 export const q28ACOAuthorisation = function (contents: string, details: Record<string, string>) {
   // eslint-disable-next-line no-param-reassign
   contents = contents.substring(contents.indexOf(partASections[28]), contents.indexOf(partASections[29]))
+  cy.log(`Q28: ${JSON.stringify(details)} ${contents}`)
   expectSoftly(contents, 'ACO Name').to.contain(`Name of person completing this form: ${this.ACO ? this.ACO.name : ''}`)
   expectSoftly(contents, 'ACO Email').to.contain(`${this.ACO ? this.ACO.email : ''}`)
   expectSoftly(contents, 'ACO Telephone').to.contain(`Telephone Number: ${details.telephone ? details.telephone : ''}`)
