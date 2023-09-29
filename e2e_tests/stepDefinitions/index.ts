@@ -164,6 +164,10 @@ Then('PO/SPO/ACO can download Part A', function () {
   cy.downloadDocX('Download the Part A').as('partAContent')
 })
 
+Then('PO/SPO/ACO can download preview of Part A', function () {
+  cy.downloadDocX('Download preview of Part A').as('partAContent')
+})
+
 Then('Part A details are correct', function () {
   cy.log(`this.testData--> ${JSON.stringify(this.testData)}`)
   const contents = this.partAContent.toString()
