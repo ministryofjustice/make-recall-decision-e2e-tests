@@ -142,9 +142,13 @@ export const q4OffenderDetails = function (contents: string, context: Record<str
 export const q5SentenceDetails = function (contents: string, context: Record<string, string>) {
   // eslint-disable-next-line no-param-reassign
   contents = contents.substring(contents.indexOf(partASections[5]), contents.indexOf(partASections[6]))
+  cy.log(`q5: ${JSON.stringify(context)} ${contents}`)
   expectSoftly(contents, 'Sentence Details-Index offence').to.contain(
     `Index offence of current sentence which has led to the offender’s recall: ${context.indexOffenceDescription}`
   )
+  cy.log(`q5 from api-- ${apiDataForCrn.dateOfOriginalOffence}`)
+  cy.log(`q5 from context---- ${context.dateOfOriginalOffence}`)
+
   expectSoftly(contents, 'Sentence Details-Dates of Original Offence').to.match(
     context.dateOfOriginalOffence
       ? new RegExp(
@@ -505,6 +509,7 @@ export const q27SPOEndorsement = function (contents: string, details: Record<str
 export const q28ACOAuthorisation = function (contents: string, details: Record<string, string>) {
   // eslint-disable-next-line no-param-reassign
   contents = contents.substring(contents.indexOf(partASections[28]), contents.indexOf(partASections[29]))
+  cy.log(`Q28: ${JSON.stringify(details)} ${contents}`)
   expectSoftly(contents, 'ACO Name').to.contain(`Name of person completing this form: ${this.ACO ? this.ACO.name : ''}`)
   expectSoftly(contents, 'ACO Email').to.contain(`${this.ACO ? this.ACO.email : ''}`)
   expectSoftly(contents, 'ACO Telephone').to.contain(`Telephone Number: ${details.telephone ? details.telephone : ''}`)

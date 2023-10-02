@@ -544,6 +544,29 @@ const validateLastCompletedDocumentTabDetails = function (letterType: string) {
   })
 }
 
+const updateContactInformation = function (question: string) {
+  if (question === 'Who completed this Part A?') {
+    cy.clickLink(currentPage)
+    cy.logPageTitle(currentPage)
+    cy.get(`#name`).type(faker.name.fullName())
+    cy.get(`#email`).type(faker.internet.email())
+    cy.selectRadio('Is this person the probation practitioner', 'No')
+    cy.clickButton('Continue')
+    currentPage = `Practitioner for ${this.offenderName}`
+    cy.logPageTitle(`${currentPage}?`)
+    cy.get(`#name`).type(faker.name.fullName())
+    cy.get(`#email`).type(faker.internet.email())
+    cy.clickButton('Continue')
+  } else {
+    cy.clickLink(currentPage)
+    cy.logPageTitle(currentPage)
+    cy.get(`#email_0`).type(faker.internet.email())
+    cy.clickButton('Add another email')
+    cy.get(`#email_1`).type(faker.internet.email())
+    cy.clickButton('Continue')
+  }
+}
+
 /* ---- Cucumber glue ---- */
 
 Given('a PO has created a recommendation to/of recall/no-recall with:', (dataTable: DataTable) => {
@@ -724,27 +747,26 @@ Then('Decision Not To Recall letter details are correct', function () {
 
 When('PO has updated {string} under Contact Information section', function (question: string) {
   currentPage = question
-  if (question === 'Who completed this Part A?') {
-    cy.clickLink(currentPage)
-    cy.logPageTitle(currentPage)
-    cy.get(`#name`).type(faker.name.fullName())
-    cy.get(`#email`).type(faker.internet.email())
-    cy.selectRadio('Is this person the probation practitioner', 'No')
-    cy.clickButton('Continue')
-    currentPage = `Practitioner for ${this.offenderName}`
-    cy.logPageTitle(`${currentPage}?`)
-    cy.get(`#name`).type(faker.name.fullName())
-    cy.get(`#email`).type(faker.internet.email())
-    cy.clickButton('Continue')
-  } else {
-    cy.clickLink(currentPage)
-    cy.logPageTitle(currentPage)
-    cy.get(`#email_0`).type(faker.internet.email())
-    cy.clickButton('Add another email')
-    cy.get(`#email_1`).type(faker.internet.email())
-    cy.clickButton('Continue')
-  }
+  updateContactInformation(currentPage)
 })
+
+When('PO has updated the Contact Information section', function () {
+  currentPage = 'Who completed this Part A?'
+  updateContactInformation(currentPage)
+  currentPage = 'Where should the revocation order be sent?'
+  updateContactInformation(currentPage)
+  currentPage = 'Where should the PPCS respond with questions?'
+  updateContactInformation(currentPage)
+})
+
 Given('the probation admin flag is turned on', function () {
-  cy.url().then(urValue => cy.visit(`${urValue}?flagProbationAdmin=1`))
+  cy.url().then(urValue => cy.visit(`${urValue.replace(/\#.*/,'')}?flagProbationAdmin=1`))
 })
+When('PO selects Preview Part A option', function () {
+  cy.contains('Preview Part A').click()
+  cy.logPageTitle('Preview Part A')
+
+})
+When('PO downloads Part A document for Preview', function () {
+  cy.clickLink('Download preview of Part A')
+});

@@ -1,4 +1,4 @@
-@smoke
+@E2E
 Feature: E2E scenarios - Recall
 
   Recall Test Scenarios where rationale is recorded in review flow before PO starts the Part A task-list,

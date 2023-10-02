@@ -164,6 +164,10 @@ Then('PO/SPO/ACO can download Part A', function () {
   cy.downloadDocX('Download the Part A').as('partAContent')
 })
 
+Then('PO/SPO/ACO can download preview of Part A', function () {
+  cy.downloadDocX('Download preview of Part A').as('partAContent')
+})
+
 Then('Part A details are correct', function () {
   cy.log(`this.testData--> ${JSON.stringify(this.testData)}`)
   const contents = this.partAContent.toString()
@@ -199,8 +203,8 @@ Then('Part A details are correct', function () {
   q24ISPESP(contents, this.testData.indeterminateOrExtendedSentenceDetails)
   if (Cypress.env('ENV')?.toString().toUpperCase() !== 'PREPROD') q25ProbationDetails(contents)
   q26OffenderManager(contents, this.testData.localPoliceDetails)
-  q27SPOEndorsement.call(this, contents, this.testData.spoCounterSignature)
-  q28ACOAuthorisation.call(this, contents, this.testData.acoCounterSignature)
+  if ((Cypress.env('ENV')?.toString().toUpperCase() === 'PREPROD' || Cypress.env('ENV')?.toString().toUpperCase() === 'DEV')) q27SPOEndorsement.call(this, contents, this.testData.spoCounterSignature)
+  if ((Cypress.env('ENV')?.toString().toUpperCase() === 'PREPROD' || Cypress.env('ENV')?.toString().toUpperCase() === 'DEV')) q28ACOAuthorisation.call(this, contents, this.testData.acoCounterSignature)
   q29Attachments(contents, this.testData.localPoliceDetails)
 })
 
