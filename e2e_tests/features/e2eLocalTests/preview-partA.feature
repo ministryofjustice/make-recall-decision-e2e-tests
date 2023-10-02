@@ -16,5 +16,5 @@ Feature: Preview Part A Document from the Task List
     When PO has updated the Contact Information section
     And PO selects Preview Part A option
     And PO downloads Part A document for Preview
-    And PO can download preview of Part A
-    Then Part A details are correct
+    Then PO can download preview of Part A
+    And Part A details are correct
