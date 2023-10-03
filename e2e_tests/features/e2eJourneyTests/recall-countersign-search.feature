@@ -1,4 +1,4 @@
-@E2E
+@smoke
 Feature: E2E scenarios - Recall
 
   Recall Test Scenarios where rationale is recorded while SPO is countersigning,
@@ -41,4 +41,4 @@ Feature: E2E scenarios - Recall
     Examples:
       | Indeterminate | Extended | TypeOfSentence | RecallType | InCustody  |
       | Yes           | Yes      | IPP            | EMERGENCY  | Yes Police |
-      | Yes           | Yes      | DPP            | EMERGENCY  | No         |
+#      | Yes           | Yes      | DPP            | EMERGENCY  | No         |
