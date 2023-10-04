@@ -492,15 +492,33 @@ export const q25ProbationDetails = (contents: string, details: Record<string, an
   )
 }
 
-export const q26OffenderManager = (contents: string, details: Record<string, string>[] | string) => {
+export const q25ProbationDetailsWithCaseAdmin = (contents: string, details: Record<string, string>) => {
+  // eslint-disable-next-line no-param-reassign
+  contents = contents.substring(contents.indexOf(partASections[25]), contents.indexOf(partASections[26]))
+  expectSoftly(contents, 'Probation-Officer-Name').to.contain(`Name of person completing the form: ${details.name}`)
+  expectSoftly(contents, 'Probation-Officer-Email').to.contain(`Email Address: ${details.email}`)
+  expectSoftly(contents, 'Probation-Officer-Telephone').to.contain(`Telephone Number: ${details.telephone}`)
+  expectSoftly(contents, 'Probation-Officer-Region').to.contain(`Region: ${details.region}`)
+  expectSoftly(contents, 'Probation-Officer-LDU').to.contain(`LDU: ${details.LDU}`)
+  expectSoftly(contents, 'Probation-Date of Decision').to.contain(`Date of decision to request revocation: ${DateTime.now().toFormat('dd/MM/y')}`)
+  expectSoftly(contents, 'Probation-Time of Decision').to.contain(`Time (24 hour) of decision to request information: ${formattedTimeIn24HrFormat()}`)
+}
+
+export const q26OffenderManager = (contents: string, details: Record<string, string>) => {
   // eslint-disable-next-line no-param-reassign
   contents = contents.substring(contents.indexOf(partASections[26]), contents.indexOf(partASections[27]))
   cy.log(`Q26: ${JSON.stringify(details)} ${contents}`)
+  expectSoftly(contents, 'Offender-Manager-Name').to.contain(`Name of OM/YOT worker: ${details.name}`)
+  expectSoftly(contents, 'Offender-Manager-Email').to.contain(`Email Address: ${details.email}`)
+  expectSoftly(contents, 'Offender-Manager-Telephone').to.contain(`Telephone Number: ${details.telephone}`)
+  expectSoftly(contents, 'Offender-Manager-Region').to.contain(`Region: ${details.region}`)
+  expectSoftly(contents, 'Offender-Manager-LDU').to.contain(`LDU: ${details.LDU}`)
 }
 
 export const q27SPOEndorsement = function (contents: string, details: Record<string, string>) {
   // eslint-disable-next-line no-param-reassign
   contents = contents.substring(contents.indexOf(partASections[27]), contents.indexOf(partASections[28]))
+  cy.log(`Q27: ${JSON.stringify(details)} ${contents}`)
   expectSoftly(contents, 'SPO Name').to.contain(`Name of person completing this form: ${this.SPO ? this.SPO.name : ''}`)
   expectSoftly(contents, 'SPO Email').to.contain(`${this.SPO ? this.SPO.email : ''}`)
   expectSoftly(contents, 'SPO Telephone').to.contain(`Telephone Number: ${details.telephone ? details.telephone : ''}`)

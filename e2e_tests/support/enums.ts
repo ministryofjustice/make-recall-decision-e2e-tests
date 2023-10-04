@@ -96,4 +96,12 @@ export enum Alternatives {
   ALTERNATIVE_TO_RECALL_OTHER = 'Other',
 }
 
+export enum Regions {
+  London = 'London',
+  Greater_Manchester = 'Greater Manchester',
+  North_East = 'North East',
+  Wales = 'Wales',
+  South_West = 'South West'
+}
+
 export const REGEXP_SPECIAL_CHAR = /[\!\#\$\%\^\&\*\)\(\+\=\.\<\>\{\}\[\]\:\;\'\"\|\~\`\_\-]/g
