@@ -27,6 +27,7 @@ import {
   ROSHLevels,
   WhyConsiderRecall,
   ApptOptions,
+  Regions,
 } from '../support/enums'
 import { formatDateToCompletedDocumentFormat } from '../utils'
 
@@ -548,14 +549,23 @@ const updateContactInformation = function (question: string) {
   if (question === 'Who completed this Part A?') {
     cy.clickLink(currentPage)
     cy.logPageTitle(currentPage)
-    cy.get(`#name`).type(faker.name.fullName())
-    cy.get(`#email`).type(faker.internet.email())
+    testData.thePersonCompletingTheForm = {} //Populates Q25 of Part A document when Probation Admin flag is set
+    cy.get(`#name`).type(testData.thePersonCompletingTheForm.name = faker.name.fullName())
+    cy.get(`#email`).type(testData.thePersonCompletingTheForm.email = faker.internet.email())
+    cy.get(`#telephone`).type(testData.thePersonCompletingTheForm.telephone = faker.phone.number('01277 ### ###'))
+    cy.get(`#region`).select(testData.thePersonCompletingTheForm.region = faker.helpers.arrayElement(Object.values(Regions)))
+    cy.get(`#localDeliveryUnit`).type(testData.thePersonCompletingTheForm.LDU = faker.address.cityName())
+
     cy.selectRadio('Is this person the probation practitioner', 'No')
     cy.clickButton('Continue')
     currentPage = `Practitioner for ${this.offenderName}`
     cy.logPageTitle(`${currentPage}?`)
-    cy.get(`#name`).type(faker.name.fullName())
-    cy.get(`#email`).type(faker.internet.email())
+    testData.offenderManager = {} //Populates Q26 of Part A document when Probation Admin flag is set
+    cy.get(`#name`).type(testData.offenderManager.name = faker.name.fullName())
+    cy.get(`#email`).type(testData.offenderManager.email = faker.internet.email())
+    cy.get(`#telephone`).type(testData.offenderManager.telephone = faker.phone.number('012## ### ###'))
+    cy.get(`#region`).select(testData.offenderManager.region = faker.helpers.arrayElement(Object.values(Regions)))
+    cy.get(`#localDeliveryUnit`).type(testData.offenderManager.LDU = faker.address.cityName())
     cy.clickButton('Continue')
   } else {
     cy.clickLink(currentPage)

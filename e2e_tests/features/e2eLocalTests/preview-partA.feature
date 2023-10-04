@@ -17,4 +17,4 @@ Feature: Preview Part A Document from the Task List
     And PO selects Preview Part A option
     And PO downloads Part A document for Preview
     Then PO can download preview of Part A
-#    And Part A details are correct
+    And Part A details are correct
