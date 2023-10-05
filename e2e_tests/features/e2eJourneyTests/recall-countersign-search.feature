@@ -1,4 +1,4 @@
-@smoke
+@E2E
 Feature: E2E scenarios - Recall
 
   Recall Test Scenarios where rationale is recorded while SPO is countersigning,
