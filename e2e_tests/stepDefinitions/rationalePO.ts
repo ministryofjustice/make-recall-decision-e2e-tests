@@ -430,7 +430,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
   if (testData.contraband.hasRisk === 'YES')
     cy.get('#hasContrabandRiskDetailsYes').type((testData.contraband.riskDetails = faker.hacker.phrase()))
   cy.clickButton('Continue')
-  currentPage = `Current risk of serious harm`
+  currentPage = `Indicative risk assessment pending OASys review`
   cy.clickLink(currentPage)
   cy.logPageTitle(currentPage)
   testData.currentRoshForPartA = {}
