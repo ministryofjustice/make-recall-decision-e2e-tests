@@ -121,11 +121,8 @@ assets/stylesheets/*.css
 build-info.json
 dist/
 test_results/
-integration_tests/videos/
-integration_tests/screenshots/
-integration_tests/downloads/
-*/*.iml
 **/Chart.lock
+e2e_tests/downloads
 e2e_tests/junit
 e2e_tests/screenshots
 e2e_tests/reports
