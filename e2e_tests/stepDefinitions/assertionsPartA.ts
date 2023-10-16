@@ -498,7 +498,7 @@ export const q25ProbationDetailsWithCaseAdmin = (contents: string, details: Reco
   expectSoftly(contents, 'Probation-Officer-Name').to.contain(`Name of person completing the form: ${details.name}`)
   expectSoftly(contents, 'Probation-Officer-Email').to.contain(`Email Address: ${details.email}`)
   expectSoftly(contents, 'Probation-Officer-Telephone').to.contain(`Telephone Number: ${details.telephone}`)
-  // expectSoftly(contents, 'Probation-Officer-Region').to.contain(`Region: ${details.region}`)
+  expectSoftly(contents, 'Probation-Officer-Region').to.contain(`Region: ${details.region}`)
   expectSoftly(contents, 'Probation-Officer-LDU').to.contain(`LDU: ${details.LDU}`)
   expectSoftly(contents, 'Probation-Date of Decision').to.contain(`Date of decision to request revocation: ${DateTime.now().toFormat('dd/MM/y')}`)
   expectSoftly(contents, 'Probation-Time of Decision').to.contain(`Time (24 hour) of decision to request information: ${formattedTimeIn24HrFormat()}`)
