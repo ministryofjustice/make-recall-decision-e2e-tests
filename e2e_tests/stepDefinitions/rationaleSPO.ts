@@ -14,12 +14,26 @@ const recordSpoDecision = function (spoDecision?: string) {
   cy.clickButton('Continue')
   cy.clickLink(`Explain the decision`)
   this.testData.spoDecision = spoDecision || faker.helpers.arrayElement(['RECALL', 'NO_RECALL'])
-  cy.selectRadioByValue('Explain the decision', this.testData.spoDecision)
-  this.testData.spoDecisionExplanation = faker.hacker.phrase()
-  cy.get('div:not(.govuk-radios__conditional--hidden)>div>textarea').type(this.testData.spoDecisionExplanation)
-  cy.clickButton('Continue')
-  cy.clickLink('Record the decision')
-  cy.clickButton('Send to NDelius')
+  if (spoDecision === 'NO_RECALL') {
+    cy.selectRadio('Explain the decision', 'Do not recall - send a decision not to recall letter')
+    cy.clickButton('Continue')
+    this.testData.spoDecisionExplanation = faker.hacker.phrase()
+    cy.log('On Page - Why do you think this person should not be recalled?')
+    cy.get('#spoNoRecallRationale').type(this.testData.spoDecisionExplanation)
+    cy.clickButton('Continue')
+    cy.log('On Page - Senior manger endorsement')
+    cy.clickLink('Continue')
+    cy.clickLink('Record the decision')
+    cy.clickButton('Send to NDelius')
+  }
+  else {
+    cy.selectRadioByValue('Explain the decision', this.testData.spoDecision)
+    this.testData.spoDecisionExplanation = faker.hacker.phrase()
+    cy.get('div:not(.govuk-radios__conditional--hidden)>div>textarea').type(this.testData.spoDecisionExplanation)
+    cy.clickButton('Continue')
+    cy.clickLink('Record the decision')
+    cy.clickButton('Send to NDelius')
+  }
 }
 
 const recordSpoDecisionAfterCountersigning = function () {
