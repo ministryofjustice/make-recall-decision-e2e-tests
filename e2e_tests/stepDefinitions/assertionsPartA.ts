@@ -449,7 +449,10 @@ export const q23LicenceConditionsToAdd = (contents: string, details: Record<stri
   contents = contents.substring(contents.indexOf(partASections[23]), contents.indexOf(partASections[24]))
   expectSoftly(contents, 'Licence Conditions to Add').to.contain(
     // eslint-disable-next-line no-nested-ternary
-    details.recallType === 'STANDARD'
+    details.recallType === 'STANDARD' && details.extended === 'YES'
+      ? 'N/A (extended sentence recall)'
+      : /* eslint-disable-next-line no-nested-ternary */
+      details.recallType === 'STANDARD'
       ? 'N/A (standard recall)'
       : /* eslint-disable-next-line no-nested-ternary */
       details.recallType === 'FIXED_TERM' && details.fixedTermRecall === 'NO'

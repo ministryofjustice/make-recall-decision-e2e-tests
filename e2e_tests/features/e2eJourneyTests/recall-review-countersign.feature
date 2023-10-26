@@ -38,4 +38,4 @@ Feature: E2E scenarios - Recall
     Examples:
       | Indeterminate | Extended | TypeOfSentence | RecallType | InCustody  | SPODecision |
       | Yes           | No       | LIFE           | EMERGENCY  | Yes Police | RECALL      |
-      | No            | Yes      |                | EMERGENCY  | No         | RECALL      |
+      | No            | Yes      |                | STANDARD   | No         | RECALL      |

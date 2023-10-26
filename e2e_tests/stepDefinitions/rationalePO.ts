@@ -194,7 +194,37 @@ function selectAlternativesTried(htmlElements: HTMLElement[]) {
 
 const createPartAOrNoRecallLetter = function (partADetails?: Record<string, string>) {
   cy.log(`testData before Part A creation--> ${JSON.stringify(testData)}`)
-  if (testData.indeterminate === 'NO' && testData.extended === 'NO') {
+  if (testData.indeterminate === 'NO' && testData.extended === 'YES') {
+    testData.recallType = partADetails?.RecallType
+        ? partADetails.RecallType.toString().toUpperCase()
+        : faker.helpers.arrayElement(Object.keys(NonIndeterminateRecallType))
+    cy.logPageTitle('What do you recommend?')
+    cy.selectRadioByValue('What do you recommend', testData.recallType)
+    cy.clickButton('Continue')
+    if (testData.recallType !== 'NO_RECALL') {
+      cy.title().then($title => {
+        if ($title.match('Is this an emergency recall?')) {
+          cy.logPageTitle('Is this an emergency recall?')
+          testData.emergencyRecall = partADetails?.EmergencyRecall
+              ? partADetails.EmergencyRecall.toString().toUpperCase()
+              : faker.helpers.arrayElement(Object.keys(YesNoType))
+          cy.selectRadioByValue('Is this an emergency recall', testData.emergencyRecall)
+          cy.clickButton('Continue')
+        }
+      })
+      cy.logPageTitle('Indeterminate and extended sentences')
+      testData.indeterminateAndExtendedSentencesCriteria = 'BEHAVIOUR_LEADING_TO_SEXUAL_OR_VIOLENT_OFFENCE'
+      cy.get('input[type="checkbox"]').check(testData.indeterminateAndExtendedSentencesCriteria)
+      testData.indeterminatANDExtendedSentences = faker.hacker.phrase()
+      cy.get(
+          `#indeterminateOrExtendedSentenceDetailsDetail-${testData.indeterminateAndExtendedSentencesCriteria}`
+      ).type(testData.indeterminatANDExtendedSentences)
+    }
+    cy.clickButton('Continue')
+    cy.logPageTitle('Sensitive Information')
+    cy.clickLink('Continue')
+  }
+  else if (testData.indeterminate === 'NO' && testData.extended === 'NO') {
     testData.recallType = partADetails?.RecallType
       ? partADetails.RecallType.toString().toUpperCase()
       : faker.helpers.arrayElement(Object.keys(NonIndeterminateRecallType))
@@ -227,7 +257,8 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
       cy.clickButton('Continue')
     }
     cy.clickLink('Continue')
-  } else {
+  }
+  else {
     testData.recallType = partADetails?.RecallType
       ? partADetails.RecallType.toString().toUpperCase()
       : faker.helpers.arrayElement(Object.keys(IndeterminateRecallType))
