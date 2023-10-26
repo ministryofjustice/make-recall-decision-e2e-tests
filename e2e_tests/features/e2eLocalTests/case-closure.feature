@@ -51,3 +51,24 @@ Feature: Case closure scenarios
     # MRD-1466:AC4
     Then the previous Recommendation should be marked a complete
     And SPO can no longer record rationale
+
+  @MRD-1940
+  Scenario: E2E - When Extended sentence is Yes but Indeterminate is No
+    Given a PO has created a recommendation to recall with:
+      | Indeterminate | No |
+      | Extended      | Yes |
+    And PO has created a Part A form without requesting SPO review with:
+      | RecallType          | STANDARD   |
+      | InCustody           | Yes Police |
+      | VictimContactScheme | No         |
+    And PO requests an SPO to countersign
+    And SPO has visited the countersigning link
+    And SPO countersigns without recording rationale
+    And SPO requests ACO to countersign
+    And ACO visits the countersigning link
+    And ACO countersigns
+    And PO has logged in and downloaded Part A
+    When SPO logs back in to add rationale
+    Then SPO is able to record rationale
+    And a confirmation of the decision is shown to SPO
+    And SPO can see the case is closed on the Overview page
