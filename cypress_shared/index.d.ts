@@ -24,6 +24,8 @@ declare global {
 
       visitPageAndLogin(url: string, userType?: UserType): Chainable<void>
 
+      visitPageAndLoginAsPPCS(url: string, userType?: UserType): Chainable<void>
+
       pageHeading(): Chainable<string>
 
       getText(qaAttr: string, opts?: CommandOpts): Chainable<string>
