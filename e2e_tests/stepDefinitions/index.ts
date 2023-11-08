@@ -82,7 +82,6 @@ export const signOut = function () {
 }
 
 function loginAndSearchCrn(userType: UserType) {
-  cy.log("HERERERER --- " + userType)
   signOut()
   cy.wait(1000)
   cy.reload(true)
