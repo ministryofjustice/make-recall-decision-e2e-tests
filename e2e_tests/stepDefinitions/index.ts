@@ -117,7 +117,12 @@ function loginAndSearchCrnForPPCS(userType: UserType) {
       userType
   )
   cy.clickLink('Start now')
-  cy.clickLink('Search by case reference number (CRN)')
+  // let crn = generateCRN()
+  cy.fillInputByName('crn', this.crn)
+  cy.clickButton('Search')
+  cy.clickLink(this.offenderName)
+  cy.clickLink('Search for a record in PPUD')
+
 }
 
 /* ---- Cucumber glue ---- */
