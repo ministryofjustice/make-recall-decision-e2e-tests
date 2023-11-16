@@ -324,6 +324,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
   cy.clickButton('Continue')
   cy.clickLink(`Previous releases`)
   cy.logPageTitle('Previous releases')
+  cy.get('[type="radio"]').check('NO')
   if (partADetails?.PreviousReleases) {
     const previousReleases = partADetails?.PreviousReleases.split(',').map(s => s.trim())
     previousReleases.forEach(previousRelease => {
