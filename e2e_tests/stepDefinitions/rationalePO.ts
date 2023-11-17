@@ -324,7 +324,25 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
   cy.clickButton('Continue')
   cy.clickLink(`Previous releases`)
   cy.logPageTitle('Previous releases')
-  cy.get('[type="radio"]').check('NO')
+  //ECSL change
+  testData.releasedUnderECSL = faker.helpers.arrayElement(Object.keys(YesNoType))
+  if (testData.releasedUnderECSL === 'NO') {
+    cy.get('[type="radio"]').check('NO')
+  } else {
+    cy.get('[type="radio"]').check('YES')
+    testData.ecslDateOfRelease = faker.date.past(1)
+    cy.enterDateTime({
+      day: testData.ecslDateOfRelease.getDate().toString(),
+      month: (testData.ecslDateOfRelease.getMonth() + 1).toString(),
+      year: testData.ecslDateOfRelease.getFullYear().toString(),
+    })
+    testData.conditionalReleaseDate = faker.date.past(3)
+    cy.enterDateForCRD({
+      day: testData.conditionalReleaseDate.getDate().toString(),
+      month: (testData.conditionalReleaseDate.getMonth() + 1).toString(),
+      year: testData.conditionalReleaseDate.getFullYear().toString(),
+    })
+  }
   if (partADetails?.PreviousReleases) {
     const previousReleases = partADetails?.PreviousReleases.split(',').map(s => s.trim())
     previousReleases.forEach(previousRelease => {
