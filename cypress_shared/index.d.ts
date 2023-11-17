@@ -55,6 +55,12 @@ declare global {
         opts?: CommandOpts
       ): Chainable<void>
 
+      enterDateForCRD(
+          parts: { day: string; month: string; year: string; hour?: string; minute?: string },
+          opts?: CommandOpts,
+      ): Chainable<void>
+
+
       clickButton(label: string, opts?: CommandOpts): Chainable<Element>
 
       clickLink(label: string, opts?: CommandOpts): Chainable<Element>

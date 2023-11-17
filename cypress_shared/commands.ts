@@ -196,6 +196,18 @@ Cypress.Commands.add('enterDateTime', (parts, opts = { parent: '#main-content' }
   }
 })
 
+Cypress.Commands.add('enterDateForCRD', (parts, opts = { parent: '#conditionalReleaseDate' }) => {
+  const { day, month, year, hour, minute } = parts
+  const options = { ...opts, clearExistingText: true }
+  cy.fillInput('Day', day, options)
+  cy.fillInput('Month', month, options)
+  cy.fillInput('Year', year, options)
+  if (hour && minute) {
+    cy.fillInput('Hours', hour, options)
+    cy.fillInput('Minutes', minute, options)
+  }
+})
+
 Cypress.Commands.add('selectCheckboxes', (groupLabel, values, opts = {}) => {
   cy.get(opts.parent || 'body')
     .contains('legend', groupLabel)
