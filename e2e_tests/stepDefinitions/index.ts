@@ -39,7 +39,7 @@ export const crns = {
   2: Cypress.env('CRN2') || 'X514364',
   3: Cypress.env('CRN3') || 'X252642',
   4: Cypress.env('CRN4') || 'X487027',
-  5: Cypress.env('CRN5') || 'X476202',
+  5: Cypress.env('CRN5') || 'X514364',
 }
 export const deleteOpenRecommendation = () => {
   cy.clickLink('Recommendations')
