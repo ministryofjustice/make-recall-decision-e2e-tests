@@ -409,7 +409,7 @@ Cypress.Commands.add('getPreviousReleases', () => {
   const previousReleaseDetails: Record<string, string> = {}
   if (Cypress.$('[data-qa="release-info-table"]:contains("Releasing prison or custodial establishment")').length > 0)
     cy.getDefinitionListValue('Releasing prison or custodial establishment').then(text => {
-      previousReleaseDetails.releasingPrison = replaceMissingNDeliusInfoWithBlank(text)
+      previousReleaseDetails.releasingPrison = replaceMissingNDeliusInfoWithBlank(text).replace(/\,.*/,"")
     })
   if (Cypress.$('[data-qa="release-info-table"]:contains("Last release")').length > 0)
     cy.getDefinitionListValue('Last release').then(text => {
