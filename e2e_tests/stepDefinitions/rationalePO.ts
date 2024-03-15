@@ -815,7 +815,7 @@ When('PO has updated the Contact Information section', function () {
   updateContactInformation(currentPage)
   currentPage = 'Where should the revocation order be sent?'
   updateContactInformation(currentPage)
-  currentPage = 'Where should the PPCS respond with questions?'
+  currentPage = 'Where should PPCS respond with questions?'
   updateContactInformation(currentPage)
 })
 
