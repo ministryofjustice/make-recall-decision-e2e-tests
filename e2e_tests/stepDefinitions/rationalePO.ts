@@ -53,9 +53,9 @@ const makeRecommendation = function (crn, recommendationDetails?: Record<string,
       // Create a new recommendation - START
       cy.clickLink('Make a recommendation')
       cy.clickButton('Continue')
-      cy.clickLink(`What has made you think about recalling ${offenderName}`)
+      cy.clickLink(`What has made you consider recalling ${offenderName}`)
       testData.recallReason = faker.hacker.phrase()
-      cy.fillInput(`What has made you think about recalling ${offenderName}`, testData.recallReason)
+      cy.fillInput(`What has made you consider recalling ${offenderName}`, testData.recallReason)
       cy.clickButton('Continue')
       cy.clickLink(`How has ${offenderName} responded to probation so far`)
       testData.probationResponse = faker.hacker.phrase()
