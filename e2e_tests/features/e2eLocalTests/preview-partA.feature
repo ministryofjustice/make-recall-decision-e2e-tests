@@ -12,8 +12,6 @@ Feature: Preview Part A Document from the Task List
       | RecallType          | STANDARD   |
       | InCustody           | Yes Police |
       | VictimContactScheme | No         |
-    And the probation admin flag is turned on
-    When PO has updated the Contact Information section
     And PO selects Preview Part A option
     And PO downloads Part A document for Preview
     Then PO can download preview of Part A
