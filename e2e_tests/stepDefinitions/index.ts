@@ -84,6 +84,7 @@ function loginAndSearchCrn(userType: UserType) {
   cy.pageHeading().should('equal', 'Sign in')
   openApp(
     {
+      flagProbationAdmin: 0,
       flagRecommendationsPage: 1,
       flagDeleteRecommendation: 1,
       flagTriggerWork: 1,

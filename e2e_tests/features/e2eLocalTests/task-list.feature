@@ -8,6 +8,7 @@ Feature: Task list
       | Indeterminate | No |
       | Extended      | No |
     And PO has requested an SPO to review recommendation
+    And the probation admin flag is turned off
     And SPO has visited the review link
     And SPO has recorded a review decision of RECALL
     When PO logs back in to update Recommendation
@@ -24,6 +25,7 @@ Feature: Task list
     Given a PO has created a recommendation to recall with:
       | Indeterminate | No |
       | Extended      | No |
+    And the probation admin flag is turned off
     And PO has created a Part A form without requesting SPO review with:
       | RecallType          | STANDARD   |
       | InCustody           | Yes Police |
