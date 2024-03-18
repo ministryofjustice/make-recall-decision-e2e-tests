@@ -202,7 +202,7 @@ Then('Part A details are correct', function () {
     extended: this.testData.extended,
   })
   q24ISPESP(contents, this.testData.indeterminateOrExtendedSentenceDetails)
-  if (Cypress.env('ENV')?.toString().toUpperCase() === 'DEV') q25ProbationDetails(contents)
+  if (Cypress.env('ENV')?.toString().toUpperCase() === 'DEV') q25ProbationDetailsWithCaseAdmin(contents, this.testData.thePersonCompletingTheForm)
   if ((Cypress.env('ENV')?.toString().toUpperCase() !== 'PREPROD' && Cypress.env('ENV')?.toString().toUpperCase() !== 'DEV')) q25ProbationDetailsWithCaseAdmin(contents, this.testData.thePersonCompletingTheForm)
   if ((Cypress.env('ENV')?.toString().toUpperCase() !== 'PREPROD' && Cypress.env('ENV')?.toString().toUpperCase() !== 'DEV')) q26OffenderManager(contents, this.testData.offenderManager)
   if ((Cypress.env('ENV')?.toString().toUpperCase() === 'PREPROD' || Cypress.env('ENV')?.toString().toUpperCase() === 'DEV')) q27SPOEndorsement.call(this, contents, this.testData.spoCounterSignature)
