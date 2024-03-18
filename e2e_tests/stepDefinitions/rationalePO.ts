@@ -301,6 +301,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
     cy.get('#custodyStatusDetailsYesPolice').type(testData.custodyAddress)
   }
   cy.clickButton('Continue')
+  cy.clickLink('Continue') //Share with a case admin
   cy.clickLink(`What has led to this recall`)
   cy.logPageTitle('What has led to this recall?')
   cy.get(`#whatLedToRecall`).type((testData.reasonForRecall = faker.hacker.phrase()))
@@ -524,6 +525,12 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
     }
   })
   cy.clickLink('Continue')
+  currentPage = "Who completed this Part A?"
+  updateContactInformation(currentPage)
+  currentPage = "Where should the revocation order be sent?"
+  updateContactInformation(currentPage)
+  currentPage = "Where should PPCS respond with questions?"
+  updateContactInformation(currentPage)
 }
 
 const createDNTRLetter = function () {
@@ -688,6 +695,7 @@ Given('PO has started creating the Part A form without requesting SPO review', f
   cy.logPageTitle(`${currentPage}?`)
   cy.selectRadio(currentPage, CustodyType.NO)
   cy.clickButton('Continue')
+  cy.clickLink('Continue')//share with case admin
 })
 
 Given('PO( has) creates/created a Part A form without requesting SPO review with:', function (dataTable: DataTable) {
