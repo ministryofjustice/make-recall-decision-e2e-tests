@@ -18,6 +18,7 @@ Feature: Case closure scenarios
       | InCustody           | Yes Police |
       | VictimContactScheme | No         |
     And PO requests an SPO to countersign
+    And the probation admin flag is turned off
     And SPO has visited the countersigning link
     And SPO countersigns without recording rationale
     And SPO requests ACO to countersign
@@ -40,6 +41,7 @@ Feature: Case closure scenarios
       | InCustody           | Yes Police |
       | VictimContactScheme | No         |
     And PO requests an SPO to countersign
+    And the probation admin flag is turned off
     And SPO has visited the countersigning link
     And SPO countersigns without recording rationale
     And SPO requests ACO to countersign
@@ -62,6 +64,7 @@ Feature: Case closure scenarios
       | InCustody           | Yes Police |
       | VictimContactScheme | No         |
     And PO requests an SPO to countersign
+    And the probation admin flag is turned off
     And SPO has visited the countersigning link
     And SPO countersigns without recording rationale
     And SPO requests ACO to countersign

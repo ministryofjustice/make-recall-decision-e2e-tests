@@ -629,7 +629,7 @@ const updateContactInformation = function (question: string) {
 
 /* ---- Cucumber glue ---- */
 
-Given('a PO has created a recommendation to/of recall/no-recall with:', (dataTable: DataTable) => {
+Given('a PO has Fcreated a recommendation to/of recall/no-recall with:', (dataTable: DataTable) => {
   const crn = ['DEV', 'PREPROD'].includes(Cypress.env('ENV')?.toString().toUpperCase())
     ? crns[faker.helpers.arrayElement(Object.keys(crns))]
     : crns[1]
@@ -822,6 +822,11 @@ When('PO has updated the Contact Information section', function () {
 Given('the probation admin flag is turned on', function () {
   cy.url().then(urValue => cy.visit(`${urValue.replace(/\#.*/,'')}?flagProbationAdmin=1`))
 })
+
+Given('the probation admin flag is turned off', function () {
+  cy.url().then(urValue => cy.visit(`${urValue.replace(/\#.*/,'')}?flagProbationAdmin=0F`))
+})
+
 When('PO selects Preview Part A option', function () {
   cy.contains('Preview Part A').click()
   cy.logPageTitle('Preview Part A')
