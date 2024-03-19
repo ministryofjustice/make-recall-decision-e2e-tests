@@ -129,7 +129,7 @@ When('{userType} logs( back) in to view All Recommendations', function (userType
 })
 
 When('PO creates a new Recommendation for same CRN', function () {
-  cy.clickLink(`Back to overview for ${this.offenderName}`)
+  cy.clickLink(`Return to overview for ${this.offenderName}`)
   cy.clickLink('Consider a recall', { parent: '#main-content' })
   cy.clickButton('Continue')
 })
@@ -227,6 +227,6 @@ Then('SPO can see the case is closed on the Overview page', function () {
 })
 
 Then('PO can see the case is closed on the Overview page', function () {
-  cy.clickLink(`Back to overview for ${this.offenderName}`)
+  cy.clickLink(`Return to overview for ${this.offenderName}`)
   cy.get('#main-content a:contains("Consider a recall")').should('not.exist')
 })

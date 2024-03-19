@@ -302,6 +302,18 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
   }
   cy.clickButton('Continue')
   cy.clickLink('Continue') //Share with a case admin
+  cy.clickLink(`When did the SPO agree this recall?`)
+  cy.logPageTitle('When did the SPO agree this recall?')
+  testData.recallDateBySPO = faker.date.future()
+  cy.enterDateTime({
+    day: (testData.recallDateBySPO.getDate()+ 1).toString(),
+    month: testData.recallDateBySPO.getMonth().toString(),
+    year: testData.recallDateBySPO.getFullYear().toString(),
+    hour: testData.recallDateBySPO.getHours().toString(),
+    minute: testData.recallDateBySPO.getMinutes().toString(),
+  })
+  cy.clickButton('Continue')
+
   cy.clickLink(`What has led to this recall`)
   cy.logPageTitle('What has led to this recall?')
   cy.get(`#whatLedToRecall`).type((testData.reasonForRecall = faker.hacker.phrase()))
@@ -827,9 +839,6 @@ When('PO has updated the Contact Information section', function () {
   updateContactInformation(currentPage)
 })
 
-Given('the probation admin flag is turned on', function () {
-  cy.url().then(urValue => cy.visit(`${urValue.replace(/\#.*/,'')}?flagProbationAdmin=1`))
-})
 When('PO selects Preview Part A option', function () {
   cy.contains('Preview Part A').click()
   cy.logPageTitle('Preview Part A')

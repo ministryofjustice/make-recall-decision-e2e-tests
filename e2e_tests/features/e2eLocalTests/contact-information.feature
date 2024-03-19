@@ -8,7 +8,6 @@ Feature: Contact Information section on the Task List
       | Indeterminate | No |
       | Extended      | No |
     And PO has started creating the Part A form without requesting SPO review
-    And the probation admin flag is turned on
     When PO has updated "Who completed this Part A?" under Contact Information section
     And PO has updated "Where should the revocation order be sent?" under Contact Information section
     And PO has updated "Where should PPCS respond with questions?" under Contact Information section
