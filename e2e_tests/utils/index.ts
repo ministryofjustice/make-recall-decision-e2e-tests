@@ -29,6 +29,29 @@ export const formatObjectDateToLongFormat = (objectDate: Record<string, number |
   return d.toFormat('d MMMM yyyy')
 }
 
+export const formatDateFromUTCLongToShortFormat = (inputDate: string) => {
+  const date = new Date(inputDate)
+  const day = date.getUTCDate()
+  const month = date.getUTCMonth()
+  const year = date.getFullYear()
+
+  const formattedDay = day < 10 ? `0${day}` : `${day}`
+  const formattedMonth = month < 10 ? `0${month}` : `${month}`
+
+  return `${formattedDay}/${formattedMonth}/${year}`
+}
+
+export const extractTimeFromUTCDateFormat = (inputDate: string) => {
+  const date = new Date(inputDate)
+  const hours = date.getUTCHours()
+  const minutes = date.getUTCMinutes()
+
+  const formattedHours = hours < 10 ? `0${hours}` : `${hours}`
+  const formattedMin = minutes < 10 ? `0${minutes}` : `${minutes}`
+
+  return `${formattedHours}:${formattedMin}`
+}
+
 export const formatDateToCompletedDocumentFormat = () => {
   const d = DateTime.now()
   return d.toFormat('d MMM yyyy')

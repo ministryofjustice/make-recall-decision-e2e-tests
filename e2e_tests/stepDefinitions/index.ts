@@ -18,7 +18,7 @@ import {
   q22RecallType,
   q23LicenceConditionsToAdd,
   q24ISPESP,
-  q25ProbationDetails, q25ProbationDetailsWithCaseAdmin,
+  q25ProbationDetailsWithCaseAdmin,
   q26OffenderManager,
   q27SPOEndorsement,
   q28ACOAuthorisation,
@@ -202,8 +202,7 @@ Then('Part A details are correct', function () {
     extended: this.testData.extended,
   })
   q24ISPESP(contents, this.testData.indeterminateOrExtendedSentenceDetails)
-  if (Cypress.env('ENV')?.toString().toUpperCase() === 'DEV') q25ProbationDetailsWithCaseAdmin(contents, this.testData.thePersonCompletingTheForm)
-  if ((Cypress.env('ENV')?.toString().toUpperCase() !== 'PREPROD' && Cypress.env('ENV')?.toString().toUpperCase() !== 'DEV')) q25ProbationDetailsWithCaseAdmin(contents, this.testData.thePersonCompletingTheForm)
+  q25ProbationDetailsWithCaseAdmin(contents, this.testData.thePersonCompletingTheForm, this.testData)
   if ((Cypress.env('ENV')?.toString().toUpperCase() !== 'PREPROD' && Cypress.env('ENV')?.toString().toUpperCase() !== 'DEV')) q26OffenderManager(contents, this.testData.offenderManager)
   if ((Cypress.env('ENV')?.toString().toUpperCase() === 'PREPROD' || Cypress.env('ENV')?.toString().toUpperCase() === 'DEV')) q27SPOEndorsement.call(this, contents, this.testData.spoCounterSignature)
   if ((Cypress.env('ENV')?.toString().toUpperCase() === 'PREPROD' || Cypress.env('ENV')?.toString().toUpperCase() === 'DEV')) q28ACOAuthorisation.call(this, contents, this.testData.acoCounterSignature)
