@@ -30,27 +30,27 @@ Feature: Case closure scenarios
     And a confirmation of the decision is shown to SPO
     And SPO can see the case is closed on the Overview page
 
-#  @MRD-1466
-#  Scenario: E2E - Recommendation is closed when a new recommendation is created before SPO records a rationale
-#    Given a PO has created a recommendation to recall with:
-#      | Indeterminate | No |
-#      | Extended      | No |
-#    And PO has created a Part A form without requesting SPO review with:
-#      | RecallType          | STANDARD   |
-#      | InCustody           | Yes Police |
-#      | VictimContactScheme | No         |
-#    And PO requests an SPO to countersign
-#    And SPO has visited the countersigning link
-#    And SPO countersigns without recording rationale
-#    And SPO requests ACO to countersign
-#    And ACO visits the countersigning link
-#    And ACO countersigns
-#    And PO has logged in and downloaded Part A
-#    When PO creates a new Recommendation for same CRN
-#    And PO returns to Recommendations page of CRN
-#    # MRD-1466:AC4
-#    Then the previous Recommendation should be marked a complete
-#    And SPO can no longer record rationale
+  @MRD-1466
+  Scenario: E2E - Recommendation is closed when a new recommendation is created before SPO records a rationale
+    Given a PO has created a recommendation to recall with:
+      | Indeterminate | No |
+      | Extended      | No |
+    And PO has created a Part A form without requesting SPO review with:
+      | RecallType          | STANDARD   |
+      | InCustody           | Yes Police |
+      | VictimContactScheme | No         |
+    And PO requests an SPO to countersign
+    And SPO has visited the countersigning link
+    And SPO countersigns without recording rationale
+    And SPO requests ACO to countersign
+    And ACO visits the countersigning link
+    And ACO countersigns
+    And PO has logged in and downloaded Part A
+    When PO creates a new Recommendation for same CRN
+    And PO returns to Recommendations page of CRN
+    # MRD-1466:AC4
+    Then the previous Recommendation should be marked a complete
+    And SPO can no longer record rationale
 
   @MRD-1940
   Scenario: E2E - When Extended sentence is Yes but Indeterminate is No
