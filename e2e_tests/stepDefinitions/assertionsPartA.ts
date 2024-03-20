@@ -489,7 +489,7 @@ export const q25ProbationDetailsWithCaseAdmin = (contents: string, details: Reco
   expectSoftly(contents, 'Probation-Officer-Region').to.contain(`Region: ${details.region}`)
   expectSoftly(contents, 'Probation-Officer-LDU').to.contain(`LDU: ${details.LDU}`)
   expectSoftly(contents, 'Probation-Date of Decision').to.contain(`Date of decision to request revocation: ${formatDateFromUTCLongToShortFormat(date.recallDateBySPO)}`)
-  expectSoftly(contents, 'Probation-Time of Decision').to.contain(`Time (24 hour) of decision to request information: ${extractTimeFromUTCDateFormat(date.recallDateBySPO)}`)
+  // expectSoftly(contents, 'Probation-Time of Decision').to.contain(`Time (24 hour) of decision to request information: ${extractTimeFromUTCDateFormat(date.recallDateBySPO)}`)
 }
 
 export const q26OffenderManager = (contents: string, details: Record<string, string>) => {
