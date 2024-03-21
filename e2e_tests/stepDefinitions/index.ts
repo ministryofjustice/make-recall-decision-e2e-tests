@@ -36,10 +36,10 @@ import { CustodyType, YesNoType } from '../support/enums'
 
 export const crns = {
   1: Cypress.env('CRN') || 'X098092',
-  2: Cypress.env('CRN2') || 'X514364',
-  3: Cypress.env('CRN3') || 'X252642',
-  4: Cypress.env('CRN4') || 'X487027',
-  5: Cypress.env('CRN5') || 'X514364',
+  // 2: Cypress.env('CRN2') || 'X514364',
+  // 3: Cypress.env('CRN3') || 'X252642',
+  // 4: Cypress.env('CRN4') || 'X487027',
+  // 5: Cypress.env('CRN5') || 'X514364',
 }
 export const deleteOpenRecommendation = () => {
   cy.clickLink('Recommendations')
@@ -130,7 +130,7 @@ When('{userType} logs( back) in to view All Recommendations', function (userType
 
 When('PO creates a new Recommendation for same CRN', function () {
   cy.clickLink(`Return to overview for ${this.offenderName}`)
-  cy.clickLink('Consider a recall', { parent: '#main-content' })
+  cy.clickLink('Make a recommendation', { parent: '#main-content' })
   cy.clickButton('Continue')
 })
 
