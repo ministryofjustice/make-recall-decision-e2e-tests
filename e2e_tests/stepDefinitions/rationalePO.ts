@@ -307,7 +307,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
   testData.recallDateBySPO = faker.date.future()
   cy.enterDateTime({
     day: testData.recallDateBySPO.getDate().toString(),
-    month: testData.recallDateBySPO.getMonth().toString(),
+    month: (testData.recallDateBySPO.getMonth() + 1).toString(),
     year: testData.recallDateBySPO.getFullYear().toString(),
     hour: testData.recallDateBySPO.getHours().toString(),
     minute: testData.recallDateBySPO.getMinutes().toString(),

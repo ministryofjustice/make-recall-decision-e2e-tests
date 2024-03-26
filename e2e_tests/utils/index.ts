@@ -32,7 +32,7 @@ export const formatObjectDateToLongFormat = (objectDate: Record<string, number |
 export const formatDateFromUTCLongToShortFormat = (inputDate: string) => {
   const date = new Date(inputDate)
   const day = date.getUTCDate()
-  const month = date.getUTCMonth()
+  const month = (date.getUTCMonth() + 1)
   const year = date.getFullYear()
 
   const formattedDay = day < 10 ? `0${day}` : `${day}`
