@@ -229,7 +229,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
       ? partADetails.RecallType.toString().toUpperCase()
       : faker.helpers.arrayElement(Object.keys(NonIndeterminateRecallType))
     cy.logPageTitle('What do you recommend?')
-    cy.selectRadioByValue('What do you recommend', testData.recallType)
+    cy.selectRadioByValue('Select your recommendation', testData.recallType)
     if (testData.recallType !== 'NO_RECALL') {
       testData.partARecallReason = faker.hacker.phrase()
       cy.get(
@@ -595,7 +595,11 @@ const createDNTRLetter = function () {
 
 const recordPoDecision = function (poDecision?: string) {
   this.testData.poDecision = poDecision || faker.helpers.arrayElement(['RECALL', 'NO_RECALL'])
-  cy.selectRadioByValue('What do you recommend?', this.testData.poDecision)
+    if (testData.indeterminate === 'NO' && testData.extended === 'NO'){
+        cy.selectRadioByValue('Select your recommendation', this.testData.poDecision)
+    } else {
+        cy.selectRadioByValue('What do you recommend?', this.testData.poDecision)
+    }
   cy.clickButton('Continue')
 }
 
@@ -692,7 +696,11 @@ Given('PO has started creating the Part A form without requesting SPO review', f
   cy.clickLink('Continue')
   cy.clickLink('Continue')
   cy.logPageTitle('What do you recommend?')
-  cy.selectRadio('What do you recommend', NonIndeterminateRecallType.STANDARD)
+  if (testData.indeterminate === 'NO' && testData.extended === 'NO'){
+    cy.selectRadio('Select your recommendation', NonIndeterminateRecallType.STANDARD)
+  } else {
+    cy.selectRadio('What do you recommend', NonIndeterminateRecallType.STANDARD)
+  }
   cy.get(
     `#recallTypeDetails${NonIndeterminateRecallType.STANDARD.toString()
       .split('_')
