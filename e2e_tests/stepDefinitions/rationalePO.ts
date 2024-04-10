@@ -249,12 +249,28 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
     cy.clickButton('Continue')
     if (testData.recallType === 'FIXED_TERM') {
       testData.fixedTermRecall = faker.helpers.arrayElement(Object.keys(YesNoType))
-      cy.logPageTitle('Fixed term call')
-      cy.selectRadioByValue('Fixed term recall', testData.fixedTermRecall)
+      cy.logPageTitle('Licence conditions - fixed term recall')
+      cy.selectRadioByValue('Licence conditions - fixed term recall', testData.fixedTermRecall)
       if (testData.fixedTermRecall === 'YES') {
         cy.get('#hasFixedTermLicenceConditionsDetails').type((testData.fixedTermRecallNotes = faker.hacker.phrase()))
       }
       cy.clickButton('Continue')
+      cy.logPageTitle('Suitability for fixed term recall')
+      testData.suitabilityForfixedTermRecall = {}
+      cy.selectRadioByValue(
+          `Is ${this.offenderName} under 18?`,testData.suitabilityForfixedTermRecall.offenderUnder18 = faker.helpers.arrayElement(Object.keys(YesNoType))
+      )
+      cy.selectRadioByValue(
+          `Is the sentence 12 months or over?`, testData.suitabilityForfixedTermRecall.sentenceOver12Months = faker.helpers.arrayElement(Object.keys(YesNoType))
+      )
+      cy.selectRadioByValue(
+          `Is the MAPPA level above 1?`, testData.suitabilityForfixedTermRecall.mappaAbove1 = faker.helpers.arrayElement(Object.keys(YesNoType))
+      )
+      cy.selectRadioByValue(
+          `Has ${this.offenderName} been charged with a serious offence?`, testData.suitabilityForfixedTermRecall.seriousOffence = faker.helpers.arrayElement(Object.keys(YesNoType))
+      )
+      cy.clickButton('Continue')
+      cy.logPageTitle('Sensitive Information')
     }
     cy.clickLink('Continue')
   }
