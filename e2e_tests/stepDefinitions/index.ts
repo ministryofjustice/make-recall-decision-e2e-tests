@@ -1,4 +1,4 @@
-import { After, Before, defineParameterType, Then, When } from '@badeball/cypress-cucumber-preprocessor'
+import { After, Before, defineParameterType, Then, When, Given } from '@badeball/cypress-cucumber-preprocessor'
 import { flush } from '@alfonso-presa/soft-assert'
 import { UserType } from '../support/commands'
 import {
@@ -32,7 +32,7 @@ import {
   q8ArrestIssues,
   q9LocalPoliceDetails,
 } from './assertionsPartA'
-import { CustodyType, YesNoType } from '../support/enums'
+import {CustodyType, YesNoType} from '../support/enums'
 
 export const crns = {
   1: Cypress.env('CRN') || 'X098092',
@@ -66,9 +66,12 @@ export const openApp = function (queryParams: object, userType?: UserType, newUr
   Object.keys(queryParams).forEach(keyName => {
     queryParameters = `${queryParameters + keyName}=${queryParams[keyName]}&`
   })
-  cy.visitPageAndLogin(`${newUrl || ''}?${queryParameters}`, userType || UserType.PO)
+  if( userType === UserType.PPCS) {
+    cy.visitPageAndLoginAsPPCS(`${newUrl || ''}?${queryParameters}`, userType || UserType.PPCS)
+  } else {
+    cy.visitPageAndLogin(`${newUrl || ''}?${queryParameters}`, userType || UserType.PO)
+  }
 }
-
 export const signOut = function () {
   cy.get('body').then($body => {
     const signOutSelector = '[data-qa="signOut"]'
@@ -97,6 +100,30 @@ function loginAndSearchCrn(userType: UserType) {
   cy.fillInputByName('crn', this.crn)
   cy.clickButton('Search')
   cy.clickLink(this.offenderName)
+}
+
+function loginAndSearchCrnForPPCS(userType: UserType) {
+  signOut()
+  cy.wait(1000)
+  cy.reload(true)
+  cy.pageHeading().should('equal', 'Sign in')
+  openApp(
+      {
+        flagRecommendationsPage: 1,
+        flagDeleteRecommendation: 1,
+        flagTriggerWork: 1,
+        flagLastCompleted: 1,
+      },
+      userType
+  )
+  cy.clickLink('Start now')
+  cy.fillInputByName('crn', this.crn)
+  cy.clickButton('Search')
+  cy.logPageTitle("Search Results")
+  cy.clickLink('Continue')
+  cy.logPageTitle("Use these details to search PPUD")
+  cy.clickButton('Continue')
+
 }
 
 /* ---- Cucumber glue ---- */
@@ -151,6 +178,10 @@ When('{userType}( has) logged/logs (back )in to Countersign', function (userType
 When('{userType} logs( back) in to add rationale', function (userType: UserType) {
   loginAndSearchCrn.call(this, userType)
   cy.clickLink('Consider a recall', { parent: '#main-content' })
+})
+
+Given('PPCS logs in and searches by a CRN', function (userType: UserType) {
+  loginAndSearchCrnForPPCS.call(this, UserType.PPCS)
 })
 
 Then('the page heading contains {string}', heading => {
