@@ -1,4 +1,4 @@
-import { After, Before, defineParameterType, Then, When } from '@badeball/cypress-cucumber-preprocessor'
+import { After, Before, defineParameterType, Then, When, Given } from '@badeball/cypress-cucumber-preprocessor'
 import { flush } from '@alfonso-presa/soft-assert'
 import { UserType } from '../support/commands'
 import {
@@ -66,8 +66,11 @@ export const openApp = function (queryParams: object, userType?: UserType, newUr
   Object.keys(queryParams).forEach(keyName => {
     queryParameters = `${queryParameters + keyName}=${queryParams[keyName]}&`
   })
-  cy.visitPageAndLogin(`${newUrl || ''}?${queryParameters}`, userType || UserType.PO)
-}
+  if( userType === UserType.PPCS) {
+    cy.visitPageAndLoginAsPPCS(`${newUrl || ''}?${queryParameters}`, userType || UserType.PPCS)
+  } else {
+    cy.visitPageAndLogin(`${newUrl || ''}?${queryParameters}`, userType || UserType.PO)
+  }}
 
 export const signOut = function () {
   cy.get('body').then($body => {
@@ -94,6 +97,29 @@ function loginAndSearchCrn(userType: UserType) {
   cy.fillInputByName('crn', this.crn)
   cy.clickButton('Search')
   cy.clickLink(this.offenderName)
+}
+
+function loginAndSearchCrnForPPCS(userType: UserType) {
+  signOut()
+  cy.wait(1000)
+  cy.reload(true)
+  cy.pageHeading().should('equal', 'Sign in')
+  openApp(
+      {
+        flagRecommendationsPage: 1,
+        flagDeleteRecommendation: 1,
+        flagLastCompleted: 1,
+      },
+      userType
+  )
+  cy.clickLink('Start now')
+  cy.fillInputByName('crn', "X098092")
+  cy.clickButton('Search')
+  cy.logPageTitle("Search Results")
+  cy.clickLink('Continue')
+  cy.logPageTitle("Use these details to search PPUD")
+  cy.clickButton('Continue')
+
 }
 
 /* ---- Cucumber glue ---- */
@@ -152,6 +178,10 @@ When('{userType} logs( back) in to add rationale', function (userType: UserType)
 
 Then('the page heading contains {string}', heading => {
   cy.pageHeading().should('contains', heading)
+})
+
+Given('PPCS logs in and searches by a CRN', function (userType: UserType) {
+  loginAndSearchCrnForPPCS.call(this, UserType.PPCS)
 })
 
 Then('PO/SPO/ACO can create Part A', function () {

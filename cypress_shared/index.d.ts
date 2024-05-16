@@ -26,6 +26,8 @@ declare global {
 
       pageHeading(): Chainable<string>
 
+      visitPageAndLoginAsPPCS(url: string, userType?: UserType): Chainable<void>
+
       getText(qaAttr: string, opts?: CommandOpts): Chainable<string>
 
       getTaskStatus(taskName: string, opts?: CommandOpts): Chainable<string>
