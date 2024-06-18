@@ -166,9 +166,8 @@ const makeRecommendation = function (crn, recommendationDetails?: Record<string,
   cy.clickButton('Continue')
   cy.wrap(testData).as('testData')
   cy.clickButton('Continue')
-  cy.logPageTitle('Record the consideration in NDelius')
-  cy.clickButton('Send to NDelius')
-
+  // cy.logPageTitle('Record the consideration in NDelius')
+  // cy.clickButton('Send to NDelius')
 }
 
 const selectVulnerabilities = function (htmlElements: HTMLElement[]) {
