@@ -48,7 +48,7 @@ slack-fail-post-step: &slack-fail-post-step
 jobs:
   validate:
     machine:
-      image: ubuntu-2204:2023.07.2
+      image: ubuntu-2204:current
       docker_layer_caching: true
     resource_class: xlarge
     steps:
@@ -88,7 +88,7 @@ jobs:
 
   e2e_local_test:
     machine:
-      image: ubuntu-2004:2023.07.1
+      image: ubuntu-2204:current
     parallelism: << pipeline.parameters.e2e-parallelism >>
     steps:
       - run:
