@@ -35,9 +35,9 @@ import {
 import { CustodyType, YesNoType } from '../support/enums'
 
 export const crns = {
-  1: Cypress.env('CRN') || 'X098092',
+  1: Cypress.env('CRN') || 'D002399',
   2: Cypress.env('CRN2') || 'X514364',
-  3: Cypress.env('CRN3') || 'X252642',
+  3: Cypress.env('CRN3') || 'D002399',
   4: Cypress.env('CRN4') || 'X487027',
   5: Cypress.env('CRN5') || 'X514364',
 }
