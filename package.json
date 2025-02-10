@@ -129,7 +129,7 @@
   "devDependencies": {
     "@alfonso-presa/soft-assert": "^0.6.0",
     "@aws-sdk/types": "^3.226.0",
-    "@badeball/cypress-cucumber-preprocessor": "^15.1.0",
+    "@badeball/cypress-cucumber-preprocessor": "^22.0.1",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.1.5",
     "@faker-js/faker": "^7.6.0",
     "@types/bunyan": "^1.8.8",
