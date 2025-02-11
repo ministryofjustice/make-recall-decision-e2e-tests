@@ -6,7 +6,7 @@
     "types": ["node", "cypress"],
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node16"
   },
   "include": ["**/*.ts"],
   "exclude": ["cypress.config.ts"]
