@@ -118,7 +118,7 @@ jobs:
             echo PWD:: $PWD
             shopt -s globstar
             
-            SPECS=$(circleci tests glob "e2e_tests/features/**/*.feature" | circleci tests split --split-by=timings --show-counts)
+            SPECS=$(circleci tests glob "e2e_tests/features/**/*.feature" | circleci tests split --split-by=timings --show-counts | paste -sd ',')
             echo "Running feature file(s): $SPECS"
 
             set +e
