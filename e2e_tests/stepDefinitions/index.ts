@@ -33,6 +33,7 @@ import {
   q9LocalPoliceDetails,
 } from './assertionsPartA'
 import { CustodyType, YesNoType } from '../support/enums'
+import { loginAndSearchCrn } from "./user/user"
 
 export const crns = {
   1: Cypress.env('CRN') || 'D002399',
@@ -69,36 +70,9 @@ export const openApp = function (queryParams: object, userType?: UserType, newUr
   cy.visitPageAndLogin(`${newUrl || ''}?${queryParameters}`, userType || UserType.PO)
 }
 
-export const signOut = function () {
-  cy.get('body').then($body => {
-    const signOutSelector = '[data-qa="signOut"]'
-    if ($body.find(signOutSelector).length > 0) cy.get(signOutSelector).click()
-  })
-  cy.clearAllCookies()
-}
-
-function loginAndSearchCrn(userType: UserType) {
-  signOut()
-  cy.wait(1000)
-  cy.reload(true)
-  cy.pageHeading().should('equal', 'Sign in')
-  openApp(
-    {
-      flagRecommendationsPage: 1,
-      flagDeleteRecommendation: 1
-    },
-    userType
-  )
-  cy.clickLink('Start now')
-  cy.clickLink('Search by case reference number (CRN)')
-  cy.fillInputByName('crn', this.crn)
-  cy.clickButton('Search')
-  cy.clickLink(this.offenderName)
-}
-
 /* ---- Cucumber glue ---- */
 
-defineParameterType({ name: 'userType', regexp: /PO|SPO|ACO/, transformer: s => UserType[s] })
+defineParameterType({ name: 'userType', regexp: /PO|SPO|ACO|PPCS/, transformer: s => UserType[s] })
 
 defineParameterType({
   name: 'managersDecision',
@@ -113,41 +87,6 @@ Before(() => {
 After(function () {
   cy.log(`this.testData@End--> ${JSON.stringify(this.testData)}`)
   flush()
-})
-
-When('{userType} logs( back) in to update/view Recommendation', function (userType: UserType) {
-  loginAndSearchCrn.call(this, userType)
-  cy.clickLink('Update recommendation')
-})
-
-When('{userType} logs( back) in to view All Recommendations', function (userType: UserType) {
-  loginAndSearchCrn.call(this, userType)
-  cy.clickLink('Recommendations')
-})
-
-When('PO creates a new Recommendation for same CRN', function () {
-  cy.clickLink(`Return to overview for ${this.offenderName}`)
-  cy.clickLink('Make a recommendation', { parent: '#main-content' })
-  cy.clickButton('Continue')
-})
-
-When('{userType}( has) logged/logs( back) in to/and download(ed) Part A', function (userType: UserType) {
-  loginAndSearchCrn.call(this, userType)
-  cy.clickLink('Update recommendation')
-  cy.clickLink('Create Part A')
-  cy.downloadDocX('Download the Part A').as('partAContent')
-})
-
-When('{userType}( has) logged/logs (back )in to Countersign', function (userType: UserType) {
-  expect(userType, 'Checking only SPO/ACO user is passed!!').to.not.equal(UserType.PO)
-  loginAndSearchCrn.call(this, userType)
-  cy.clickLink('Countersign')
-  if (userType === UserType.SPO) cy.clickLink('Line manager countersignature')
-})
-
-When('{userType} logs( back) in to add rationale', function (userType: UserType) {
-  loginAndSearchCrn.call(this, userType)
-  cy.clickLink('Consider a recall', { parent: '#main-content' })
 })
 
 Then('the page heading contains {string}', heading => {

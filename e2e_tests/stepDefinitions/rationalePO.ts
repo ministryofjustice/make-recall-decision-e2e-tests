@@ -34,10 +34,16 @@ import { formatDateToCompletedDocumentFormat } from '../utils'
 const expectSoftly = proxy(expect)
 
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-let testData: Record<string, any>
+let testData: Record<string, any> = {}
 let currentPage
 
-const makeRecommendation = function (crn, recommendationDetails?: Record<string, string>) {
+export const makeRecommendation = function (crn, recommendationDetails?: Record<string, string>) {
+  testData = {
+    licenceConditions: { standard: [], advanced: [] },
+    alternativesTried: [],
+    vulnerabilities: [],
+  }
+
   cy.clickLink('Start now')
   cy.clickLink('Search by case reference number (CRN)')
   cy.fillInputByName('crn', crn)
@@ -65,7 +71,7 @@ const makeRecommendation = function (crn, recommendationDetails?: Record<string,
       // select all standard recommendation if recommendationDetails.LicenceConditions === 'all' passed else choose a few randomly
       cy.get('input[id^=standard-]').then(standardLicenceConditions => {
         const stdConditions =
-          recommendationDetails.LicenceConditions && recommendationDetails.LicenceConditions.toLowerCase() === 'all'
+          recommendationDetails?.LicenceConditions?.toLowerCase() === 'all'
             ? standardLicenceConditions.toArray()
             : faker.helpers.arrayElements(standardLicenceConditions.toArray())
         stdConditions.forEach(htmlElement => {
@@ -76,14 +82,12 @@ const makeRecommendation = function (crn, recommendationDetails?: Record<string,
       // select additional licence randomly or if recommendationDetails.LicenceConditions === 'all' is passed
       if (
         faker.datatype.boolean() ||
-        (recommendationDetails.LicenceConditions && recommendationDetails.LicenceConditions.length !== 0)
+        (recommendationDetails?.LicenceConditions?.length ?? 0 !== 0)
       ) {
         cy.get('body').then($body => {
           if ($body.find('input[id^=additional-]').length !== 0) {
             cy.get('input[id^=additional-]').then(advancedLicenceConditions => {
-              const addConditions =
-                recommendationDetails.LicenceConditions &&
-                recommendationDetails.LicenceConditions.toLowerCase() === 'all'
+              const addConditions = recommendationDetails?.LicenceConditions?.toLowerCase() === 'all'
                   ? advancedLicenceConditions.toArray()
                   : faker.helpers.arrayElements(advancedLicenceConditions.toArray())
               addConditions.forEach(htmlElement => {
@@ -691,32 +695,17 @@ Given('a PO has created a recommendation to/of recall/no-recall with:', (dataTab
     : 'X098092'
   cy.wrap(crn).as('crn')
   cy.log(`Using CRN--> ${crn}`)
-  testData = {
-    licenceConditions: { standard: [], advanced: [] },
-    alternativesTried: [],
-    vulnerabilities: [],
-  }
   makeRecommendation(crn, dataTable.rowsHash())
 })
 
 Given('a PO has created a recommendation', () => {
   const crn = crns[faker.helpers.arrayElement(Object.keys(crns))]
   cy.wrap(crn).as('crn')
-  testData = {
-    licenceConditions: { standard: [], advanced: [] },
-    alternativesTried: [],
-    vulnerabilities: [],
-  }
   makeRecommendation(crn)
 })
 
 Given('a PO has created a recommendation to recall CRN: {word} with:', (crn, dataTable: DataTable) => {
   cy.wrap(crn).as('crn')
-  testData = {
-    licenceConditions: { standard: [], advanced: [] },
-    alternativesTried: [],
-    vulnerabilities: [],
-  }
   makeRecommendation(crn, dataTable.rowsHash())
 })
 

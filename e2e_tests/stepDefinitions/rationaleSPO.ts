@@ -1,7 +1,8 @@
 import { DataTable, Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import { proxy } from '@alfonso-presa/soft-assert'
 import { faker } from '@faker-js/faker/locale/en_GB'
-import { openApp, signOut } from './index'
+import { openApp } from './index'
+import { signOut } from "./user/user"
 import { YesNoType } from '../support/enums'
 import { UserType } from '../support/commands'
 

@@ -53,6 +53,10 @@ Cypress.Commands.add('clickLink', (label, opts = { parent: 'body' }) => {
   clickElement(label, 'a', opts)
 })
 
+Cypress.Commands.add('clickLinkById', (id, label, opts = { parent: 'body' }) => {
+  clickElement(label, `a.govuk-link#${id}`, opts)
+})
+
 Cypress.Commands.add('getElement', (selector, opts = { parent: 'body' }) =>
   (selector as Cypress.Selector).qaAttr
     ? cy.get(`[data-qa="${(selector as Cypress.Selector).qaAttr}"]`)
