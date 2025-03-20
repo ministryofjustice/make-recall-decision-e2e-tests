@@ -50,7 +50,7 @@ export const postPORecallRecommendationRequest: () => UpdateRecommendationReques
     const decisionDateTime = faker.date.past()
     const decisionDateTimeReduced = [
         decisionDateTime.getFullYear(),
-        decisionDateTime.getMonth(),
+        decisionDateTime.getMonth() + 1,
         decisionDateTime.getDate(),
         decisionDateTime.getHours(),
         decisionDateTime.getMinutes()

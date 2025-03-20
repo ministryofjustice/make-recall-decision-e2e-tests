@@ -71,7 +71,7 @@ export const makeRecommendation = function (crn, recommendationDetails?: Record<
       // select all standard recommendation if recommendationDetails.LicenceConditions === 'all' passed else choose a few randomly
       cy.get('input[id^=standard-]').then(standardLicenceConditions => {
         const stdConditions =
-          recommendationDetails?.LicenceConditions.toLowerCase() === 'all'
+          recommendationDetails?.LicenceConditions?.toLowerCase() === 'all'
             ? standardLicenceConditions.toArray()
             : faker.helpers.arrayElements(standardLicenceConditions.toArray())
         stdConditions.forEach(htmlElement => {
@@ -82,12 +82,12 @@ export const makeRecommendation = function (crn, recommendationDetails?: Record<
       // select additional licence randomly or if recommendationDetails.LicenceConditions === 'all' is passed
       if (
         faker.datatype.boolean() ||
-        (recommendationDetails?.LicenceConditions.length ?? 0 !== 0)
+        (recommendationDetails?.LicenceConditions?.length ?? 0 !== 0)
       ) {
         cy.get('body').then($body => {
           if ($body.find('input[id^=additional-]').length !== 0) {
             cy.get('input[id^=additional-]').then(advancedLicenceConditions => {
-              const addConditions = recommendationDetails?.LicenceConditions.toLowerCase() === 'all'
+              const addConditions = recommendationDetails?.LicenceConditions?.toLowerCase() === 'all'
                   ? advancedLicenceConditions.toArray()
                   : faker.helpers.arrayElements(advancedLicenceConditions.toArray())
               addConditions.forEach(htmlElement => {
