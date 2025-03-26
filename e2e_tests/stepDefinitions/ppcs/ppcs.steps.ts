@@ -1,5 +1,5 @@
 import { Given, Then, When } from "@badeball/cypress-cucumber-preprocessor";
-import { recommendationService } from "../../utils/recommendations/recommendationsSerivce";
+import { recommendationService } from "../../utils/recommendations/recommendationsService";
 import { getApiAuth } from "../../utils/auth";
 import { loginAndSearchForCrn, signOut } from "../user/user";
 import { selectRandomOption } from "../../utils/inputs/select";
@@ -132,7 +132,7 @@ Then('the user proceeds to book a recall', () => {
 
     cy.clickLinkById('edit-ethnicity', editText)
     cy.pageHeading().should('equal', 'Edit ethnicity')
-    selectRandomOption('select', true)
+    selectRandomOption('#ethnicity', true)
     cy.clickButton('Continue')
 
     cy.clickLinkById('edit-releasingprison', editText)
@@ -165,7 +165,7 @@ Then('the user proceeds to book a recall', () => {
     selectRandomOption('#policeForce', true)
     cy.clickButton('Continue')
 
-    cy.clickLinkById('edit-mpaalevel', editText)
+    cy.clickLinkById('edit-mappalevel', editText)
     cy.pageHeading().should('equal', 'Edit MAPPA level')
     selectRandomRadio('.govuk-radios') // Forced to select by class at the moment as no id
     cy.clickButton('Continue')

@@ -3,7 +3,7 @@ import { YESNONA } from "../../utils/standardTypes"
 // TODO it would be nice to pull these from source as a future improvement
 type OptionValue = { text: string, value: string }
 
-export const licenseConitionsStandard: OptionValue[] = [
+export const licenseConditionsStandard: OptionValue[] = [
     { text: "Be of good behaviour and not behave in a way which undermines the purpose of the licence period", value: "GOOD_BEHAVIOUR" },
     { text: "Not commit any offence", value: "NO_OFFENCE" },
     { text: "Keep in touch with the supervising officer in accordance with instructions given by the supervising officer", value: "KEEP_IN_TOUCH" },
@@ -15,7 +15,7 @@ export const licenseConitionsStandard: OptionValue[] = [
     { text: "Tell your supervising officer if you change or add any contact details, including phone number or email", value: "CONTACT_DETAILS" }
 ]
 
-export const licenseConitionsAdditional : { note: string, title: string, details: string, subCatCode: string, mainCatCode: string }[] = [
+export const licenseConditionsAdditional : { note: string, title: string, details: string, subCatCode: string, mainCatCode: string }[] = [
     {
         note: null,
         title: "Freedom of movement",

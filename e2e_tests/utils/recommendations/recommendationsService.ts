@@ -1,11 +1,11 @@
-import { CreateRecommendationRequest, FeatureFlags, Recommendation, UpdateRecommendationRequest, UpdateRecommendationStatusRequest } from "./recommendations.d"
+import { CreateRecommendationRequest, FeatureFlags, Recommendation, UpdateRecommendationRequest, UpdateRecommendationStatusRequest } from "./recommendations"
 
-const MRD_URL_KEY = 'MAKE_RECALL_DECISION_API_URL'
+const MRD_URL = Cypress.env('MAKE_RECALL_DECISION_API_URL')
 
 const createRecommendation = (data: CreateRecommendationRequest, authToken: string, featureFlags?: FeatureFlags) => {
     return cy.request({
         method: 'POST',
-        url: `${Cypress.env(MRD_URL_KEY)}/recommendations`,
+        url: `${MRD_URL}/recommendations`,
         body: data,
         headers: {
             Authorization: authToken,
@@ -20,7 +20,7 @@ const createRecommendation = (data: CreateRecommendationRequest, authToken: stri
 const updateRecommendation = (recommedationId: number, data: UpdateRecommendationRequest, authToken: string, propertiesToRefresh?: string[]) => {
     return cy.request({
         method: 'PATCH',
-        url: `${Cypress.env(MRD_URL_KEY)}/recommendations/${recommedationId}${propertiesToRefresh ? `?refreshProperty=${propertiesToRefresh.join(',')}` : ''}`,
+        url: `${MRD_URL}/recommendations/${recommedationId}${propertiesToRefresh ? `?refreshProperty=${propertiesToRefresh.join(',')}` : ''}`,
         body: data,
         headers: {
             Authorization: authToken
@@ -33,7 +33,7 @@ const updateRecommendation = (recommedationId: number, data: UpdateRecommendatio
 const updateRecommendationStatus = (recommendationId: number, data: UpdateRecommendationStatusRequest, authToken: string) => {
     return cy.request({
         method: 'PATCH',
-        url: `${Cypress.env(MRD_URL_KEY)}/recommendations/${recommendationId}/status`,
+        url: `${MRD_URL}/recommendations/${recommendationId}/status`,
         body: data,
         headers: {
             Authorization: authToken

@@ -5,7 +5,7 @@ type DetailsForValueSelector = (elem: HTMLElement) => string;
 const defaultGetDetailsForValueSelector: DetailsForValueSelector = (elem: HTMLElement) => `#${elem.getAttribute('name')}Detail-${elem.getAttribute('value')}`
 
 export const selectRandomCheckBoxes = (name: string) => {
-    cy.get(`input[type="radio"][name="${name}"]`).then(checkboxes => {
+    cy.get(`input[type="checkbox"][name="${name}"]`).then(checkboxes => {
         faker.helpers.arrayElements(checkboxes.toArray()).forEach(cb => cy.get(`#${cb.id}`).check())
     })
 }

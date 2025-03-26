@@ -5,7 +5,7 @@ import { RECOMMENDATION_STATUSES } from "../../utils/recommendations/recommendat
 import { YESNONA } from "../../utils/standardTypes";
 
 export const createRecommendationRequest: (crn: string) => CreateRecommendationRequest = (crn) => ({
-        crn: crn, //TODO toggle and crns for Dev/Pre prod that works for other services
+        crn: crn, //TODO V2: toggle and crns for Dev/Pre prod that works for other services
 })
 
 export const initialRecomendationRequest: () => UpdateRecommendationRequest = () => ({
@@ -13,14 +13,14 @@ export const initialRecomendationRequest: () => UpdateRecommendationRequest = ()
     responseToProbation: faker.lorem.paragraph(),
     licenceConditionsBreached: {
         standardLicenceConditions: {
-            selected: faker.helpers.arrayElements(OPTIONS.licenseConitionsStandard).map(l => l.value),
-            allOptions: OPTIONS.licenseConitionsStandard
+            selected: faker.helpers.arrayElements(OPTIONS.licenseConditionsStandard).map(l => l.value),
+            allOptions: OPTIONS.licenseConditionsStandard
         },
         additionalLicenceConditions: {
             selected: null,
-            allOptions: OPTIONS.licenseConitionsAdditional,
+            allOptions: OPTIONS.licenseConditionsAdditional,
             selectedOptions: faker.datatype.boolean()
-                ? faker.helpers.arrayElements(OPTIONS.licenseConitionsAdditional).map(l => ({ subCatCode: l.subCatCode, mainCatCode: l.mainCatCode }))
+                ? faker.helpers.arrayElements(OPTIONS.licenseConditionsAdditional).map(l => ({ subCatCode: l.subCatCode, mainCatCode: l.mainCatCode }))
                 : []
         }
     },
@@ -47,7 +47,7 @@ export const startRecallRecommendationStatusRequest: () => UpdateRecommendationS
 })
 
 export const postPORecallRecommendationRequest: () => UpdateRecommendationRequest = () => {
-    const decisionDateTime = faker.date.past()
+    const decisionDateTime = faker.date.recent(7) // Some time within the last week
     const decisionDateTimeReduced = [
         decisionDateTime.getFullYear(),
         decisionDateTime.getMonth() + 1,
