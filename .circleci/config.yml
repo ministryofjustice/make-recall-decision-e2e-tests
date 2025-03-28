@@ -124,7 +124,7 @@ jobs:
             set +e
 
             npx cypress run \
-              --env TAGS='not @E2E and not @smoke',USERNAME_PO=${CYPRESS_USERNAME_PO_local},PASSWORD_PO=${CYPRESS_PASSWORD_PO_local},USERNAME_SPO=${CYPRESS_USERNAME_SPO_local},PASSWORD_SPO=${CYPRESS_PASSWORD_SPO_local},USERNAME_ACO=${CYPRESS_USERNAME_ACO_local},PASSWORD_ACO=${CYPRESS_PASSWORD_ACO_local},USERNAME_PPCS=${CYPRESS_USERNAME_PPCS_local},PASSWORD_PPCS=${CYPRESS_PASSWORD_PPCS_local},MAKE_RECALL_DECISION_API_URL=${CYPRESS_MAKE_RECALL_DECISION_API_URL_local},HMPPS_AUTH_EXTERNAL_URL=${CYPRESS_HMPPS_AUTH_EXTERNAL_URL_local} \
+              --env TAGS='not @E2E and not @smoke',USERNAME=${CYPRESS_USERNAME_local},PASSWORD=${CYPRESS_PASSWORD_local},USERNAME_SPO=${CYPRESS_USERNAME_SPO_local},PASSWORD_SPO=${CYPRESS_PASSWORD_SPO_local},USERNAME_ACO=${CYPRESS_USERNAME_ACO_local},PASSWORD_ACO=${CYPRESS_PASSWORD_ACO_local} \
               --config-file e2e_tests/cypress.config.ts \
               --browser chrome \
               --record false \
@@ -157,6 +157,84 @@ jobs:
       - store_test_results:
           path: make-recall-decision-e2e-tests/e2e_tests/junit
 
+  integration_tests:
+    machine:
+      image: ubuntu-2204:current
+    parallelism: << pipeline.parameters.e2e-parallelism >>
+    steps:
+      - run:
+          name: Clone and checkout make-recall-decision-e2e-tests
+          command: |
+            git clone https://github.com/ministryofjustice/make-recall-decision-e2e-tests.git
+            cd make-recall-decision-e2e-tests 
+            git checkout $CIRCLE_BRANCH
+      - run:
+          name: Clone and checkout make-recall-decision-api
+          command: |
+            git clone https://github.com/ministryofjustice/make-recall-decision-api.git
+            cd make-recall-decision-api
+            git checkout main
+      - run:
+          name: Clone and checkout make-recall-decision-ui
+          command: |
+            git clone https://github.com/ministryofjustice/make-recall-decision-ui.git
+            cd make-recall-decision-ui
+            git checkout main
+      - run:
+          name: Start components for integration tests
+          working_directory: make-recall-decision-e2e-tests
+          command: ./scripts/start-services-integration.sh
+      - run:
+          name: Run Integration Tests
+          working_directory: make-recall-decision-e2e-tests
+          command: |
+            npm ci --no-audit
+            echo PWD:: $PWD
+            shopt -s globstar
+
+            echo Generating specs
+            SPECS=$(circleci tests glob "e2e_tests/features/**/*.feature" | circleci tests split --split-by=timings --show-counts)
+            echo "Running feature file(s): $SPECS"
+
+            set +e
+
+            npx cypress run \
+              --env=TAGS='not @E2E and not @smoke',USERNAME_PO=${int_CYPRESS_USERNAME_PO},PASSWORD_PO=${int_CYPRESS_PASSWORD_PO},USERNAME_SPO=${int_CYPRESS_USERNAME_SPO},PASSWORD_SPO=${int_CYPRESS_PASSWORD_SPO},USERNAME_ACO=${int_CYPRESS_USERNAME_ACO},PASSWORD_ACO=${int_CYPRESS_PASSWORD_ACO},USERNAME_PPCS=${int_CYPRESS_USERNAME_PPCS},PASSWORD_PPCS=${int_CYPRESS_PASSWORD_PPCS},API_CLIENT_ID=${int_CYPRESS_API_CLIENT_ID},API_CLIENT_SECRET=${int_CYPRESS_API_CLIENT_SECRET},MAKE_RECALL_DECISION_API_URL=${int_CYPRESS_MAKE_RECALL_DECISION_API_URL},HMPPS_AUTH_EXTERNAL_URL=${int_CYPRESS_HMPPS_AUTH_EXTERNAL_URL} \
+              --config-file e2e_tests/cypress.config.ts \
+              --browser chrome \
+              --record false \
+              --spec $SPECS \
+
+            export E2E_RESULT=$?
+            node scripts/fix-junit-reports.js
+
+            set -e
+            exit $E2E_RESULT
+      - run:
+          when: on_fail
+          name: make-recall-decision-api - docker logs
+          working_directory: make-recall-decision-api
+          command: docker-compose logs
+      - run:
+          when: on_fail
+          name: make-recall-decision-ui - docker logs
+          working_directory: make-recall-decision-ui
+          command: docker-compose logs
+      - store_artifacts:
+          path: make-recall-decision-e2e-tests/e2e_tests/screenshots
+          destination: screenshots
+      - store_artifacts:
+          path: make-recall-decision-e2e-tests/e2e_tests/reports
+          destination: reports
+      - store_artifacts:
+          path: make-recall-decision-e2e-tests/e2e_tests/junit
+          destination: junit
+      - store_test_results:
+          path: make-recall-decision-e2e-tests/e2e_tests/junit
+
+
+
+
 # E2E tests using the dev and pre-prod environments have been commented out.
 # They were actingas a 'gate' to prevent a broken production deployment, this has been superceded by a 'manual' gate step.
 # Deactivating these tests also removes flakiness caused by drifting test fixtures.
@@ -179,7 +257,7 @@ workflows:
 #            - hmpps-common-vars
 #          <<: *slack-fail-post-step
 
-      - e2e_local_test:
+      - integration_tests:
           context:
             - hmpps-common-vars
           <<: *slack-fail-post-step

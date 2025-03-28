@@ -66,6 +66,8 @@ const resolveUserDetails: (userType: UserType) => { username: string, password: 
       return { username: userNamePpcs, password: passwordPpcs }
     case UserType.PO:
     default:
+      cy.log(`user: ${userNamePo}/${Cypress.env('USERNAME_PO')}`)
+      cy.log(`pass: ${passwordPo}/${Cypress.env('PASSWORD_PO')}`)
       return { username: userNamePo, password: passwordPo }
   }
 }
@@ -75,6 +77,7 @@ Cypress.Commands.add('visitPageAndLogin', function (url, userType = UserType.PO)
   cy.visit(url)
   cy.pageHeading().should('equal', 'Sign in')
   const userDetails = resolveUserDetails(userType)
+  cy.log('User Type: ', userType, '- Details: ', JSON.stringify(userDetails))
   cy.get('#username').type(userDetails.username)
   cy.get('#password').type(userDetails.password, { log: false })
   cy.get('#submit').click()
