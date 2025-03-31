@@ -1,6 +1,6 @@
 Feature: e2e scenarios - Book a recall
 
-  Scenario: Develop PPCS e2e
+  Scenario: PPCS user is able to book a recall - default happy path test
     Given a recommendation exists for use in PPCS
     And the PPCS recommendation is submitted by a PO
     And the PPCS recommendation has had a recall decision recorded
