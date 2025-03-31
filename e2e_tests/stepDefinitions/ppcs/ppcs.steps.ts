@@ -84,7 +84,6 @@ Then('the PPCS recommendation is counter-signed and downloaded', () => {
     const lineManagerLabel = 'Line manager countersignature'
     cy.clickLink(lineManagerLabel)
     cy.pageHeading().should('equal', 'Enter your telephone number')
-    textInputRandomText('telephone', faker.phone.number)
     cy.clickButton('Continue')
     cy.pageHeading().should('equal', lineManagerLabel)
     textAreaRandomText('managerCountersignatureExposition')
@@ -95,7 +94,6 @@ Then('the PPCS recommendation is counter-signed and downloaded', () => {
     const seniorLineManagerLabel = 'Senior manager countersignature'
     cy.clickLink(seniorLineManagerLabel)
     cy.pageHeading().should('contain', 'Enter your telephone number')
-    textInputRandomText('telephone', faker.phone.number)
     cy.clickButton('Continue')
     cy.pageHeading().should('equal', seniorLineManagerLabel)
     textAreaRandomText('managerCountersignatureExposition')
