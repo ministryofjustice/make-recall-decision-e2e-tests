@@ -55,7 +55,6 @@ export const postPORecallRecommendationRequest: () => UpdateRecommendationReques
         decisionDateTime.getHours(),
         decisionDateTime.getMinutes()
     ]
-    cy.log(decisionDateTime.toString(), decisionDateTimeReduced.reduce((a, b) => `${a} - ${b}`, "=> "))
     let selectedVulnerabilities: { value: string, details?: string}[]
     switch(faker.datatype.number({ min: 1, max: 3})) {
         case 1:

@@ -1,7 +1,6 @@
 import { Buffer } from 'buffer'
 
 export const getApiAuth = () => {
-    cy.log('Auth url', Cypress.env('HMPPS_AUTH_EXTERNAL_URL'))
     return cy.request({
         method: 'POST',
         url: `${Cypress.env('HMPPS_AUTH_EXTERNAL_URL')}/oauth/token?grant_type=client_credentials`,
