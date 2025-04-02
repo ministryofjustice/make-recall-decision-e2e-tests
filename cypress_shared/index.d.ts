@@ -65,6 +65,8 @@ declare global {
 
       clickLink(label: string, opts?: CommandOpts): Chainable<Element>
 
+      clickLinkById(id: string, label: string, opts?: CommandOpts): Chainable<Element>
+
       getElement(selector: string | Selector, opts?: CommandOpts): Chainable<JQuery<HTMLElement>>
 
       viewDetails(summaryLabel: string, opts?: CommandOpts): Chainable<string>

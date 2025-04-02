@@ -9,16 +9,20 @@ export enum UserType {
   PO = 'PO',
   SPO = 'SPO',
   ACO = 'ACO',
+  PPCS = 'PPCS'
 }
 
-const userName = Cypress.env('USERNAME')
-const password = Cypress.env('PASSWORD')
+const userNamePo = Cypress.env('USERNAME_PO')
+const passwordPo = Cypress.env('PASSWORD_PO')
 
 const userNameSpo = Cypress.env('USERNAME_SPO')
 const passwordSpo = Cypress.env('PASSWORD_SPO')
 
 const userNameAco = Cypress.env('USERNAME_ACO')
 const passwordAco = Cypress.env('PASSWORD_ACO')
+
+const userNamePpcs = Cypress.env('USERNAME_PPCS')
+const passwordPpcs = Cypress.env('PASSWORD_PPCS')
 
 const getUserDetails = function (userType: UserType) {
   let userDetails = {}
@@ -46,18 +50,33 @@ Cypress.Commands.add('visitPage', (url, isSpoUser = false) => {
   cy.clearCookies()
   cy.visit(url)
   cy.pageHeading().should('equal', 'Sign in')
-  cy.get('#username').type(isSpoUser ? userNameSpo : userName, { log: false })
-  cy.get('#password').type(isSpoUser ? passwordSpo : password, { log: false })
+  cy.get('#username').type(isSpoUser ? userNameSpo : userNamePo, { log: false })
+  cy.get('#password').type(isSpoUser ? passwordSpo : passwordPo, { log: false })
   cy.get('#submit').click()
   getUserDetails(isSpoUser ? UserType.SPO : UserType.PO)
 })
+
+const resolveUserDetails: (userType: UserType) => { username: string, password: string } = (userType) => {
+  switch (userType) {
+    case UserType.ACO:
+      return { username: userNameAco, password: passwordAco }
+    case UserType.SPO:
+      return { username: userNameSpo, password: passwordSpo }
+    case UserType.PPCS:
+      return { username: userNamePpcs, password: passwordPpcs }
+    case UserType.PO:
+    default:
+      return { username: userNamePo, password: passwordPo }
+  }
+}
 
 Cypress.Commands.add('visitPageAndLogin', function (url, userType = UserType.PO) {
   cy.clearCookies()
   cy.visit(url)
   cy.pageHeading().should('equal', 'Sign in')
-  cy.get('#username').type(userType === UserType.ACO ? userNameAco : userType === UserType.SPO ? userNameSpo : userName, { log: false })
-  cy.get('#password').type(userType === UserType.ACO ? passwordAco : userType === UserType.SPO ? passwordSpo : password, { log: false })
+  const userDetails = resolveUserDetails(userType)
+  cy.get('#username').type(userDetails.username)
+  cy.get('#password').type(userDetails.password, { log: false })
   cy.get('#submit').click()
   getUserDetails(userType)
 })

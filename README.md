@@ -39,7 +39,7 @@ npm run e2e-ui -- --env TAGS='@E2E and not @ignore',ENV=dev
 
 ## E2E Tests on CircleCI
 
-E2E tests are not run on a feature branch, only unit, integration and accessibility tests are run. Once a feature branch is merged into `main`, the E2E tests are ran against the `dev` and `preprod` environments after deployment. The user credentials they use to log into the service are stored as [environment variables (in CircleCI)](https://app.circleci.com/settings/project/github/ministryofjustice/make-recall-decision-ui/environment-variables) called `CYPRESS_USERNAME_<environment>`, `CYPRESS_PASSWORD_<environment>`, `CYPRESS_USERNAME_SPO_<environment>`, `CYPRESS_PASSWORD_SPO_<environment>`,`CYPRESS_USERNAME_ACO_<environment>`, `CYPRESS_PASSWORD_ACO_<environment>`.
+E2E tests are not run on a feature branch, only unit, integration and accessibility tests are run. Once a feature branch is merged into `main`, the E2E tests are ran against the `dev` and `preprod` environments after deployment. The user credentials they use to log into the service are stored as [environment variables (in CircleCI)](https://app.circleci.com/settings/project/github/ministryofjustice/make-recall-decision-ui/environment-variables) called `CYPRESS_USERNAME_PO<environment>`, `CYPRESS_PASSWORD_PO<environment>`, `CYPRESS_USERNAME_SPO_<environment>`, `CYPRESS_PASSWORD_SPO_<environment>`,`CYPRESS_USERNAME_ACO_<environment>`, `CYPRESS_PASSWORD_ACO_<environment>`,`CYPRESS_USERNAME_PPCS_<environment>`, `CYPRESS_PASSWORD_PPCS_<environment>`.
 
 ### Running E2E tests on CircleCI on demand
 
