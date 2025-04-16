@@ -32,7 +32,7 @@ import {
   q8ArrestIssues,
   q9LocalPoliceDetails,
 } from './assertionsPartA'
-import { CustodyType, YesNoType } from '../support/enums'
+import { CUSTODY_GROUP, CustodyType, YesNoType } from '../support/enums'
 import { loginAndSearchCrn } from "./user/user"
 
 export const crns = {
@@ -79,6 +79,8 @@ defineParameterType({
   regexp: /RECALL|NO_RECALL/,
   transformer: s => s,
 })
+
+defineParameterType({ name: 'custodyGroup', regexp: /DETERMINATE|INDETERMINATE/, transformer: s => CUSTODY_GROUP[s] })
 
 Before(() => {
   openApp({ flagRecommendationsPage: 1, flagDeleteRecommendation: 1 })
