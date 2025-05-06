@@ -104,4 +104,9 @@ export enum Regions {
   South_West = 'South West'
 }
 
+export enum CUSTODY_GROUP {
+  DETERMINATE = "Determinate",
+  INDETERMINATE = "Indeterminate",
+}
+
 export const REGEXP_SPECIAL_CHAR = /[\!\#\$\%\^\&\*\)\(\+\=\.\<\>\{\}\[\]\:\;\'\"\|\~\`\_\-]/g
