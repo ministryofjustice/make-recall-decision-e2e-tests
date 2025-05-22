@@ -1,6 +1,6 @@
 # E2E tests
 
-This repo if for the e2e tests for Make Recall Decision Project. They run using Cypress.
+This repo is for the e2e tests for Make Recall Decision Project. They run using Cypress.
 
 There's a HMPPS dev 'community of practice' talk on [how the E2E tests are set up](https://drive.google.com/file/d/1OeekvkViazrYNJXGMZrlM8UZU-Z71x6X/view).
 
@@ -39,19 +39,19 @@ npm run e2e-ui -- --env TAGS='@E2E and not @ignore',ENV=dev
 
 ## E2E Tests on CircleCI
 
-E2E tests are not run on a feature branch, only unit, integration and accessibility tests are run. Once a feature branch is merged into `main`, the E2E tests are ran against the `dev` and `preprod` environments after deployment. The user credentials they use to log into the service are stored as [environment variables (in CircleCI)](https://app.circleci.com/settings/project/github/ministryofjustice/make-recall-decision-ui/environment-variables) called `CYPRESS_USERNAME_PO<environment>`, `CYPRESS_PASSWORD_PO<environment>`, `CYPRESS_USERNAME_SPO_<environment>`, `CYPRESS_PASSWORD_SPO_<environment>`,`CYPRESS_USERNAME_ACO_<environment>`, `CYPRESS_PASSWORD_ACO_<environment>`,`CYPRESS_USERNAME_PPCS_<environment>`, `CYPRESS_PASSWORD_PPCS_<environment>`.
+E2E tests are not run on a feature branch, only unit, integration and accessibility tests are run. Once a feature branch is merged into `main`, the E2E tests are ran against the `dev` environments after deployment. The user credentials they use to log into the service are stored as [environment variables (in CircleCI)](https://app.circleci.com/settings/project/github/ministryofjustice/make-recall-decision-ui/environment-variables) called `CYPRESS_USERNAME_PO<environment>`, `CYPRESS_PASSWORD_PO<environment>`, `CYPRESS_USERNAME_SPO_<environment>`, `CYPRESS_PASSWORD_SPO_<environment>`,`CYPRESS_USERNAME_ACO_<environment>`, `CYPRESS_PASSWORD_ACO_<environment>`,`CYPRESS_USERNAME_PPCS_<environment>`, `CYPRESS_PASSWORD_PPCS_<environment>`.
 
 ### Running E2E tests on CircleCI on demand
 
-The E2E test can be run manually on `dev` & `preprod` from the [Pipeline](https://app.circleci.com/pipelines/github/ministryofjustice/make-recall-decision-ui?branch=main) page
+The E2E test can be run manually on `dev` from the [Pipeline](https://app.circleci.com/pipelines/github/ministryofjustice/make-recall-decision-ui?branch=main) page
 
 To run the tests:
 1. Click on **Trigger Pipeline** button
 2. Click on **Add another parameter** button
 3. Select `boolean` in **Parameter type** dropdown
-4. Enter `e2e-check-dev` in **Name** field for 'dev' and `e2e-check-preprod` for 'preprod'
+4. Enter `e2e-check-dev` in **Name** field
 5. Select `true` in the **Value** field
-6. If you want to override the cucumber tags you can add another string parameter called `e2e-tags` and enter a valid cucumber tag expression, .e.g. `@E2E and not @ignore` without any quotes. This is optional, if not passed it defaults to `@E2E` when running on `dev` & `@smoke` on `preprod`.
+6. If you want to override the cucumber tags you can add another string parameter called `e2e-tags` and enter a valid cucumber tag expression, .e.g. `@E2E and not @ignore` without any quotes. This is optional, if not passed it defaults to `@E2E` when running on `dev`.
 
 If a test fails, look under the **ARTIFACTS** tab for the CircleCI job to see a screenshot, video and logs of the failed step.
 
@@ -65,17 +65,10 @@ You can run your local tests against dev env using:
 npx cypress open --env USERNAME=<username>,PASSWORD=<password>,USERNAME_SPO=<username_spo>,PASSWORD_SPO=<password_spo>,USERNAME_ACO=<username_aco>,PASSWORD_ACO=<password_aco>,ENV=dev --config-file e2e_tests/cypress.config.ts --config baseUrl=https://make-recall-decision-dev.hmpps.service.justice.gov.uk
 ```
 
-You can run your local tests against preprod env using:
-
-```
-npx cypress open --env USERNAME=<username>,PASSWORD=<password>,USERNAME_SPO=<username_spo>,PASSWORD_SPO=<password_spo>,USERNAME_ACO=<username_aco>,PASSWORD_ACO=<password_aco>,CRN=<crn1>,CRN2=<crn2>,CRN3=<crn3>,CRN4=<crn4>,CRN5=<crn5>,ENV=preprod --config-file e2e_tests/cypress.config.ts --config baseUrl=https://make-recall-decision-preprod.hmpps.service.justice.gov.uk
-```
-
 With params replaced as follows:
-- USERNAME - your Delius username for `dev`/`preprod`
-- PASSWORD - your Delius password for `dev`/`preprod`
-- USERNAME_SPO - the value of the `CYPRESS_USERNAME_SPO_dev`/`CYPRESS_USERNAME_SPO_preprod` env var in [CircleCi](https://app.circleci.com/settings/project/github/ministryofjustice/make-recall-decision-ui/environment-variables)
-- PASSWORD_SPO - the value of the `CYPRESS_PASSWORD_SPO_dev`/`CYPRESS_PASSWORD_SPO_preprod` env var in [CircleCi](https://app.circleci.com/settings/project/github/ministryofjustice/make-recall-decision-ui/environment-variables)
-- USERNAME_ACO - the value of the `CYPRESS_USERNAME_ACO_dev`/`CYPRESS_USERNAME_ACO_preprod` env var in [CircleCi](https://app.circleci.com/settings/project/github/ministryofjustice/make-recall-decision-ui/environment-variables)
-- PASSWORD_ACO - the value of the `CYPRESS_PASSWORD_ACO_dev`/`CYPRESS_PASSWORD_ACO_preprod` env var in [CircleCi](https://app.circleci.com/settings/project/github/ministryofjustice/make-recall-decision-ui/environment-variables)
-- (for preprod only) - CRN1, 2 etc - the values of CRN_preprod, CRN2_preprod etc in CircleCI
+- USERNAME - your Delius username for `dev`
+- PASSWORD - your Delius password for `dev`
+- USERNAME_SPO - the value of the `CYPRESS_USERNAME_SPO_dev` env var in [CircleCi](https://app.circleci.com/settings/project/github/ministryofjustice/make-recall-decision-ui/environment-variables)
+- PASSWORD_SPO - the value of the `CYPRESS_PASSWORD_SPO_dev` env var in [CircleCi](https://app.circleci.com/settings/project/github/ministryofjustice/make-recall-decision-ui/environment-variables)
+- USERNAME_ACO - the value of the `CYPRESS_USERNAME_ACO_dev` env var in [CircleCi](https://app.circleci.com/settings/project/github/ministryofjustice/make-recall-decision-ui/environment-variables)
+- PASSWORD_ACO - the value of the `CYPRESS_PASSWORD_ACO_dev` env var in [CircleCi](https://app.circleci.com/settings/project/github/ministryofjustice/make-recall-decision-ui/environment-variables)
