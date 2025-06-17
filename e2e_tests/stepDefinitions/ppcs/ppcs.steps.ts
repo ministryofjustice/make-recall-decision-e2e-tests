@@ -186,8 +186,11 @@ Then('the user proceeds to book a {custodyGroup} sentence recall', function(cust
 
   if (custodyGroup === CUSTODY_GROUP.DETERMINATE) {
     cy.pageHeading().should('contain', 'Select the index offence for ')
-    selectRandomRadio('.govuk-radios') // Forced to select by class at the moment as no id
+    selectRadio('indexOffence', '3934359')
     cy.clickButton('Continue')
+
+    cy.pageHeading().should('equal', 'Check the index offence and its consecutive sentences')
+    cy.clickLink('Continue')
 
     cy.pageHeading().should('equal', 'Select a matching index offence in PPUD')
     selectRandomAutocompleteOption('indexOffence')
