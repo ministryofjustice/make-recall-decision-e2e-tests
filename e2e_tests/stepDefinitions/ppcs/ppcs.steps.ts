@@ -206,6 +206,13 @@ Then('the user proceeds to book a {custodyGroup} sentence recall', function(cust
   } else if (custodyGroup === CUSTODY_GROUP.INDETERMINATE) {
     cy.pageHeading().should('contain', 'Select or add a sentence for your booking')
     selectRandomRadio('.govuk-radios') // Forced to select by class at the moment as no id
+    cy.clickButton('Continue')
+
+    cy.pageHeading().should('contain', 'Your recall booking for ')
+    cy.clickButton('Continue')
+
+    // TODO MRD-2684 the below once booking is supported for indeterminates
+    // cy.pageHeading().should('match', 'Create new PPUD record for ')
     // cy.clickButton('Continue')
   }
 })
@@ -215,7 +222,7 @@ Then('the {custodyGroup} booking reports successfully sent to PPUD', function (c
     cy.pageHeading().should('contain', 'Your recall booking')
   } else if (custodyGroup === CUSTODY_GROUP.INDETERMINATE) {
     // temporary end state until the full journey is implemented
-    cy.pageHeading().should('contain', 'Select or add a sentence for your booking')
+    cy.pageHeading().should('match', /Book (?:\w+\s?)*? onto PPUD/)
   } else {
     cy.contains(`Unexpected custody group encountered: ${custodyGroup}`).should('not.exist')
   }
