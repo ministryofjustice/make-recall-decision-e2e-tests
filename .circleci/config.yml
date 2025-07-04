@@ -236,7 +236,7 @@ jobs:
 
 
 # E2E tests using the dev and pre-prod environments have been commented out.
-# They were actingas a 'gate' to prevent a broken production deployment, this has been superceded by a 'manual' gate step.
+# They were acting as a 'gate' to prevent a broken production deployment, this has been superseded by a 'manual' gate step.
 # Deactivating these tests also removes flakiness caused by drifting test fixtures.
 # the E2E local test is still in place, it tests te FE/BE contract and assumes contracts between MRD and other external systems.
 workflows:
