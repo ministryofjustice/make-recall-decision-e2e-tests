@@ -36,11 +36,11 @@ import { CUSTODY_GROUP, CustodyType, YesNoType } from '../support/enums'
 import { loginAndSearchCrn } from "./user/user"
 
 export const crns = {
-  1: Cypress.env('CRN') || 'D002399',
-  2: Cypress.env('CRN2') || 'X514364',
-  3: Cypress.env('CRN3') || 'D002399',
-  4: Cypress.env('CRN4') || 'X487027',
-  5: Cypress.env('CRN5') || 'X514364',
+  1: Cypress.env('CRN') || 'X514364',
+  // 2: Cypress.env('CRN2') || 'D002399',
+  // 3: Cypress.env('CRN3') || 'D002399',
+  // 4: Cypress.env('CRN4') || 'X487027',
+  // 5: Cypress.env('CRN5') || 'X514364',
 }
 export const deleteOpenRecommendation = () => {
   cy.clickLink('Recommendations')
