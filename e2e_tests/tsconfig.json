@@ -6,7 +6,8 @@
     "types": ["node", "cypress"],
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "moduleResolution": "node"
+    "moduleResolution": "nodenext",
+    "module": "nodenext"
   },
   "include": ["**/*.ts"],
   "exclude": ["cypress.config.ts"]
