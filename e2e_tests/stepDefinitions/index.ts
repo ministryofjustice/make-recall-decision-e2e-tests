@@ -86,11 +86,6 @@ Before(() => {
   openApp({ flagRecommendationsPage: 1, flagDeleteRecommendation: 1 })
 })
 
-After(function () {
-  cy.log(`this.testData@End--> ${JSON.stringify(this.testData)}`)
-  flush()
-})
-
 Then('the page heading contains {string}', heading => {
   cy.pageHeading().should('contains', heading)
 })
