@@ -1,5 +1,4 @@
 import { After, Before, defineParameterType, Then, When } from '@badeball/cypress-cucumber-preprocessor'
-import { flush } from '@alfonso-presa/soft-assert'
 import { UserType } from '../support/commands'
 import {
   q10Vulnerabilities,
@@ -81,9 +80,12 @@ defineParameterType({
 })
 
 defineParameterType({ name: 'custodyGroup', regexp: /DETERMINATE|INDETERMINATE/, transformer: s => CUSTODY_GROUP[s] })
-
 Before(() => {
   openApp({ flagRecommendationsPage: 1, flagDeleteRecommendation: 1 })
+})
+
+After(function () {
+  cy.log(`this.testData@End--> ${JSON.stringify(this.testData)}`)
 })
 
 Then('the page heading contains {string}', heading => {
