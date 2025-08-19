@@ -1,7 +1,8 @@
 import { defineConfig } from 'cypress'
-import createBundler  from '@bahmutov/cypress-esbuild-preprocessor'
+import createBundler from '@bahmutov/cypress-esbuild-preprocessor'
 import { addCucumberPreprocessorPlugin } from '@badeball/cypress-cucumber-preprocessor'
 import createEsbuildPlugin from '@badeball/cypress-cucumber-preprocessor/esbuild'
+import { nodeModulesPolyfillPlugin } from 'esbuild-plugins-node-modules-polyfill'
 import installLogsPrinter from 'cypress-terminal-report/src/installLogsPrinter'
 import { readDocX } from '../cypress_shared/plugins'
 
@@ -15,6 +16,7 @@ export default defineConfig({
   screenshotsFolder: 'e2e_tests/screenshots',
   videosFolder: 'e2e_tests/videos',
   video: process.env.ENVIRONMENT !== 'local',
+  videoCompression: process.env.ENVIRONMENT !== 'local',
   reporter: 'cypress-multi-reporters',
   reporterOptions: {
     reportDir: 'e2e_tests/reports',
@@ -46,7 +48,7 @@ export default defineConfig({
       on(
         'file:preprocessor',
         createBundler({
-          plugins: [createEsbuildPlugin(config)],
+          plugins: [nodeModulesPolyfillPlugin(), createEsbuildPlugin(config)],
         })
       )
 
