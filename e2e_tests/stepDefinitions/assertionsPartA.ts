@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { proxy, flush } from '@alfonso-presa/soft-assert'
+import { proxy } from '@alfonso-presa/soft-assert'
 import {
   changeDateFromLongFormatToShort,
   formatObjectDateToLongFormat,
@@ -529,5 +529,3 @@ export const q29Attachments = (contents: string, details: Record<string, string>
   contents = contents.substring(contents.indexOf(partASections[29]))
   cy.log(`Q29: ${JSON.stringify(details)} ${contents}`)
 }
-
-export const assertAllPartA = () => flush()
