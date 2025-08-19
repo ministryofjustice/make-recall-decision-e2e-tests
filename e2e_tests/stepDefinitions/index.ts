@@ -1,4 +1,5 @@
 import { After, Before, defineParameterType, Then, When } from '@badeball/cypress-cucumber-preprocessor'
+import { flush } from '@alfonso-presa/soft-assert'
 import { UserType } from '../support/commands'
 import {
   q10Vulnerabilities,
@@ -36,10 +37,10 @@ import { loginAndSearchCrn } from "./user/user"
 
 export const crns = {
   1: Cypress.env('CRN') || 'X514364',
-  // 2: Cypress.env('CRN2') || 'D002399',
-  // 3: Cypress.env('CRN3') || 'D002399',
-  // 4: Cypress.env('CRN4') || 'X487027',
-  // 5: Cypress.env('CRN5') || 'X514364',
+  2: Cypress.env('CRN2') || 'X514364',
+  3: Cypress.env('CRN3') || 'X487027',
+  4: Cypress.env('CRN4') || 'X487027',
+  // 5: Cypress.env('CRN5') || 'D002399', // Removed temporarily. This CRN doesn't have an address, and causes an error on the addressDetails page
 }
 export const deleteOpenRecommendation = () => {
   cy.clickLink('Recommendations')
@@ -86,6 +87,7 @@ Before(() => {
 
 After(function () {
   cy.log(`this.testData@End--> ${JSON.stringify(this.testData)}`)
+  flush()
 })
 
 Then('the page heading contains {string}', heading => {

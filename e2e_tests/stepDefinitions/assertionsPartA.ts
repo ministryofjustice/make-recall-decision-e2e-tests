@@ -50,7 +50,7 @@ const partASections = {
   25: '25. Probation Details – PS/YOT community offender manager',
   26: '26. If different from above, details of the current supervising PS/YOT community offender manager',
   27: '27. Endorsement of Recall Report and Risk Assessment by PS/YOT Line Manager',
-  28: '28. Authorisation and comments by senior manager who is equivalent to the former ACO grade/YOT Manager or equivalent',
+  28: '28. Authorisation and comments by senior manager who is equivalent to the former ACO grade/YOT Manager',
   29: '29. Attachments',
 }
 
