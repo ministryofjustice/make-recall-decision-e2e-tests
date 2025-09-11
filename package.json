@@ -195,9 +195,13 @@
   },
   "overrides": {
     "json5": "2.2.3",
-    "glob": "10.4.5"
+    "glob": "10.4.5",
+    "csurf": {
+      "cookie": "1.0.2"
+    }
   },
   "overridesComments": {
-    "glob": "Jest depends on babel-plugin-istanbul, which depends on an older glob version. This should be fixed soon, but overriding this until then - see https://github.com/istanbuljs/babel-plugin-istanbul/issues"
+    "glob": "Jest depends on babel-plugin-istanbul, which depends on an older glob version. This should be fixed soon, but overriding this until then - see https://github.com/istanbuljs/babel-plugin-istanbul/issues",
+    "cookie": "csurf depends on a version of cookie with a vulnerability. Overriding here, but csurf deprecated so we should try to replace it soon. Recorded in MRD-2884."
   }
 }
