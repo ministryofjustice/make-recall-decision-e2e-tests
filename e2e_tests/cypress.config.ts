@@ -61,5 +61,6 @@ export default defineConfig({
     excludeSpecPattern: '**/!(*.cy).ts',
     specPattern: '**/*.feature',
     supportFile: 'e2e_tests/support/index.ts',
+    experimentalRunAllSpecs: true,
   },
 })
