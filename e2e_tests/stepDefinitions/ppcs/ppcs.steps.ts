@@ -207,7 +207,7 @@ Then('the user proceeds to book a {custodyGroup} sentence recall', function(cust
     cy.pageHeading().should('contain', 'Select or add a sentence for your booking')
 
     // navigate to 'determinate ppud sentences' page and come back
-    cy.get('#determinateSentencesDetails summary', { timeout: 0 }).then(($summary) => {
+    cy.get('#determinateSentencesDetails summary').then(($summary) => {
       if ($summary.length) {
         cy.wrap($summary).click();
         cy.get('#determinate-sentences-link').click();
