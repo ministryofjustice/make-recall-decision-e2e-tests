@@ -264,14 +264,16 @@ export const q10Vulnerabilities = (contents: string, details: Record<string, str
   // eslint-disable-next-line no-param-reassign
   contents = contents.substring(contents.indexOf(partASections[10]), contents.indexOf(partASections[11]))
   if (details && typeof details[0] === 'string') {
-    expectSoftly(contents, 'Vulnerabilities status').to.contain(
-      `Are there any vulnerability issues and/or diversity needs in view of arrest and subsequent location at prison or police custody? No`
-    )
-    expectSoftly(contents, 'Vulnerabilities details').to.contain(`If yes, provide details: ${details[0]}`)
+    if (details[0] !== 'None') {
+      expectSoftly(contents, 'Vulnerabilities status').to.contain(
+        `Are there any vulnerability issues and/or diversity needs in view of arrest and subsequent location at prison or police custody? No concerns about vulnerabilities or needs`
+      )
+      expectSoftly(contents, 'Vulnerabilities details').to.contain(`If yes, provide details: ${details[0]}`)
+    }
   } else if (details && typeof details[0] === 'object') {
     details.forEach(detail => {
       expectSoftly(contents, 'Vulnerabilities status').to.contain(
-        `Are there any vulnerability issues and/or diversity needs in view of arrest and subsequent location at prison or police custody? Yes`
+        `Are there any vulnerability issues and/or diversity needs in view of arrest and subsequent location at prison or police custody? Yes, has vulnerabilities or needs`
       )
       expectSoftly(contents, 'Vulnerabilities details').to.contain(
         `${detail.vulnerabilityName}:${detail.vulnerabilityNotes}`
