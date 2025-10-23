@@ -32,7 +32,7 @@ const partASections = {
   7: '7. Last recorded address where s/he should be residing',
   8: '8. Are there any arrest issues of which police should be aware',
   9: '9. Local police details and the OM’s local police contact',
-  10: '10. Are there any vulnerability issues',
+  10: '10. Consider if you think this recall could affect any vulnerabilities or needs the offender may have',
   11: '11. Do you have any suspicions that the offender is using recall to bring contraband into the prison estate',
   12: '12. Current MAPPA Management',
   13: '13. Registered PPO/IOM',
@@ -264,14 +264,21 @@ export const q10Vulnerabilities = (contents: string, details: Record<string, str
   // eslint-disable-next-line no-param-reassign
   contents = contents.substring(contents.indexOf(partASections[10]), contents.indexOf(partASections[11]))
   if (details && typeof details[0] === 'string') {
-    expectSoftly(contents, 'Vulnerabilities status').to.contain(
-      `Are there any vulnerability issues and/or diversity needs in view of arrest and subsequent location at prison or police custody? No`
-    )
-    expectSoftly(contents, 'Vulnerabilities details').to.contain(`If yes, provide details: ${details[0]}`)
+    if (details[0] === 'None') {
+      expectSoftly(contents, 'Vulnerabilities status').to.contain(
+        `Consider if you think this recall could affect any vulnerabilities or needs the offender may have No concerns about vulnerabilities or needs`
+      )
+      expectSoftly(contents, 'Vulnerabilities details').to.contain(`If yes, provide details:`)
+    } else if (details[0] === 'Not known') {
+      expectSoftly(contents, 'Vulnerabilities status').to.contain(
+        `Consider if you think this recall could affect any vulnerabilities or needs the offender may have Do not know about vulnerabilities or needs`
+      )
+      expectSoftly(contents, 'Vulnerabilities details').to.contain(`If yes, provide details:`)
+    }
   } else if (details && typeof details[0] === 'object') {
     details.forEach(detail => {
       expectSoftly(contents, 'Vulnerabilities status').to.contain(
-        `Are there any vulnerability issues and/or diversity needs in view of arrest and subsequent location at prison or police custody? Yes`
+        `Consider if you think this recall could affect any vulnerabilities or needs the offender may have Yes, has vulnerabilities or needs`
       )
       expectSoftly(contents, 'Vulnerabilities details').to.contain(
         `${detail.vulnerabilityName}:${detail.vulnerabilityNotes}`
