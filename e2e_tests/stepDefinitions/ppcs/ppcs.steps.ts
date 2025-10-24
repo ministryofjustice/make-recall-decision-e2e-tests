@@ -205,6 +205,21 @@ Then('the user proceeds to book a {custodyGroup} sentence recall', function(cust
     cy.clickButton('Continue')
   } else if (custodyGroup === CUSTODY_GROUP.INDETERMINATE) {
     cy.pageHeading().should('contain', 'Select or add a sentence for your booking')
+
+    // navigate to 'determinate ppud sentences' page and come back
+    cy.get('body').then(($body) => {
+      const $summary = $body.find('#determinateSentencesDetails summary')
+      if ($summary.length) {
+        cy.wrap($summary).click()
+        cy.get('#determinate-sentences-link').click()
+        cy.pageHeading().should('equal', 'Determinate sentences in PPUD')
+        cy.contains('a', 'Return to indeterminate sentences').click()
+      } else {
+        cy.log('No determinate sentences summary found, skipping steps')
+      }
+    })
+
+    // select random radio on the indeterminate page
     selectRandomRadio('.govuk-radios') // Forced to select by class at the moment as no id
     cy.clickButton('Continue')
 
