@@ -113,7 +113,7 @@
     "jquery": "^3.6.3",
     "jwt-decode": "^3.1.2",
     "luxon": "^3.2.1",
-    "mammoth": "^1.5.1",
+    "mammoth": "^1.11.0",
     "nocache": "^3.0.4",
     "nunjucks": "^3.2.3",
     "passport": "^0.6.0",
