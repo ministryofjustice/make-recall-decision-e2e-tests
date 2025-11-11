@@ -196,6 +196,10 @@ Then('the user proceeds to book a {custodyGroup} sentence recall', function(cust
     selectRandomAutocompleteOption('indexOffence')
     cy.clickButton('Continue')
 
+    cy.pageHeading().should('contain', 'Which custody type is ')
+    selectRandomRadio('.govuk-radios')
+    cy.clickButton('Continue')
+
     cy.pageHeading().should('contain', 'Your recall booking - ')
     // TODO Verify data that was set during the test once we have normalised the summary list
     // and can access direct data
