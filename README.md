@@ -1,5 +1,7 @@
 # E2E tests
 
+[![Ministry of Justice Repository Compliance Badge](https://github-community.service.justice.gov.uk/repository-standards/api/make-recall-decision-e2e-tests/badge?style=flat)](https://github-community.service.justice.gov.uk/repository-standards/make-recall-decision-e2e-tests)
+
 This repo is for the e2e tests for Make Recall Decision Project. They run using Cypress.
 
 There's a HMPPS dev 'community of practice' talk on [how the E2E tests are set up](https://drive.google.com/file/d/1OeekvkViazrYNJXGMZrlM8UZU-Z71x6X/view).
