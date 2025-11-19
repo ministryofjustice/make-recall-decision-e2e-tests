@@ -182,7 +182,7 @@ Then('the user proceeds to book a {custodyGroup} sentence recall', function(cust
   selectRandomRadio('.govuk-radios') // Forced to select by class at the moment as no id
   cy.clickButton('Continue')
 
-  cy.clickButton('Accept and continue')
+  cy.clickButton('Continue')
 
   if (custodyGroup === CUSTODY_GROUP.DETERMINATE) {
     cy.pageHeading().should('contain', 'Select the index offence for ')
