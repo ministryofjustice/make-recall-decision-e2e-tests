@@ -131,7 +131,6 @@ Then('the user proceeds to book a {custodyGroup} sentence recall', function(cust
   cy.pageHeading().should('equal', 'PPUD record found')
   if (custodyGroup === CUSTODY_GROUP.DETERMINATE) {
     cy.contains('span', 'What to do if you cannot find the right PPUD record').click()
-    // cy.get('button').should('have.attr', 'role', 'button')
     cy.contains('a', 'Create a determinate PPUD record').should('have.attr', 'role', 'button').click()
   } else {
     cy.get('form').find('button').click()
