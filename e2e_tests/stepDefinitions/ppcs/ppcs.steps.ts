@@ -130,7 +130,8 @@ Then('the user proceeds to book a {custodyGroup} sentence recall', function(cust
 
   cy.pageHeading().should('equal', 'PPUD record found')
   if (custodyGroup === CUSTODY_GROUP.DETERMINATE) {
-    cy.clickLink('Continue and create PPUD record') // TODO: these links should have the button role and should check for this
+    cy.contains('span', 'What to do if you cannot find the right PPUD record').click()
+    cy.contains('a', 'Create a determinate PPUD record').should('have.attr', 'role', 'button').click()
   } else {
     cy.get('form').find('button').click()
   }
