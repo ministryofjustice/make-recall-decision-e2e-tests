@@ -165,6 +165,10 @@ Then('the user proceeds to book a {custodyGroup} sentence recall', function(cust
     cy.pageHeading().should('equal', 'Edit legislation released under')
     selectRandomOption('#legislationReleasedUnder', true)
     cy.clickButton('Continue')
+
+    cy.get('#edit-legislationreleasedunder').should('exist')
+  } else {
+    cy.get('#edit-legislationreleasedunder').should('not.exist')
   }
 
   cy.clickLinkById('edit-currentestablishment', editText)
