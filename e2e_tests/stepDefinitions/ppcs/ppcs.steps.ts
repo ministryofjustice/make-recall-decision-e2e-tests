@@ -153,15 +153,23 @@ Then('the user proceeds to book a {custodyGroup} sentence recall', function(cust
   selectRandomAutocompleteOption('releasingPrison')
   cy.clickButton('Continue')
 
-  cy.clickLinkById('edit-legislationreleasedunder', editText)
-  cy.pageHeading().should('equal', 'Edit legislation released under')
-  selectRandomOption('#legislationReleasedUnder', true)
-  cy.clickButton('Continue')
+  cy.get('#edit-legislationreleasedunder').should('not.exist')
 
   cy.clickLinkById('edit-custodygroup', editText)
   cy.pageHeading().should('equal', 'Is the sentence determinate or indeterminate?')
   selectRadio('custodyGroup', custodyGroup)
   cy.clickButton('Continue')
+
+  if (custodyGroup === CUSTODY_GROUP.DETERMINATE) {
+    cy.clickLinkById('edit-legislationreleasedunder', editText)
+    cy.pageHeading().should('equal', 'Edit legislation released under')
+    selectRandomOption('#legislationReleasedUnder', true)
+    cy.clickButton('Continue')
+
+    cy.get('#edit-legislationreleasedunder').should('exist')
+  } else {
+    cy.get('#edit-legislationreleasedunder').should('not.exist')
+  }
 
   cy.clickLinkById('edit-currentestablishment', editText)
   cy.pageHeading().should('equal', 'Edit current establishment')
