@@ -217,7 +217,7 @@ Then('the user proceeds to book a {custodyGroup} sentence recall', function(cust
     cy.pageHeading().should('contain', 'Create new PPUD record for ')
     cy.clickButton('Continue')
   } else if (custodyGroup === CUSTODY_GROUP.INDETERMINATE) {
-    cy.pageHeading().should('contain', 'Select or add a sentence for your booking')
+    cy.pageHeading().should('contain', 'Select a sentence for your booking')
 
     // navigate to 'determinate ppud sentences' page and come back
     cy.get('body').then(($body) => {
