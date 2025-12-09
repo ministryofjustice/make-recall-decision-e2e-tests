@@ -2,6 +2,7 @@ version: 2.1
 
 orbs:
   hmpps: ministryofjustice/hmpps@6
+  node: circleci/node@6.1.0
   slack: circleci/slack@4.10.1
 
 parameters:
@@ -106,6 +107,9 @@ jobs:
       - run:
           name: Checkout/clone make-recall-decision-ui
           command: git clone https://github.com/ministryofjustice/make-recall-decision-ui.git
+      - node/install:
+          node-version: '20' # node/install doesn't have a working_directory parameter, but the .nvmrc file is in a
+                             # sub-directory (make-recall-decision-e2e-tests), so we need to set the node version here
       - run:
           name: Start components
           working_directory: make-recall-decision-ui
@@ -180,6 +184,9 @@ jobs:
             git clone https://github.com/ministryofjustice/make-recall-decision-ui.git
             cd make-recall-decision-ui
             git checkout main
+      - node/install:
+          node-version: '20' # node/install doesn't have a working_directory parameter, but the .nvmrc file is in a
+                             # sub-directory (make-recall-decision-e2e-tests), so we need to set the node version here
       - run:
           name: Start components for integration tests
           working_directory: make-recall-decision-e2e-tests
