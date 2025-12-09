@@ -32,7 +32,7 @@ import {
   q8ArrestIssues,
   q9LocalPoliceDetails,
 } from './assertionsPartA'
-import { CustodyGroup, CustodyType, PPUDRecordState, YesNoType } from "../support/enums";
+import { CustodyGroup, CustodyType, PPUDRecordState, YesNoType } from '../support/enums'
 import { loginAndSearchCrn } from "./user/user"
 
 export const crns = {

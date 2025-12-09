@@ -216,13 +216,16 @@ Then(
     cy.pageHeading().should('equal', 'View the index offence and its consecutive sentences')
     cy.clickLink('Continue')
 
-    cy.pageHeading().should('equal', 'Select a matching index offence in PPUD')
-    selectRandomAutocompleteOption('indexOffence')
-    cy.clickButton('Continue')
-
     if (ppudRecordState === PPUDRecordState.EXISTING) {
       cy.pageHeading().should('contain', 'Add your booking to PPUD - ')
       selectRandomRadio('.govuk-radios', 'ADD_NEW')
+      cy.clickButton('Continue')
+
+      cy.pageHeading().should('equal', 'Do you need to change the index offence or add a comment?')
+      selectRadio('changeOffenceOrAddComment', 'YES')
+      cy.clickButton('Continue')
+
+      cy.pageHeading().should('equal', 'Change index offence or add a comment')
       cy.clickButton('Continue')
 
       cy.pageHeading().should('contain', 'Double check your booking')
@@ -233,6 +236,10 @@ Then(
       cy.pageHeading().should('match', /Book \S.+? onto PPUD/)
       cy.clickButton('Continue')
     } else if (ppudRecordState === PPUDRecordState.NEW) {
+      cy.pageHeading().should('equal', 'Select a matching index offence in PPUD')
+      selectRandomAutocompleteOption('indexOffence')
+      cy.clickButton('Continue')
+
       cy.pageHeading().should('contain', 'Which custody type is ')
       selectRandomRadio('.govuk-radios')
       cy.clickButton('Continue')
