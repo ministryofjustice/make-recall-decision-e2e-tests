@@ -1,13 +1,13 @@
-import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
-import { recommendationService } from '../../utils/recommendations/recommendationsService'
-import { getApiAuth } from '../../utils/auth'
-import { loginAndSearchForCrn, signOut } from '../user/user'
-import { selectRandomOption } from '../../utils/inputs/select'
-import { selectRadio, selectRandomRadio } from '../../utils/inputs/radios'
-import { selectRandomAutocompleteOption } from '../../utils/inputs/accessibleAutocomplete'
-import { pages } from '../pages/pages'
-import { UserType } from '../../support/commands'
-import { textAreaRandomText } from '../../utils/inputs/textArea'
+import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor';
+import { recommendationService } from '../../utils/recommendations/recommendationsService';
+import { getApiAuth } from '../../utils/auth';
+import { loginAndSearchForCrn, signOut } from '../user/user';
+import { selectRandomOption } from '../../utils/inputs/select';
+import { selectRadio, selectRandomRadio } from '../../utils/inputs/radios';
+import { selectRandomAutocompleteOption } from '../../utils/inputs/accessibleAutocomplete';
+import { pages } from '../pages/pages';
+import { UserType } from '../../support/commands';
+import { textAreaRandomText } from '../../utils/inputs/textArea';
 import {
   createRecommendationRequest,
   initialRecomendationRequest,
@@ -15,10 +15,10 @@ import {
   recordDecisionRecommendationRequest,
   spoSignatureRequestStatusRequest,
   startRecallRecommendationStatusRequest,
-} from './ppcs.requests'
-import { CUSTODY_GROUP } from '../../support/enums'
+} from './ppcs.requests';
+import { CustodyGroup, PPUDRecordState } from '../../support/enums';
 
-const LOCAL_TEST_PPCS_CRN = 'X738925'
+const LOCAL_TEST_PPCS_CRN = 'X738925';
 
 let ppcsTestData: {
   crn: string,
@@ -32,13 +32,13 @@ Given('a recommendation exists for use in PPCS', () => {
   const crn = resolveTestCRN()
 
   getApiAuth().then((authToken) => {
-    recommendationService.createRecommendation(createRecommendationRequest(crn), authToken).then((recommedation) => {
+    recommendationService.createRecommendation(createRecommendationRequest(crn), authToken).then((recommendation) => {
       ppcsTestData = {
         crn: crn,
-        recommendationId: recommedation.id,
+        recommendationId: recommendation.id,
       }
       recommendationService.updateRecommendation(ppcsTestData.recommendationId, initialRecomendationRequest(), authToken)
-      recommendationService.updateRecommendationStatus(recommedation.id, startRecallRecommendationStatusRequest(), authToken)
+      recommendationService.updateRecommendationStatus(recommendation.id, startRecallRecommendationStatusRequest(), authToken)
     })
   })
 })
@@ -115,9 +115,14 @@ When('a PPCS user locates the existing recommendation ready to book', () => {
   loginAndSearchForCrn(UserType.PPCS, ppcsTestData.crn)
 })
 
-Then('the user proceeds to book a {custodyGroup} sentence recall', function(custodyGroup: CUSTODY_GROUP) {
-  if (![CUSTODY_GROUP.DETERMINATE, CUSTODY_GROUP.INDETERMINATE].includes(custodyGroup)) {
-    cy.contains(`Unexpected custody group encountered: ${custodyGroup}`).should('not.exist')
+Then(
+  'the user proceeds to book a(n) {ppudRecordState} {custodyGroup} sentence recall',
+  function (ppudRecordState: PPUDRecordState, custodyGroup: CustodyGroup) {
+  if (![CustodyGroup.DETERMINATE, CustodyGroup.INDETERMINATE].includes(custodyGroup)) {
+    cy.contains(`Unexpected custody group encountered: ${custodyGroup}`).should('exist')
+  }
+  if (custodyGroup === CustodyGroup.INDETERMINATE && ppudRecordState === PPUDRecordState.NEW) {
+    cy.contains('Indeterminate PPUD record creation is not supported at this time').should('exist')
   }
 
   const editText = 'Edit'
@@ -129,7 +134,7 @@ Then('the user proceeds to book a {custodyGroup} sentence recall', function(cust
   cy.clickButton('Continue')
 
   cy.pageHeading().should('equal', 'PPUD record found')
-  if (custodyGroup === CUSTODY_GROUP.DETERMINATE) {
+  if (ppudRecordState === PPUDRecordState.NEW) {
     cy.contains('span', 'What to do if you cannot find the right PPUD record').click()
     cy.contains('a', 'Create a determinate PPUD record').should('have.attr', 'role', 'button').click()
   } else {
@@ -160,7 +165,7 @@ Then('the user proceeds to book a {custodyGroup} sentence recall', function(cust
   selectRadio('custodyGroup', custodyGroup)
   cy.clickButton('Continue')
 
-  if (custodyGroup === CUSTODY_GROUP.DETERMINATE) {
+  if (custodyGroup === CustodyGroup.DETERMINATE) {
     cy.clickLinkById('edit-legislationreleasedunder', editText)
     cy.pageHeading().should('equal', 'Edit legislation released under')
     selectRandomOption('#legislationReleasedUnder', true)
@@ -193,7 +198,7 @@ Then('the user proceeds to book a {custodyGroup} sentence recall', function(cust
 
   cy.clickButton('Continue')
 
-  if (custodyGroup === CUSTODY_GROUP.DETERMINATE) {
+  if (custodyGroup === CustodyGroup.DETERMINATE) {
     cy.pageHeading().should('contain', 'Select the index offence for ')
     selectRadio('indexOffence', '3934359')
     cy.clickButton('Continue')
@@ -201,22 +206,43 @@ Then('the user proceeds to book a {custodyGroup} sentence recall', function(cust
     cy.pageHeading().should('equal', 'View the index offence and its consecutive sentences')
     cy.clickLink('Continue')
 
-    cy.pageHeading().should('equal', 'Select a matching index offence in PPUD')
-    selectRandomAutocompleteOption('indexOffence')
-    cy.clickButton('Continue')
+    if (ppudRecordState === PPUDRecordState.EXISTING) {
+      cy.pageHeading().should('contain', 'Add your booking to PPUD - ')
+      selectRandomRadio('.govuk-radios', 'ADD_NEW')
+      cy.clickButton('Continue')
 
-    cy.pageHeading().should('contain', 'Which custody type is ')
-    selectRandomRadio('.govuk-radios')
-    cy.clickButton('Continue')
+      cy.pageHeading().should('equal', 'Do you need to change the index offence or add a comment?')
+      selectRadio('changeIndexOffence', 'YES')
+      cy.clickButton('Continue')
 
-    cy.pageHeading().should('contain', 'Your recall booking - ')
-    // TODO Verify data that was set during the test once we have normalised the summary list
-    // and can access direct data
-    cy.clickButton('Continue')
+      cy.pageHeading().should('equal', 'Change index offence or add a comment')
+      cy.clickLink('Continue')
 
-    cy.pageHeading().should('contain', 'Create new PPUD record for ')
-    cy.clickButton('Continue')
-  } else if (custodyGroup === CUSTODY_GROUP.INDETERMINATE) {
+      cy.pageHeading().should('contain', 'Double check your booking')
+      // TODO Verify data that was set during the test once we have normalised the summary list
+      // and can access direct data
+      cy.clickButton('Continue')
+
+      cy.pageHeading().should('match', /Book \S.+? onto PPUD/)
+      cy.clickButton('Continue')
+    } else if (ppudRecordState === PPUDRecordState.NEW) {
+      cy.pageHeading().should('equal', 'Select a matching index offence in PPUD')
+      selectRandomAutocompleteOption('indexOffence')
+      cy.clickButton('Continue')
+
+      cy.pageHeading().should('contain', 'Which custody type is ')
+      selectRandomRadio('.govuk-radios')
+      cy.clickButton('Continue')
+
+      cy.pageHeading().should('contain', 'Your recall booking - ')
+      // TODO Verify data that was set during the test once we have normalised the summary list
+      // and can access direct data
+      cy.clickButton('Continue')
+
+      cy.pageHeading().should('contain', 'Create new PPUD record for ')
+      cy.clickButton('Continue')
+    }
+  } else if (custodyGroup === CustodyGroup.INDETERMINATE) {
     cy.pageHeading().should('contain', 'Select a sentence for your booking')
 
     // navigate to 'determinate ppud sentences' page and come back
@@ -244,10 +270,10 @@ Then('the user proceeds to book a {custodyGroup} sentence recall', function(cust
   }
 })
 
-Then('the {custodyGroup} booking reports successfully sent to PPUD', function (custodyGroup: CUSTODY_GROUP) {
-  if (custodyGroup in [CUSTODY_GROUP.DETERMINATE, CUSTODY_GROUP.INDETERMINATE]) {
+Then('the {custodyGroup} booking reports successfully sent to PPUD', function (custodyGroup: CustodyGroup) {
+  if ([CustodyGroup.DETERMINATE, CustodyGroup.INDETERMINATE].includes(custodyGroup)) {
     cy.pageHeading().should('contain', 'Your recall booking')
   } else {
-    cy.contains(`Unexpected custody group encountered: ${custodyGroup}`).should('not.exist')
+    cy.contains(`Unexpected custody group encountered: ${custodyGroup}`).should('exist')
   }
 })

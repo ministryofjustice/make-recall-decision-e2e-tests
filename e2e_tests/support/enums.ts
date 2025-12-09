@@ -104,7 +104,12 @@ export enum Regions {
   South_West = 'South West'
 }
 
-export enum CUSTODY_GROUP {
+export enum PPUDRecordState {
+  NEW = 'New',
+  EXISTING = 'Existing',
+}
+
+export enum CustodyGroup {
   DETERMINATE = "Determinate",
   INDETERMINATE = "Indeterminate",
 }
