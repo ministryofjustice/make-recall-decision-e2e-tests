@@ -114,7 +114,7 @@ jobs:
           name: Run E2E tests
           working_directory: make-recall-decision-e2e-tests
           command: |
-            npm ci --no-audit
+            npm run setup:no-audit
             echo PWD:: $PWD
             shopt -s globstar
             
@@ -188,7 +188,7 @@ jobs:
           name: Run Integration Tests
           working_directory: make-recall-decision-e2e-tests
           command: |
-            npm ci --no-audit
+            npm run setup:no-audit
             echo PWD:: $PWD
             shopt -s globstar
 

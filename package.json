@@ -7,7 +7,9 @@
   "scripts": {
     "e2e": "export $(cat .env) && npx cypress run --config-file e2e_tests/cypress.config.ts",
     "e2e-ui": "export $(cat .env) && npx cypress open --config-file e2e_tests/cypress.config.ts",
-    "e2e:report": "node e2e_tests/cucumber-report.js"
+    "e2e:report": "node e2e_tests/cucumber-report.js",
+    "setup": "npm ci && hmpps-npm-script-run-allowlist",
+    "setup:no-audit": "npm ci --no-audit && hmpps-npm-script-run-allowlist"
   },
   "engines": {
     "node": "^20",
@@ -133,6 +135,7 @@
     "@badeball/cypress-cucumber-preprocessor": "^22.2.0",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.5",
     "@faker-js/faker": "^7.6.0",
+    "@ministryofjustice/hmpps-npm-script-allowlist": "0.0.3",
     "@types/bunyan": "^1.8.8",
     "@types/bunyan-format": "^0.2.5",
     "@types/compression": "^1.7.2",
