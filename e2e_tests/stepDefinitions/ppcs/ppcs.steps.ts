@@ -131,9 +131,9 @@ Then('the user proceeds to book a {custodyGroup} sentence recall', function(cust
   cy.pageHeading().should('equal', 'PPUD record found')
   if (custodyGroup === CUSTODY_GROUP.DETERMINATE) {
     cy.contains('span', 'What to do if you cannot find the right PPUD record').click()
-    cy.contains('a', 'Create a determinate PPUD record').should('have.attr', 'role', 'button').click()
+    cy.get('form').find('button.govuk-button--secondary').click()
   } else {
-    cy.get('form').find('button').click()
+    cy.get('form').find('button.govuk-button-as-link').click()
   }
 
   cy.pageHeading().should('contain', 'Check booking details for ')
@@ -152,22 +152,21 @@ Then('the user proceeds to book a {custodyGroup} sentence recall', function(cust
   cy.pageHeading().should('equal', 'Edit releasing prison')
   selectRandomAutocompleteOption('releasingPrison')
   cy.clickButton('Continue')
-
-  cy.get('#edit-legislationreleasedunder').should('not.exist')
-
-  cy.clickLinkById('edit-custodygroup', editText)
-  cy.pageHeading().should('equal', 'Is the sentence determinate or indeterminate?')
-  selectRadio('custodyGroup', custodyGroup)
-  cy.clickButton('Continue')
-
   if (custodyGroup === CUSTODY_GROUP.DETERMINATE) {
+    cy.get('#edit-custodygroup').should('not.exist')
+    cy.get('#check-booking-custody-details-list-determinate-or-indeterminate-row')
+      .find('.govuk-summary-list__value')
+      .should('contain', 'Determinate')
+    cy.get('#edit-legislationreleasedunder').should('exist')
     cy.clickLinkById('edit-legislationreleasedunder', editText)
     cy.pageHeading().should('equal', 'Edit legislation released under')
     selectRandomOption('#legislationReleasedUnder', true)
     cy.clickButton('Continue')
-
-    cy.get('#edit-legislationreleasedunder').should('exist')
   } else {
+    cy.clickLinkById('edit-custodygroup', editText)
+    cy.pageHeading().should('equal', 'Is the sentence determinate or indeterminate?')
+    selectRadio('custodyGroup', custodyGroup)
+    cy.clickButton('Continue')
     cy.get('#edit-legislationreleasedunder').should('not.exist')
   }
 
