@@ -6,6 +6,7 @@ export function loginAndSearchCrn(userType: UserType) {
     cy.wait(1000)
     cy.reload(true)
     cy.pageHeading().should('equal', 'Sign in')
+    cy.compareSnapshot('Login and search CRN - 1')
     openApp(
         {
             flagRecommendationsPage: 1,
@@ -13,10 +14,14 @@ export function loginAndSearchCrn(userType: UserType) {
         },
         userType
     )
+    cy.compareSnapshot('Login and search CRN - 2')
     cy.clickLink('Start now')
+    cy.compareSnapshot('Login and search CRN - 3')
     cy.clickLink('Search by case reference number (CRN)')
     cy.fillInputByName('crn', this.crn)
+    cy.compareSnapshot('Login and search CRN - 4')
     cy.clickButton('Search')
+    cy.compareSnapshot('Login and search CRN - 5')
     cy.clickLink(this.offenderName)
 }
 
@@ -28,11 +33,14 @@ export const loginAndSearchForCrn = (userType: UserType, crn: string) => {
     openApp({}, userType)
     cy.clickLink('Start now') // TODO: this should check for the button role
     if(userType !== UserType.PPCS) {
+        cy.compareSnapshot('Login and search CRN - 2')
         cy.clickLink('Search by case reference number (CRN)')
     }
     cy.fillInputByName('crn', crn)
+    cy.compareSnapshot('Login and search CRN - 3')
     cy.clickButton('Search')
     // TODO Check details?
+    cy.compareSnapshot('Login and search CRN - 4')
 }
 
 export const signOut = function () {

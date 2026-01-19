@@ -1,5 +1,11 @@
 /// <reference path = "../../cypress_shared/index.d.ts" />
 import '../../cypress_shared/commands'
+import { addCompareSnapshotCommand } from 'cypress-visual-regression/dist/command'
+
+addCompareSnapshotCommand({
+    capture: 'fullPage',
+    errorThreshold: 0.05,
+})
 
 Cypress.Keyboard.defaults({
   keystrokeDelay: 0,

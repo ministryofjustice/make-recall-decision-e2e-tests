@@ -45,10 +45,14 @@ export const makeRecommendation = function (crn, recommendationDetails?: Record<
     vulnerabilities: [],
   }
 
+  cy.compareSnapshot('makeRecommendation - 1')
   cy.clickLink('Start now')
+  cy.compareSnapshot('makeRecommendation - 2')
   cy.clickLink('Search by case reference number (CRN)')
+  cy.compareSnapshot('makeRecommendation - 3')
   cy.fillInputByName('crn', crn)
   cy.clickButton('Search')
+  cy.compareSnapshot('makeRecommendation - 4')
   // get offender name for use in subsequent pages
   cy.get(`[data-qa="row-${crn}"] [data-qa="name"]`)
     .first()
@@ -58,16 +62,23 @@ export const makeRecommendation = function (crn, recommendationDetails?: Record<
     .then(offenderName => {
       deleteOpenRecommendation()
       // Create a new recommendation - START
+      cy.compareSnapshot('makeRecommendation - 4')
       cy.clickLink('Make a recommendation')
+      cy.compareSnapshot('makeRecommendation - 5')
       cy.clickButton('Continue')
+      cy.compareSnapshot('makeRecommendation - 6')
       cy.clickLink(`What has made you consider recalling ${offenderName}`)
+      cy.compareSnapshot('makeRecommendation - 7')
       testData.recallReason = faker.hacker.phrase()
       cy.fillInput(`What has made you consider recalling ${offenderName}`, testData.recallReason)
       cy.clickButton('Continue')
+      cy.compareSnapshot('makeRecommendation - 8')
       cy.clickLink(`How has ${offenderName} responded to probation so far`)
+      cy.compareSnapshot('makeRecommendation - 9')
       testData.probationResponse = faker.hacker.phrase()
       cy.fillInput(`How has ${offenderName} responded to probation so far`, testData.probationResponse)
       cy.clickButton('Continue')
+      cy.compareSnapshot('makeRecommendation - 10')
       cy.clickLink(`What licence conditions has ${offenderName} breached`)
       // select all standard recommendation if recommendationDetails.LicenceConditions === 'all' passed else choose a few randomly
       cy.get('input[id^=standard-]').then(standardLicenceConditions => {
@@ -110,27 +121,34 @@ export const makeRecommendation = function (crn, recommendationDetails?: Record<
         })
       }
       cy.clickButton('Continue')
+      cy.compareSnapshot('makeRecommendation - 11')
       // Select if offender is on indeterminate sentence
       cy.clickLink(`Is ${offenderName} on an indeterminate sentence`)
+      cy.compareSnapshot('makeRecommendation - 12')
       testData.indeterminate = recommendationDetails?.Indeterminate
         ? recommendationDetails.Indeterminate.toString().toUpperCase()
         : faker.helpers.arrayElement(Object.keys(YesNoType))
       cy.selectRadioByValue(`Is ${offenderName} on an indeterminate sentence`, testData.indeterminate)
       cy.clickButton('Continue')
+      cy.compareSnapshot('makeRecommendation - 13')
       testData.extended = recommendationDetails?.Extended
         ? recommendationDetails.Extended.toString().toUpperCase()
         : faker.helpers.arrayElement(Object.keys(YesNoType))
       cy.selectRadioByValue(`Is ${offenderName} on an extended sentence`, testData.extended)
+      cy.compareSnapshot('makeRecommendation - 14')
       cy.clickButton('Continue')
+      cy.compareSnapshot('makeRecommendation - 15')
       if (recommendationDetails?.Indeterminate.toString().toUpperCase() === 'YES') {
         testData.TypeOfSentence = recommendationDetails?.TypeOfSentence
           ? recommendationDetails.TypeOfSentence.toString().toUpperCase()
           : faker.helpers.arrayElement(['LIFE', 'IPP', 'DPP'])
         cy.selectRadioByValue(`What type of sentence is ${offenderName} on`, testData.TypeOfSentence)
         cy.clickButton('Continue')
+        cy.compareSnapshot('makeRecommendation - 16')
       }
     })
   cy.clickLink(`What alternatives to recall have been tried already`)
+  cy.compareSnapshot('makeRecommendation - 17')
   const alternativesTried = recommendationDetails?.AlternativesTried
   if (['All', 'Some'].includes(alternativesTried)) {
     cy.get('.govuk-checkboxes input:not([data-behaviour="exclusive"])').then(alternatives => {
@@ -167,10 +185,13 @@ export const makeRecommendation = function (crn, recommendationDetails?: Record<
     })
   }
   cy.clickButton('Continue')
+  cy.compareSnapshot('makeRecommendation - 19')
   cy.wrap(testData).as('testData')
   cy.clickButton('Continue')
+  cy.compareSnapshot('makeRecommendation - 20')
   cy.logPageTitle('Record the consideration in NDelius')
   cy.clickButton('Send to NDelius')
+  cy.compareSnapshot('makeRecommendation - 21')
 }
 
 const selectVulnerabilities = function (htmlElements: HTMLElement[]) {
@@ -204,12 +225,14 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
       ? partADetails.RecallType.toString().toUpperCase()
       : faker.helpers.arrayElement(Object.keys(NonIndeterminateRecallType))
     cy.logPageTitle('What do you recommend?')
+    cy.compareSnapshot('Create Part A or No Recall Letter - 1')
     cy.selectRadioByValue('What do you recommend', testData.recallType)
     cy.clickButton('Continue')
     if (testData.recallType !== 'NO_RECALL') {
       cy.title().then($title => {
         if ($title.match('Is this an emergency recall?')) {
           cy.logPageTitle('Is this an emergency recall?')
+          cy.compareSnapshot('Create Part A or No Recall Letter - 2')
           testData.emergencyRecall = partADetails?.EmergencyRecall
             ? partADetails.EmergencyRecall.toString().toUpperCase()
             : faker.helpers.arrayElement(Object.keys(YesNoType))
@@ -218,6 +241,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
         }
       })
       cy.logPageTitle('Indeterminate and extended sentences')
+      cy.compareSnapshot('Create Part A or No Recall Letter - 3')
       testData.indeterminateAndExtendedSentencesCriteria = 'BEHAVIOUR_LEADING_TO_SEXUAL_OR_VIOLENT_OFFENCE'
       cy.get('input[type="checkbox"]').check(testData.indeterminateAndExtendedSentencesCriteria)
       testData.indeterminatANDExtendedSentences = faker.hacker.phrase()
@@ -227,12 +251,14 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
     }
     cy.clickButton('Continue')
     cy.logPageTitle('Sensitive Information')
+    cy.compareSnapshot('Create Part A or No Recall Letter - 4')
     cy.clickLink('Continue')
   } else if (testData.indeterminate === 'NO' && testData.extended === 'NO') {
     testData.recallType = partADetails?.RecallType
       ? partADetails.RecallType.toString().toUpperCase()
       : faker.helpers.arrayElement(Object.keys(NonIndeterminateRecallType))
     cy.logPageTitle('Suitability for fixed term recall')
+    cy.compareSnapshot('Create Part A or No Recall Letter - 5')
     testData.suitabilityForfixedTermRecall = randomiseCriteria<{
       isSentence48MonthsOrOver: string
       isUnder18: string
@@ -259,7 +285,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
       ],
       testData.recallType !== 'STANDARD'
         ? () => true
-        : criteria => Object.keys(criteria).some(k => criteria[k] === 'YES' ?? false)
+        : criteria => Object.keys(criteria).some(k => criteria[k] === 'YES')
     )
     cy.selectRadioByValue(
       `Is ${this.offenderName}'s sentence 48 months or over?`,
@@ -288,6 +314,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
     )
     cy.clickButton('Continue')
     cy.logPageTitle('What do you recommend?')
+    cy.compareSnapshot('Create Part A or No Recall Letter - 6')
     cy.selectRadioByValue('Select your recommendation', testData.recallType)
     if (testData.recallType !== 'NO_RECALL') {
       testData.partARecallReason = faker.hacker.phrase()
@@ -304,17 +331,20 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
       ? partADetails.EmergencyRecall.toString().toUpperCase()
       : faker.helpers.arrayElement(Object.keys(YesNoType))
     cy.logPageTitle('Is this an emergency recall?')
+    cy.compareSnapshot('Create Part A or No Recall Letter - 7')
     cy.selectRadioByValue('Is this an emergency recall', testData.emergencyRecall)
     cy.clickButton('Continue')
     if (testData.recallType === 'FIXED_TERM') {
       testData.fixedTermRecall = faker.helpers.arrayElement(Object.keys(YesNoType))
       cy.logPageTitle('Licence conditions - fixed term recall')
+      cy.compareSnapshot('Create Part A or No Recall Letter - 8')
       cy.selectRadioByValue('Licence conditions - fixed term recall', testData.fixedTermRecall)
       if (testData.fixedTermRecall === 'YES') {
         cy.get('#hasFixedTermLicenceConditionsDetails').type((testData.fixedTermRecallNotes = faker.hacker.phrase()))
       }
       cy.clickButton('Continue')
       cy.logPageTitle('Sensitive Information')
+      cy.compareSnapshot('Create Part A or No Recall Letter - 9')
     }
     cy.clickLink('Continue')
   } else {
@@ -322,9 +352,11 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
       ? partADetails.RecallType.toString().toUpperCase()
       : faker.helpers.arrayElement(Object.keys(IndeterminateRecallType))
     cy.logPageTitle('What do you recommend?')
+    cy.compareSnapshot('Create Part A or No Recall Letter - 10')
     cy.selectRadioByValue('What do you recommend', testData.recallType)
     cy.clickButton('Continue')
     if (testData.recallType === 'EMERGENCY') {
+      cy.compareSnapshot('Create Part A or No Recall Letter - 11')
       testData.emergencyRecall = YesNoType.YES.toUpperCase()
       testData.indeterminateOrExtendedSentenceDetails = partADetails?.IndeterminateOrExtendedSentenceDetails
         ? Object.assign(
@@ -346,6 +378,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
         )
       })
       cy.clickButton('Continue')
+      cy.compareSnapshot('Create Part A or No Recall Letter - 12')
       cy.clickLink('Continue')
     }
   }
@@ -354,15 +387,19 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
     : faker.helpers.arrayElement(Object.keys(CustodyType))
   currentPage = `Is ${this.offenderName} in custody now`
   cy.logPageTitle(`${currentPage}?`)
+  cy.compareSnapshot('Create Part A or No Recall Letter - 13')
   cy.selectRadioByValue(currentPage, testData.inCustody)
   if (testData.inCustody === 'YES_POLICE') {
     testData.custodyAddress = faker.address.streetAddress(true)
     cy.get('#custodyStatusDetailsYesPolice').type(testData.custodyAddress)
   }
   cy.clickButton('Continue')
+  cy.compareSnapshot('Create Part A or No Recall Letter - 15')
   cy.clickLink('Continue') // Share with a case admin
+  cy.compareSnapshot('Create Part A or No Recall Letter - 16')
   cy.clickLink(`When did the SPO agree this recall?`)
   cy.logPageTitle('When did the SPO agree this recall?')
+  cy.compareSnapshot('Create Part A or No Recall Letter - 17')
   testData.recallDateBySPO = faker.date.recent(7)
   cy.enterDateTime({
     day: testData.recallDateBySPO.getDate().toString(),
@@ -373,29 +410,35 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
   })
   cy.clickButton('Continue')
 
+  cy.compareSnapshot('Create Part A or No Recall Letter - 18')
   cy.clickLink(`What has led to this recall`)
   cy.logPageTitle('What has led to this recall?')
+  cy.compareSnapshot('Create Part A or No Recall Letter - 19')
   cy.get(`#whatLedToRecall`).type((testData.reasonForRecall = faker.hacker.phrase()))
   cy.clickButton('Continue')
   cy.clickLink(`Personal details`)
   cy.logPageTitle('Personal details')
+  cy.compareSnapshot('Create Part A or No Recall Letter - 20')
   cy.getOffenderDetails().then(offenderDetails => {
     testData.offenderDetails = offenderDetails
   })
   cy.clickLink('Continue')
   cy.clickLink(`Offence details`)
   cy.logPageTitle('Offence details')
+    cy.compareSnapshot('Create Part A or No Recall Letter - 21')
   cy.getOffenceDetails().then(det => {
     testData.offenceDetails = det
   })
   cy.clickLink('Continue')
   cy.clickLink(`Offence analysis`)
   cy.logPageTitle('Offence analysis')
+  cy.compareSnapshot('Create Part A or No Recall Letter - 22')
   testData.offenceAnalysis = faker.hacker.phrase()
   cy.get(`#offenceAnalysis`).type(testData.offenceAnalysis)
   cy.clickButton('Continue')
   cy.clickLink(`Previous releases`)
   cy.logPageTitle('Previous releases')
+  cy.compareSnapshot('Create Part A or No Recall Letter - 23')
   // ECSL change
   testData.releasedUnderECSL = faker.helpers.arrayElement(Object.keys(YesNoType))
   if (testData.releasedUnderECSL === 'NO') {
@@ -421,6 +464,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
       const dateParts = previousRelease.split('-').map(s => s.trim())
       const releaseDay = { day: dateParts[0], month: dateParts[1], year: dateParts[2] }
       cy.clickLink(`Add a previous release`)
+      cy.compareSnapshot('Create Part A or No Recall Letter - 24')
       cy.enterDateTime(releaseDay)
       cy.clickButton('Continue')
     })
@@ -431,16 +475,19 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
   cy.clickButton('Continue')
   cy.clickLink(`Previous recalls`)
   cy.logPageTitle('Previous recalls')
+  cy.compareSnapshot('Create Part A or No Recall Letter - 25')
   if (partADetails?.PreviousRecalls) {
     const previousRecalls = partADetails?.PreviousRecalls.split(',').map(s => s.trim())
     previousRecalls.forEach(previousRelease => {
       const dateParts = previousRelease.split('-').map(s => s.trim())
       const recallDay = { day: dateParts[0], month: dateParts[1], year: dateParts[2] }
       cy.clickLink(`Add a previous recall`)
+      cy.compareSnapshot('Create Part A or No Recall Letter - 26')
       cy.enterDateTime(recallDay)
       cy.clickButton('Continue')
     })
   }
+  cy.compareSnapshot('Create Part A or No Recall Letter - 27')
   cy.getPreviousRecalls().then(previousRecallDates => {
     testData.offenderDetails.previousRecallDates = previousRecallDates.join()
   })
@@ -448,6 +495,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
   if (!['YES_POLICE', 'YES_PRISON'].includes(testData.inCustody)) {
     cy.clickLink(`Address`)
     cy.logPageTitle('Address')
+    cy.compareSnapshot('Create Part A or No Recall Letter - 27')
     testData.lastKnownAddressCorrect = partADetails?.LastKnownAddressCorrect
       ? partADetails.LastKnownAddressCorrect.toString().toUpperCase()
       : faker.helpers.arrayElement(Object.keys(YesNoType))
@@ -459,6 +507,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
   }
   cy.clickLink(`Would recall affect vulnerability or additional needs`)
   cy.logPageTitle('Would recall affect vulnerability or additional needs?')
+  cy.compareSnapshot('Create Part A or No Recall Letter - 28')
   const vulnerability = partADetails?.Vulnerabilities
   if (['All', 'Some'].includes(vulnerability)) {
     cy.get('.govuk-checkboxes input:not([data-behaviour="exclusive"])').then(vulnerabilities => {
@@ -499,6 +548,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
   currentPage = 'Are there any victims in the victim contact scheme'
   cy.clickLink(currentPage)
   cy.logPageTitle(`${currentPage}?`)
+  cy.compareSnapshot('Create Part A or No Recall Letter - 29')
   testData.vlo = {}
   testData.vlo.inVLOScheme = partADetails?.VictimContactScheme
     ? partADetails.VictimContactScheme.toString().replace(' ', '_').toUpperCase()
@@ -516,6 +566,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
   }
   cy.clickLink(`Local police contact details`)
   cy.logPageTitle('Local police contact details')
+  cy.compareSnapshot('Create Part A or No Recall Letter - 30')
   testData.localPoliceDetails = {}
   cy.fillInput('Police contact name', (testData.localPoliceDetails.contact = faker.name.fullName()))
   cy.fillInput('Telephone number', (testData.localPoliceDetails.phoneNumber = '01277 960 001'))
@@ -525,6 +576,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
     currentPage = `Is there anything the police should know before they arrest ${this.offenderName}`
     cy.clickLink(currentPage)
     cy.logPageTitle(`${currentPage}?`)
+    cy.compareSnapshot('Create Part A or No Recall Letter - 31')
     testData.hasArrestIssues = partADetails?.HasArrestIssues
       ? partADetails.HasArrestIssues.toString().toUpperCase()
       : faker.helpers.arrayElement(Object.keys(YesNoType))
@@ -536,6 +588,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
   currentPage = `Is ${this.offenderName} under Integrated Offender Management (IOM)`
   cy.clickLink(currentPage)
   cy.logPageTitle(`${currentPage}?`)
+  cy.compareSnapshot('Create Part A or No Recall Letter - 32')
   testData.iom = partADetails?.IOM
     ? partADetails.IOM.toString().replace(' ', '_').toUpperCase()
     : faker.helpers.arrayElement(Object.keys(YesNoNAType))
@@ -544,6 +597,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
   currentPage = `Do you think ${this.offenderName} is using recall to bring contraband into prison`
   cy.clickLink(currentPage)
   cy.logPageTitle(`${currentPage}?`)
+  cy.compareSnapshot('Create Part A or No Recall Letter - 33')
   testData.contraband = {}
   testData.contraband.hasRisk = partADetails?.HasContrabandRisk
     ? partADetails.HasContrabandRisk.toString().toUpperCase()
@@ -555,6 +609,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
   currentPage = `Indicative risk assessment pending OASys review`
   cy.clickLink(currentPage)
   cy.logPageTitle(currentPage)
+  cy.compareSnapshot('Create Part A or No Recall Letter - 34')
   testData.currentRoshForPartA = {}
   cy.selectRadioByValue(
     'Risk to children',
@@ -580,6 +635,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
   currentPage = `MAPPA for ${this.offenderName}`
   cy.clickLink(currentPage)
   cy.logPageTitle(currentPage)
+  cy.compareSnapshot('Create Part A or No Recall Letter - 35')
   testData.mappa = {}
   cy.get('body').then($body => {
     if ($body.find('[data-qa="mappa-heading"] strong').length) {
@@ -606,6 +662,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
 
 const createDNTRLetter = function () {
   cy.clickLink('Why you considered recall')
+  cy.compareSnapshot('Create DNTR Letter - 1')
   cy.selectRadio(
     'Why you considered recall',
     (testData.whyRecall = faker.helpers.arrayElement(Object.values(WhyConsiderRecall)))
@@ -634,6 +691,7 @@ const createDNTRLetter = function () {
   )
   cy.clickButton('Continue')
 
+  cy.compareSnapshot('Create DNTR Letter - 2')
   cy.selectRadio(
     'How will the appointment happen?',
     (testData.appointmentOptions = faker.helpers.arrayElement(Object.values(ApptOptions)))
@@ -648,7 +706,9 @@ const createDNTRLetter = function () {
   })
 
   cy.fillInput('Probation telephone', (testData.phoneNumber = faker.phone.number('01277 ### ###')))
+  cy.compareSnapshot('Create DNTR Letter - 3')
   cy.clickButton('Continue')
+  cy.compareSnapshot('Create DNTR Letter - 4')
   cy.clickLink('Continue')
 }
 
@@ -656,6 +716,7 @@ const recordPoDecision = function (poDecision?: string) {
   this.testData.poDecision = poDecision || faker.helpers.arrayElement(Object.keys(NonIndeterminateRecallType))
   if (testData.indeterminate === 'NO' && testData.extended === 'NO') {
     cy.logPageTitle('Suitability for fixed term recall')
+    cy.compareSnapshot('Record PO Decision - 1')
     testData.suitabilityForfixedTermRecall = randomiseCriteria<{
       isSentence48MonthsOrOver: string
       isUnder18: string
@@ -682,7 +743,7 @@ const recordPoDecision = function (poDecision?: string) {
       ],
       testData.poDecision !== 'STANDARD'
         ? () => true
-        : criteria => Object.keys(criteria).some(k => criteria[k] === 'YES' ?? false)
+        : criteria => Object.keys(criteria).some(k => criteria[k] === 'YES')
     )
     cy.selectRadioByValue(`Is ${this.offenderName} under 18?`, testData.suitabilityForfixedTermRecall.isUnder18)
     cy.selectRadioByValue(
@@ -710,8 +771,10 @@ const recordPoDecision = function (poDecision?: string) {
       testData.suitabilityForfixedTermRecall.hasBeenChargedWithTerroristOrStateThreatOffence
     )
     cy.clickButton('Continue')
+    cy.compareSnapshot('Record PO Decision - 2')
     cy.selectRadioByValue('Select your recommendation', this.testData.poDecision)
   } else {
+    cy.compareSnapshot('Record PO Decision - 3')
     cy.selectRadioByValue('What do you recommend?', this.testData.poDecision)
   }
   cy.clickButton('Continue')
@@ -736,6 +799,7 @@ const updateContactInformation = function (question: string) {
   if (question === 'Who completed this Part A?') {
     cy.clickLink(currentPage)
     cy.logPageTitle(currentPage)
+    cy.compareSnapshot('Update Contact Information - 1')
     testData.thePersonCompletingTheForm = {} // Populates Q25 of Part A document when Probation Admin flag is set
     cy.get(`#name`).type((testData.thePersonCompletingTheForm.name = faker.name.fullName()))
     cy.get(`#email`).type((testData.thePersonCompletingTheForm.email = faker.internet.email()))
@@ -749,6 +813,7 @@ const updateContactInformation = function (question: string) {
     cy.clickButton('Continue')
     currentPage = `Practitioner for ${this.offenderName}`
     cy.logPageTitle(`${currentPage}?`)
+    cy.compareSnapshot('Update Contact Information - 2')
     testData.offenderManager = {} // Populates Q26 of Part A document when Probation Admin flag is set
     cy.get(`#name`).type((testData.offenderManager.name = faker.name.fullName()))
     cy.get(`#email`).type((testData.offenderManager.email = faker.internet.email()))
@@ -759,6 +824,7 @@ const updateContactInformation = function (question: string) {
   } else {
     cy.clickLink(currentPage)
     cy.logPageTitle(currentPage)
+    cy.compareSnapshot('Update Contact Information - 3')
     cy.get(`#email_0`).type(faker.internet.email())
     cy.clickButton('Add another email')
     cy.get(`#email_1`).type(faker.internet.email())
@@ -823,7 +889,7 @@ Given('PO has started creating the Part A form without requesting SPO review', f
           generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
         },
       ],
-      criteria => Object.keys(criteria).some(k => criteria[k] === 'YES' ?? false)
+      criteria => Object.keys(criteria).some(k => criteria[k] === 'YES')
     )
     cy.selectRadioByValue(
       `Is ${this.offenderName}'s sentence 48 months or over?`,
