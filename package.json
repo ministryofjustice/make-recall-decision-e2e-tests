@@ -7,7 +7,6 @@
   "scripts": {
     "e2e": "export $(cat .env) && npx cypress run --config-file e2e_tests/cypress.config.ts",
     "e2e-ui": "export $(cat .env) && npx cypress open --config-file e2e_tests/cypress.config.ts",
-    "e2e:vrt": "export $(cat .env) && npx cypress run --config-file e2e_tests/cypress.config.ts --env visualRegressionFailSilently=false",
     "e2e:vrt:update": "export $(cat .env) && npx cypress run --config-file e2e_tests/cypress.config.ts --env visualRegressionType=base",
     "e2e:report": "node e2e_tests/cucumber-report.js",
     "setup": "npm ci && hmpps-npm-script-run-allowlist",

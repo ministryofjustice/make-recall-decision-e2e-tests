@@ -70,7 +70,7 @@ export default defineConfig({
   },
   env: {
     visualRegressionType: "regression",
-    visualRegressionFailSilently: true,
+    visualRegressionFailSilently: false,
     pluginVisualRegressionCleanupUnusedImages: true,
     visualRegressionBaseDirectory: './visualRegression/base',
     visualRegressionDiffDirectory: './visualRegression/diff',

@@ -128,7 +128,7 @@ e2e_tests/screenshots/
 e2e_tests/reports
 cypress/downloads
 e2e_tests/videos
-e2e_tests/visualRegression
+e2e_tests/visualRegression/diff
 
 .DS_Store
 *.iml
