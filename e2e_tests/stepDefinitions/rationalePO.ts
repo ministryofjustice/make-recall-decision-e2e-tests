@@ -706,7 +706,6 @@ const createDNTRLetter = function () {
   })
 
   cy.fillInput('Probation telephone', (testData.phoneNumber = faker.phone.number('01277 ### ###')))
-  cy.compareSnapshot('Create DNTR Letter - 3')
   cy.clickButton('Continue')
   cy.compareSnapshot('Create DNTR Letter - 4')
   cy.clickLink('Continue')

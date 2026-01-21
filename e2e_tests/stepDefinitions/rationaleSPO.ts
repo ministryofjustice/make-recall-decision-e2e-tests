@@ -39,15 +39,21 @@ const recordSpoDecision = function (spoDecision?: string) {
 
 const recordSpoDecisionAfterCountersigning = function () {
   cy.clickLink(`Review practitioner's concerns`)
+  cy.compareSnapshot('Record SPO decision after countersigning - 1')
   cy.clickButton('Continue')
+  cy.compareSnapshot('Record SPO decision after countersigning - 1')
   cy.clickLink(`Review profile of ${this.offenderName}`)
+  cy.compareSnapshot('Record SPO decision after countersigning - 1')
   cy.clickButton('Continue')
   cy.clickLink(`Explain the decision`)
+  cy.compareSnapshot('Record SPO decision after countersigning - 1')
   this.testData.spoDecision = 'RECALL'
   this.testData.spoDecisionExplanation = faker.hacker.phrase()
   cy.get('textarea').type(this.testData.spoDecisionExplanation)
   cy.clickButton('Continue')
+  cy.compareSnapshot('Record SPO decision after countersigning - 1')
   cy.clickLink('Record the decision')
+  cy.compareSnapshot('Record SPO decision after countersigning - 1')
   cy.clickButton('Send to NDelius')
 }
 
@@ -92,20 +98,25 @@ When('{userType}( has) visits/visited the countersigning/review link', function 
 
 Then('user is unable to access the page after decision is recorded', function () {
   cy.visit(this.spoCounterSignatureLink)
+  cy.compareSnapshot('User is unable to access page after decision is recorded - 1')
 })
 
 When('SPO( has) records/recorded rationale with {managersDecision} decision', function (decision: string) {
   cy.log('Logging rationale')
   cy.clickLink('Line manager countersignature')
+  cy.compareSnapshot('SPO records/recorded rationale with {managersDecision} decision - 1')
   cy.selectRadioByValue('You must record your rationale', YesNoType.YES.toUpperCase())
   cy.clickButton('Continue')
+  cy.compareSnapshot('SPO records/recorded rationale with {managersDecision} decision - 2')
   recordSpoDecision.call(this, decision)
 })
 
 When('SPO( has) records/recorded rationale', function () {
   cy.clickLink('Line manager countersignature')
+  cy.compareSnapshot('SPO records/recorded rationale - 1')
   cy.selectRadioByValue('You must record your rationale', YesNoType.YES.toUpperCase())
   cy.clickButton('Continue')
+  cy.compareSnapshot('SPO records/recorded rationale - 2')
   recordSpoDecisionAfterCountersigning.call(this)
 })
 
@@ -128,8 +139,11 @@ Then('a confirmation of the {word} is shown to SPO/ACO', function (confirmationP
 
 Then('SPO( has) countersigns/countersigned after recording rationale', function () {
   cy.clickLink('Return to overview')
+  cy.compareSnapshot('SPO countersigns/countersigned after recording rationale - 1')
   cy.clickLink('Countersign')
+  cy.compareSnapshot('SPO countersigns/countersigned after recording rationale - 2')
   cy.clickLink('Line manager countersignature')
+  cy.compareSnapshot('SPO countersigns/countersigned after recording rationale - 3')
   doManagerCountersign.call(this, UserType.SPO, true)
 })
 
@@ -148,16 +162,20 @@ Then('SPO( has) countersigns/countersigned after recording rationale with:', fun
 Then('SPO( has) countersigns/countersigned without recording rationale', function () {
   cy.log('Not logging rationale')
   cy.clickLink('Line manager countersignature')
+  cy.compareSnapshot('SPO countersigns/countersigned without recording rationale - 1')
   cy.selectRadioByValue('You must record your rationale', YesNoType.NO.toUpperCase())
   cy.clickButton('Continue')
+  cy.compareSnapshot('SPO countersigns/countersigned without recording rationale - 2')
   doManagerCountersign.call(this, UserType.SPO)
 })
 
 Then('SPO( has) countersigns/countersigned without recording rationale with:', function (dataTable: DataTable) {
   cy.log('Not logging rationale')
   cy.clickLink('Line manager countersignature')
+  cy.compareSnapshot('SPO countersigns/countersigned without recording rationale with - 1')
   cy.selectRadioByValue('You must record your rationale', YesNoType.NO.toUpperCase())
   cy.clickButton('Continue')
+  cy.compareSnapshot('SPO countersigns/countersigned without recording rationale with - 2')
   doManagerCountersign.call(this, UserType.SPO, dataTable.rowsHash())
 })
 

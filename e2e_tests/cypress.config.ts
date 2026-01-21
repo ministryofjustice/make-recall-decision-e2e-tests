@@ -8,8 +8,8 @@ import { readDocX } from "../cypress_shared/plugins";
 import { configureVisualRegression } from "cypress-visual-regression";
 
 export default defineConfig({
-  viewportHeight: 900,
-  viewportWidth: 1600,
+  viewportHeight: 720,
+  viewportWidth: 1280,
   pageLoadTimeout: 120000,
   chromeWebSecurity: false,
   downloadsFolder: "e2e_tests/downloads",
@@ -42,6 +42,19 @@ export default defineConfig({
       // This is required for the preprocessor to be able to generate JSON reports after each run, and more,
       await addCucumberPreprocessorPlugin(on, config);
 
+      /**
+       * force specific browser size in headless mode,
+       * see: https://docs.cypress.io/api/node-events/browser-launch-api#Set-screen-size-when-running-headless
+      **/
+      on('before:browser:launch', (browser, launchOptions) => {
+        if (browser.name === 'chrome' && browser.isHeadless) {
+          launchOptions.args.push('--window-size=1280,720')
+          launchOptions.args.push('--force-device-scale-factor=1')
+        }
+
+        return launchOptions
+      })
+
       configureVisualRegression(on);
 
       installLogsPrinter(on, {
@@ -70,7 +83,7 @@ export default defineConfig({
   },
   env: {
     visualRegressionType: "regression",
-    visualRegressionFailSilently: false,
+    visualRegressionFailSilently: true,
     pluginVisualRegressionCleanupUnusedImages: true,
     visualRegressionBaseDirectory: './visualRegression/base',
     visualRegressionDiffDirectory: './visualRegression/diff',

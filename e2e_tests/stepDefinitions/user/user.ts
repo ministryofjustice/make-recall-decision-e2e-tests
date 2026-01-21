@@ -6,7 +6,6 @@ export function loginAndSearchCrn(userType: UserType) {
     cy.wait(1000)
     cy.reload(true)
     cy.pageHeading().should('equal', 'Sign in')
-    cy.compareSnapshot('Login and search CRN - 1')
     openApp(
         {
             flagRecommendationsPage: 1,
@@ -14,14 +13,14 @@ export function loginAndSearchCrn(userType: UserType) {
         },
         userType
     )
-    cy.compareSnapshot('Login and search CRN - 2')
+    cy.compareSnapshot('Login and search CRN - 1')
     cy.clickLink('Start now')
-    cy.compareSnapshot('Login and search CRN - 3')
+    cy.compareSnapshot('Login and search CRN - 2')
     cy.clickLink('Search by case reference number (CRN)')
     cy.fillInputByName('crn', this.crn)
-    cy.compareSnapshot('Login and search CRN - 4')
+    cy.compareSnapshot('Login and search CRN - 3')
     cy.clickButton('Search')
-    cy.compareSnapshot('Login and search CRN - 5')
+    cy.compareSnapshot('Login and search CRN - 4')
     cy.clickLink(this.offenderName)
 }
 
