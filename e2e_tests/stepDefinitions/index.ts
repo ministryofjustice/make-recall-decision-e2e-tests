@@ -43,7 +43,6 @@ export const crns = {
   // 5: Cypress.env('CRN5') || 'D002399', // Removed temporarily. This CRN doesn't have an address, and causes an error on the addressDetails page
 }
 export const deleteOpenRecommendation = () => {
-  cy.compareSnapshot('Delete open recommendation - 1')
   cy.clickLink('Recommendations')
   // check if Delete button is available (the flag is enabled)
   cy.get('body').then($body => {
