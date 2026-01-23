@@ -20,7 +20,7 @@ Cypress.Commands.overwrite('compareSnapshot', (originalFn, ...args) => {
           })
 
           resolve()
-        }, 100)
+        }, 300)
       })
     })
     .then(() => originalFn(...args))
