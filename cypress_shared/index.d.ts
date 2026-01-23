@@ -1,6 +1,7 @@
 import { UserType } from '../e2e_tests/support/commands'
 
 export {}
+/// <reference types="cypress" />
 
 declare global {
   namespace Cypress {
@@ -110,6 +111,8 @@ declare global {
       getPreviousReleases(): Chainable<Record<string, string>>
 
       getPreviousRecalls(): Chainable<string[]>
+
+      compareSnapshot(name: string, errorThreshold?: number): Chainable<any>
     }
   }
 }

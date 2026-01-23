@@ -74,3 +74,47 @@ With params replaced as follows:
 - PASSWORD_SPO - the value of the `CYPRESS_PASSWORD_SPO_dev` env var in [CircleCi](https://app.circleci.com/settings/project/github/ministryofjustice/make-recall-decision-ui/environment-variables)
 - USERNAME_ACO - the value of the `CYPRESS_USERNAME_ACO_dev` env var in [CircleCi](https://app.circleci.com/settings/project/github/ministryofjustice/make-recall-decision-ui/environment-variables)
 - PASSWORD_ACO - the value of the `CYPRESS_PASSWORD_ACO_dev` env var in [CircleCi](https://app.circleci.com/settings/project/github/ministryofjustice/make-recall-decision-ui/environment-variables)
+
+## Visual Regression Testing
+
+Cypress allows for visual regression testing, this will take a series of "base" screenshots and then compare on further runs. Given that the screenshots currently contain data - albeit test data - which we may not want publicly available, visual regression is not currently monitored in the CI Pipelines and can only be run locally. As a result the base screenshots will have to be generated locally first.
+
+**Please note, there are 2 sets of screenshots being captured by the e2e app: one for reporting purposes, the other for regression testing. This section of the readme only deals with files under the `e2e_tests/visualRegression` folder**
+
+### Generating base screenshots
+
+In order to generate the base screenshots, you must first run the existing UI app with no changes locally using the usual method. You can then run the following command:
+
+```
+npm run e2e:vrt:update
+```
+
+This should populate the folder `e2e_tests/visualRegression` with the required base screenshots taking during that test run.
+
+### Comparing changes to base screenshots
+
+Once your base snapshots are in place you can actually perform the visual regression testing. First make your changes, and then run the following command:
+
+```
+npm run e2e:vrt
+```
+
+This should throw warnings when the visual differences between the base screenshots and the new screenshots are significantly different. The CLI version will throw up what screens are different and pop a visual diff in the `e2e_tests/visualRegression/diff` folder, but these can be difficult to interpret, so it's generally better to find out which are causing errors and check them in the UI where the two can be compared with a user-friendly interface.
+
+### Configuring the difference threshold
+
+You can configure the threshold for the visual differences in the `e2e_tests/support/commands.ts` file:
+
+```
+addCompareSnapshotCommand({
+    capture: 'fullPage',
+    errorThreshold: 0.05,
+})
+```
+
+at present the threshold is set to `0.05` as changes from things like UI library updates will be relatively small, but if you're getting a lot of false positives you can up this. The default is `0.1`.
+
+### VRT: Todos
+There are 2 improvements which could be made when time is less tight: 
+- **Rename the screenshots to something more meaningful:** At present the screenshots names are fairly generic, named after the test and then a number. Whilst this allows for finding the location in the testing code easily, it's not particularly descriptive and the compareScreenshot commands could be   
+- **Redact sensitive information so this can run in CI pipelines:** As mentioned above, this whole process is currently manual and can be time consuming due to the fact that the MoJ repos are publicly accessible and we don't want to give away potentially sensitive information. This can be fixed by overwriting the compareSnapshots commmand and having it blank out specific HTML elements before taking the screenshot, but this will be a lengthy process as it goes through every possible screen in CaR. An example of this can be found in the Risk Assessment repo: https://github.com/ministryofjustice/hmpps-risk-assessment-ui/blob/main/integration_tests/support/index.js

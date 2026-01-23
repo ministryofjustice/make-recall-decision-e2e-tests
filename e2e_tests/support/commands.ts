@@ -1,5 +1,30 @@
 /// <reference path = "../../cypress_shared/index.d.ts" />
 import '../../cypress_shared/commands'
+import { addCompareSnapshotCommand } from 'cypress-visual-regression/dist/command'
+
+addCompareSnapshotCommand({
+    capture: 'fullPage',
+    errorThreshold: 0.05,
+})
+
+Cypress.Commands.overwrite('compareSnapshot', (originalFn, ...args) => {
+  return cy
+    .document()
+    .then((doc) => {
+      return new Cypress.Promise((resolve) => {
+        setTimeout(() => {
+          // Prevent task list from overflow issues
+          doc.body.querySelectorAll("p[data-qa='spo-exposition']").forEach((element) => {
+            const updatedElement = element
+            updatedElement.innerHTML = 'XXXXX'
+          })
+
+          resolve()
+        }, 300)
+      })
+    })
+    .then(() => originalFn(...args))
+})
 
 Cypress.Keyboard.defaults({
   keystrokeDelay: 0,

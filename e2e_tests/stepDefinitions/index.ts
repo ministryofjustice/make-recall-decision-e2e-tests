@@ -54,6 +54,7 @@ export const deleteOpenRecommendation = () => {
         cy.getRowValuesFromTable({ tableCaption: 'Recommendations', rowSelector: 'tr[data-qa]:first-child' }).then(
           // eslint-disable-next-line no-loop-func
           () => {
+            cy.compareSnapshot('Delete open recommendation - 2')
             cy.get('[data-qa] [data-qa="delete-recommendation"]').first().click()
           }
         )
@@ -96,6 +97,7 @@ Then('the page heading contains {string}', heading => {
 
 Then('PO/SPO/ACO can create Part A', function () {
   cy.clickLink('Create Part A')
+  cy.compareSnapshot('PO/SPO/ACO can create Part A')
 })
 
 Then('PO/SPO/ACO can download Part A', function () {
@@ -147,22 +149,29 @@ Then('Part A details are correct', function () {
 })
 
 When('PO returns to Recommendations page of CRN', function () {
+  cy.compareSnapshot('PO returns to Recommendations page of CRN - 1')
   cy.clickLink(`Back`)
+  // @TODO - Fix this when GitHub Actions migration complete
+  // cy.compareSnapshot('PO returns to Recommendations page of CRN - 2')
   cy.clickLink('Back')
+  cy.compareSnapshot('PO returns to Recommendations page of CRN - 3')
   cy.clickLink('Recommendations')
 })
 
 Then('SPO can no longer record rationale', function () {
   loginAndSearchCrn.call(this, UserType.SPO)
+  cy.compareSnapshot('SPO can no longer record rationale - 1')
   cy.get('#main-content a:contains("Consider a recall")').should('not.exist')
 })
 
 Then('SPO can see the case is closed on the Overview page', function () {
   cy.clickLink('Return to overview')
+  cy.compareSnapshot('SPO can see the case is closed on the Overview page - 1')
   cy.get('#main-content a:contains("Consider a recall")').should('not.exist')
 })
 
 Then('PO can see the case is closed on the Overview page', function () {
   cy.clickLink(`Return to overview for ${this.offenderName}`)
+  cy.compareSnapshot('PO can see the case is closed on the Overview page - 1')
   cy.get('#main-content a:contains("Consider a recall")').should('not.exist')
 })

@@ -153,6 +153,9 @@ jobs:
           path: make-recall-decision-e2e-tests/e2e_tests/screenshots
           destination: screenshots
       - store_artifacts:
+          path: make-recall-decision-e2e-tests/e2e_tests/visualRegression/diff
+          destination: visualRegression
+      - store_artifacts:
           path: make-recall-decision-e2e-tests/e2e_tests/reports
           destination: reports
       - store_artifacts:
@@ -230,6 +233,9 @@ jobs:
       - store_artifacts:
           path: make-recall-decision-e2e-tests/e2e_tests/screenshots
           destination: screenshots
+      - store_artifacts:
+          path: make-recall-decision-e2e-tests/e2e_tests/visualRegression/diff
+          destination: visualRegression
       - store_artifacts:
           path: make-recall-decision-e2e-tests/e2e_tests/reports
           destination: reports
