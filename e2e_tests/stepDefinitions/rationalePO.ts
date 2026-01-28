@@ -1,4 +1,4 @@
-import { Given, Then, DataTable, When } from '@badeball/cypress-cucumber-preprocessor'
+import { DataTable, Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import { faker } from '@faker-js/faker/locale/en_GB'
 import { proxy } from '@alfonso-presa/soft-assert'
 import {
@@ -17,17 +17,17 @@ import {
 import { crns, deleteOpenRecommendation } from './index'
 
 import {
+  ApptOptions,
+  CustodyType,
   IndeterminateOrExtendedSentenceDetailType,
   IndeterminateRecallType,
   NonIndeterminateRecallType,
-  YesNoType,
-  CustodyType,
-  YesNoNAType,
-  Vulnerabilities,
-  ROSHLevels,
-  WhyConsiderRecall,
-  ApptOptions,
   Regions,
+  ROSHLevels,
+  Vulnerabilities,
+  WhyConsiderRecall,
+  YesNoNAType,
+  YesNoType,
 } from '../support/enums'
 import { formatDateToCompletedDocumentFormat } from '../utils'
 import { randomiseCriteria } from '../utils/test_data/utils'
@@ -81,7 +81,7 @@ export const makeRecommendation = function (crn, recommendationDetails?: Record<
         })
       })
       // select additional licence randomly or if recommendationDetails.LicenceConditions === 'all' is passed
-      if (faker.datatype.boolean() || (recommendationDetails?.LicenceConditions?.length ?? 0 !== 0)) {
+      if (faker.datatype.boolean() || (recommendationDetails?.LicenceConditions?.length ?? 0) !== 0) {
         cy.get('body').then($body => {
           if ($body.find('input[id^=additional-]').length !== 0) {
             cy.get('input[id^=additional-]').then(advancedLicenceConditions => {
@@ -139,8 +139,8 @@ export const makeRecommendation = function (crn, recommendationDetails?: Record<
       selectAlternativesTried(htmlElements)
     })
   } else if (alternativesTried === 'None') {
-    cy.get(`.govuk-checkboxes input[value="${alternativesTried.toUpperCase()}"]`).then(vulnerabilities => {
-      cy.wrap(vulnerabilities).click()
+    cy.get(`.govuk-checkboxes input[value="${alternativesTried.toUpperCase()}"]`).then(alternatives => {
+      cy.wrap(alternatives).click()
       testData.alternativesTried.push(alternativesTried)
     })
   } else {
@@ -173,20 +173,103 @@ export const makeRecommendation = function (crn, recommendationDetails?: Record<
   cy.clickButton('Send to NDelius')
 }
 
-const selectVulnerabilities = function (htmlElements: HTMLElement[]) {
-  htmlElements.forEach(htmlElement => {
-    htmlElement.click()
-    const vulnerabilityName = htmlElement.getAttribute('value')
-    const vulnerabilityNotes = faker.hacker.phrase()
-    cy.get(`textarea#vulnerabilitiesDetail-${vulnerabilityName}`).type(vulnerabilityNotes)
-    cy.wrap(htmlElement)
-      .next('label')
-      .invoke('text')
-      .then(text => {
-        testData.vulnerabilities.push({ vulnerabilityName: text.trim(), vulnerabilityNotes })
-      })
-  })
+function selectVulnerabilitiesWhenRiskToSelfFlagEnabled(
+  selectedVulnerabilities: Vulnerabilities[],
+  offenderName: string
+) {
+  cy.pageHeading().should(
+    'equal',
+    `Consider if this recall could affect any vulnerabilities or needs ${offenderName} may have`
+  )
+  cy.logPageTitle(
+    `Consider if this recall could affect any vulnerabilities or needs ${offenderName} may have`
+  )
+  Object.entries(Vulnerabilities)
+    .filter(vu => selectedVulnerabilities.includes(vu[1]))
+    .forEach(selectedVulnerabilityEntry => {
+      const selectedVulnerabilityId = selectedVulnerabilityEntry[0]
+      const selectedVulnerabilityDescription = selectedVulnerabilityEntry[1]
+      if (['NONE', 'NOT_KNOWN'].includes(selectedVulnerabilityId)) {
+        cy.get('.govuk-checkboxes input[value="NONE_OR_NOT_KNOWN"]').then(vulnerabilities => {
+          cy.wrap(vulnerabilities).click()
+        })
+        cy.get(`.govuk-radios input[value="${selectedVulnerabilityId}"]`).then(vulnerabilities => {
+          cy.wrap(vulnerabilities).click()
+        })
+      } else {
+        cy.get(`.govuk-checkboxes input[value="${selectedVulnerabilityId}"]`).then(vulnerabilities => {
+          cy.wrap(vulnerabilities).click()
+        })
+      }
+      testData.vulnerabilities.push(Vulnerabilities[selectedVulnerabilityDescription])
+    })
+  cy.clickButton('Continue')
 }
+
+function enterVulnerabilityDetails(selectedVulnerabilities: Vulnerabilities[]) {
+  cy.pageHeading().should('equal', 'Give details about the vulnerabilities or needs you have identified')
+  cy.logPageTitle('Give details about the vulnerabilities or needs you have identified')
+
+  cy.get('.govuk-textarea').should('have.length', selectedVulnerabilities.length)
+
+  Object.entries(Vulnerabilities)
+    .filter(vu => selectedVulnerabilities.includes(vu[1]))
+    .forEach(selectedVulnerabilityEntry => {
+      const selectedVulnerabilityId = selectedVulnerabilityEntry[0]
+      const selectedVulnerabilityDescription = selectedVulnerabilityEntry[1]
+      const vulnerabilityDetails = faker.hacker.phrase()
+      cy.get(`#vulnerabilitiesDetails-${selectedVulnerabilityId}`).type(vulnerabilityDetails)
+
+      const indexOfRecordedVulnerability = (
+        testData.vulnerabilities as {
+          vulnerabilityName: string
+        }[]
+      ).indexOf({ vulnerabilityName: selectedVulnerabilityDescription })
+      testData.vulnerabilities[indexOfRecordedVulnerability] = {
+        vulnerabilityName: selectedVulnerabilityDescription,
+        vulnerabilityNotes: vulnerabilityDetails,
+      }
+    })
+
+  cy.clickButton('Save and continue')
+}
+
+function completeVulnerabilitiesSection(partADetails: Record<string, string>, offenderName: string) {
+  const vulnerability = partADetails?.Vulnerabilities
+  const exclusiveVulnerabilities = [Vulnerabilities.NONE, Vulnerabilities.NOT_KNOWN]
+  const inclusiveVulnerabilities = Object.values(Vulnerabilities).filter(vu => !exclusiveVulnerabilities.includes(vu))
+
+  let requestedVulnerabilityOption = vulnerability
+  if (!requestedVulnerabilityOption) {
+    const selectExclusiveVulnerability = faker.datatype.boolean()
+    requestedVulnerabilityOption = selectExclusiveVulnerability
+      ? faker.helpers.arrayElement(['None', 'Not known'])
+      : 'Some'
+  }
+
+  const selectedVulnerabilities: Vulnerabilities[] = (function () {
+    switch (requestedVulnerabilityOption) {
+      case 'All':
+        return inclusiveVulnerabilities
+      case 'Some':
+        return faker.helpers.arrayElements(inclusiveVulnerabilities)
+      case 'None':
+        return [Vulnerabilities.NONE]
+      case 'Not known':
+        return [Vulnerabilities.NOT_KNOWN]
+      default:
+        throw new Error(`Unhandled case: ${requestedVulnerabilityOption}`)
+    }
+  })()
+
+  cy.clickLink('Consider if recall could affect vulnerabilities or needs')
+  selectVulnerabilitiesWhenRiskToSelfFlagEnabled(selectedVulnerabilities, offenderName)
+
+  if (selectedVulnerabilities.some(selectedVulnerability => inclusiveVulnerabilities.includes(selectedVulnerability))) {
+    enterVulnerabilityDetails(selectedVulnerabilities)
+  }
+}
+
 function selectAlternativesTried(htmlElements: HTMLElement[]) {
   htmlElements.forEach(htmlElement => {
     htmlElement.click()
@@ -419,7 +502,11 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
     const previousReleases = partADetails?.PreviousReleases.split(',').map(s => s.trim())
     previousReleases.forEach(previousRelease => {
       const dateParts = previousRelease.split('-').map(s => s.trim())
-      const releaseDay = { day: dateParts[0], month: dateParts[1], year: dateParts[2] }
+      const releaseDay = {
+        day: dateParts[0],
+        month: dateParts[1],
+        year: dateParts[2],
+      }
       cy.clickLink(`Add a previous release`)
       cy.enterDateTime(releaseDay)
       cy.clickButton('Continue')
@@ -435,7 +522,11 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
     const previousRecalls = partADetails?.PreviousRecalls.split(',').map(s => s.trim())
     previousRecalls.forEach(previousRelease => {
       const dateParts = previousRelease.split('-').map(s => s.trim())
-      const recallDay = { day: dateParts[0], month: dateParts[1], year: dateParts[2] }
+      const recallDay = {
+        day: dateParts[0],
+        month: dateParts[1],
+        year: dateParts[2],
+      }
       cy.clickLink(`Add a previous recall`)
       cy.enterDateTime(recallDay)
       cy.clickButton('Continue')
@@ -457,45 +548,9 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
     }
     cy.clickButton('Continue')
   }
-  cy.clickLink(`Would recall affect vulnerability or additional needs`)
-  cy.logPageTitle('Would recall affect vulnerability or additional needs?')
-  const vulnerability = partADetails?.Vulnerabilities
-  if (['All', 'Some'].includes(vulnerability)) {
-    cy.get('.govuk-checkboxes input:not([data-behaviour="exclusive"])').then(vulnerabilities => {
-      const htmlElements =
-        vulnerability === 'All' ? vulnerabilities.toArray() : faker.helpers.arrayElements(vulnerabilities.toArray())
-      selectVulnerabilities(htmlElements)
-    })
-  } else if (['None', 'Not known'].includes(vulnerability)) {
-    const vulnerabilityName = Object.entries(Vulnerabilities).find(vu => vu.includes(vulnerability))[0]
-    cy.get(`.govuk-checkboxes input[value="${vulnerabilityName}"]`).then(vulnerabilities => {
-      cy.wrap(vulnerabilities).click()
-      testData.vulnerabilities.push(Vulnerabilities[vulnerabilityName])
-    })
-  } else {
-    cy.get(
-      `.govuk-checkboxes ${faker.helpers.arrayElement([
-        'input:not([data-behaviour="exclusive"])',
-        'input[data-behaviour="exclusive"]',
-      ])}`
-    ).then(vulnerabilities => {
-      if (vulnerabilities.length === 2) {
-        const htmlElement = faker.helpers.arrayElement(vulnerabilities.toArray())
-        htmlElement.click()
-        testData.vulnerabilities.length = 0
-        cy.wrap(htmlElement)
-          .next('label')
-          .invoke('text')
-          .then(text => {
-            testData.vulnerabilities.push(text.trim())
-          })
-      } else {
-        const htmlElements = faker.helpers.arrayElements(vulnerabilities.toArray())
-        selectVulnerabilities(htmlElements)
-      }
-    })
-  }
-  cy.clickButton('Continue')
+
+  completeVulnerabilitiesSection(partADetails, this.offenderName)
+
   currentPage = 'Are there any victims in the victim contact scheme'
   cy.clickLink(currentPage)
   cy.logPageTitle(`${currentPage}?`)
@@ -666,11 +721,26 @@ const recordPoDecision = function (poDecision?: string) {
       hasBeenChargedWithTerroristOrStateThreatOffence: string
     }>(
       [
-        { key: 'isSentence48MonthsOrOver', generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)) },
-        { key: 'isUnder18', generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)) },
-        { key: 'isMappaCategory4', generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)) },
-        { key: 'isMappaLevel2Or3', generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)) },
-        { key: 'isRecalledOnNewChargedOffence', generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)) },
+        {
+          key: 'isSentence48MonthsOrOver',
+          generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+        },
+        {
+          key: 'isUnder18',
+          generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+        },
+        {
+          key: 'isMappaCategory4',
+          generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+        },
+        {
+          key: 'isMappaLevel2Or3',
+          generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+        },
+        {
+          key: 'isRecalledOnNewChargedOffence',
+          generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+        },
         {
           key: 'isServingFTSentenceForTerroristOffence',
           generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
@@ -809,11 +879,26 @@ Given('PO has started creating the Part A form without requesting SPO review', f
       hasBeenChargedWithTerroristOrStateThreatOffence: string
     }>(
       [
-        { key: 'isSentence48MonthsOrOver', generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)) },
-        { key: 'isUnder18', generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)) },
-        { key: 'isMappaCategory4', generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)) },
-        { key: 'isMappaLevel2Or3', generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)) },
-        { key: 'isRecalledOnNewChargedOffence', generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)) },
+        {
+          key: 'isSentence48MonthsOrOver',
+          generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+        },
+        {
+          key: 'isUnder18',
+          generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+        },
+        {
+          key: 'isMappaCategory4',
+          generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+        },
+        {
+          key: 'isMappaLevel2Or3',
+          generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+        },
+        {
+          key: 'isRecalledOnNewChargedOffence',
+          generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+        },
         {
           key: 'isServingFTSentenceForTerroristOffence',
           generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
