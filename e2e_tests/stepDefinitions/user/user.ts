@@ -38,7 +38,14 @@ export const loginAndSearchForCrn = (userType: UserType, crn: string) => {
 export const signOut = function () {
     cy.get('body').then($body => {
         const signOutSelector = '[data-qa="signOut"]'
-        if ($body.find(signOutSelector).length > 0) cy.get(signOutSelector).click()
+        // Handle the fallback header
+        if ($body.find('.probation-common-fallback-header__link').length > 0) {
+            cy.get(signOutSelector).click()
+        } else if($body.find('.probation-common-header').length > 0) {
+            cy.get('.probation-common-header__user-menu-toggle')
+              .click()
+              .get('a[href="/sign-out"]').click()
+        }
     })
     cy.clearAllCookies()
 }
