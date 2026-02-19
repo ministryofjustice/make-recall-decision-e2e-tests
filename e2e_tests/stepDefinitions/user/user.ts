@@ -15,7 +15,7 @@ export function loginAndSearchCrn(userType: UserType) {
     )
 
     // Confirm the fallback header isn't displaying outside of a local environment
-    if (Cypress.env('ENV')?.toString() !== "local") {
+    if (!Cypress.env('INTEGRATION_TEST') || Cypress.env('ENV')?.toString() !== "local") {
         cy.get('.probation-common-fallback-header').should('not.exist')
     }
 
