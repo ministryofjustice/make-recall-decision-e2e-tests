@@ -13,6 +13,12 @@ export function loginAndSearchCrn(userType: UserType) {
         },
         userType
     )
+
+    // Confirm the fallback header isn't displaying outside of a local environment
+    if (Cypress.env('ENV')?.toString() !== "local") {
+        cy.get('.probation-common-fallback-header').should('not.exist')
+    }
+
     cy.clickLink('Start now')
     cy.clickLink('Search by case reference number (CRN)')
     cy.fillInputByName('crn', this.crn)

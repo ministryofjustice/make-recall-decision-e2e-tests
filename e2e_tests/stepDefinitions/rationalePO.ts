@@ -342,7 +342,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
       ],
       testData.recallType !== 'STANDARD'
         ? () => true
-        : criteria => Object.keys(criteria).some(k => criteria[k] === 'YES' ?? false)
+        : criteria => Object.keys(criteria).some(k => criteria[k] === 'YES')
     )
     cy.selectRadioByValue(
       `Is ${this.offenderName}'s sentence 48 months or over?`,
@@ -752,7 +752,7 @@ const recordPoDecision = function (poDecision?: string) {
       ],
       testData.poDecision !== 'STANDARD'
         ? () => true
-        : criteria => Object.keys(criteria).some(k => criteria[k] === 'YES' ?? false)
+        : criteria => Object.keys(criteria).some(k => criteria[k] === 'YES')
     )
     cy.selectRadioByValue(`Is ${this.offenderName} under 18?`, testData.suitabilityForfixedTermRecall.isUnder18)
     cy.selectRadioByValue(
@@ -908,7 +908,7 @@ Given('PO has started creating the Part A form without requesting SPO review', f
           generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
         },
       ],
-      criteria => Object.keys(criteria).some(k => criteria[k] === 'YES' ?? false)
+      criteria => Object.keys(criteria).some(k => criteria[k] === 'YES')
     )
     cy.selectRadioByValue(
       `Is ${this.offenderName}'s sentence 48 months or over?`,
