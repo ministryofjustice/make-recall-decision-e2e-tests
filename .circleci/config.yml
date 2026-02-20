@@ -131,7 +131,7 @@ jobs:
             shopt -s globstar
 
             SPECS=$(circleci tests glob "e2e_tests/features/e2eTests/*.feature" | circleci tests split --show-counts)
-            echo $SPECS
+            echo "Running feature file(s): $SPECS"
 
             npx cypress run \
               --env TAGS='<< parameters.e2e-tags >>',USERNAME_PO=${<< parameters.environment >>_CYPRESS_USERNAME_PO},PASSWORD_PO=${<< parameters.environment >>_CYPRESS_PASSWORD_PO},USERNAME_SPO=${<< parameters.environment >>_CYPRESS_USERNAME_SPO},PASSWORD_SPO=${<< parameters.environment >>_CYPRESS_PASSWORD_SPO},USERNAME_ACO=${<< parameters.environment >>_CYPRESS_USERNAME_ACO},PASSWORD_ACO=${<< parameters.environment >>_CYPRESS_PASSWORD_ACO},CRN=${CRN_<< parameters.environment >>},CRN2=${CRN2_<< parameters.environment >>},CRN3=${CRN3_<< parameters.environment >>},CRN4=${CRN4_<< parameters.environment >>},CRN5=${CRN5_<< parameters.environment >>},ENV=<< parameters.environment >> \
