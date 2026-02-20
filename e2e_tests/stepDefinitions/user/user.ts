@@ -48,9 +48,7 @@ export const signOut = function () {
         if ($body.find('.probation-common-fallback-header__link').length > 0) {
             cy.get(signOutSelector).click()
         } else if($body.find('.probation-common-header').length > 0) {
-            cy.get('.probation-common-header__user-menu-toggle')
-              .click()
-              .get('a[href="/sign-out"]').click()
+            cy.get('a[href="/sign-out"]').click({ force: true })
         }
     })
     cy.clearAllCookies()
