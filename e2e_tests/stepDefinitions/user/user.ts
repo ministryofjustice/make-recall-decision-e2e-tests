@@ -48,8 +48,6 @@ export const signOut = function () {
         if ($body.find('.probation-common-fallback-header__link').length > 0) {
             cy.get(signOutSelector).click()
         } else if($body.find('.probation-common-header').length > 0) {
-            cy.log('=== HITTING PROBATION COMMON HEADER BRANCH ===')
-            console.log('=== HITTING PROBATION COMMON HEADER BRANCH ===')
             cy.get('a[href="/sign-out"]').click({ force: true })
         }
     })

@@ -31,6 +31,7 @@ import {
 } from '../support/enums'
 import { formatDateToCompletedDocumentFormat } from '../utils'
 import { randomiseCriteria } from '../utils/test_data/utils'
+import { signOut } from './user/user'
 
 const expectSoftly = proxy(expect)
 
@@ -1024,7 +1025,7 @@ Given('PO( has) requests/requested an SPO to review recommendation', function ()
   cy.clickLink('Continue')
   cy.clickLink('Continue')
   cy.log('Logging out as PO!')
-  cy.clickLink('Sign out')
+  signOut()
 })
 
 Then('the previous Recommendation should be marked a complete', function () {
