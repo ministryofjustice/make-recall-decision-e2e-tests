@@ -105,7 +105,12 @@ jobs:
         type: string
         default: "@E2E"
     steps:
-      - checkout
+      - run:
+          name: Checkout/clone make-recall-decision-e2e-tests
+          command: |
+            git clone https://github.com/ministryofjustice/make-recall-decision-e2e-tests.git
+            cd make-recall-decision-e2e-tests 
+            git checkout ${CIRCLE_BRANCH}
       # the credentials need to be updated before running apt-get update
       - run:
           name: Update credentials
