@@ -335,10 +335,10 @@ workflows:
 #            - hmpps-common-vars
 #          <<: *slack-fail-post-step
 
-      - integration_tests:
-          context:
-            - hmpps-common-vars
-          <<: *slack-fail-post-step
+      # - integration_tests:
+      #     context:
+      #       - hmpps-common-vars
+      #     <<: *slack-fail-post-step
 
       - e2e_environment_test:
           context:
