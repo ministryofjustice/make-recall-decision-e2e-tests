@@ -87,6 +87,72 @@ jobs:
           name: Run E2E tests on '<< parameters.environment >>'
           command: ./scripts/run-e2e-tests.sh -e << parameters.environment >>
 
+  e2e_environment_test:
+    circleci_ip_ranges: true # opt-in to jobs running on a restricted set of IPs
+    docker:
+      - image: cypress/browsers:node-20.9.0-chrome-118.0.5993.88-1-ff-118.0.2-edge-118.0.2088.46-1
+
+    parallelism: << pipeline.parameters.e2e-parallelism-env >>
+    resource_class: large
+    parameters:
+      environment:
+        type: string
+        default: dev
+      e2e-tags:
+        type: string
+        default: "@E2E"
+    steps:
+      - checkout
+      # the credentials need to be updated before running apt-get update
+      - run:
+          name: Update credentials
+          command: wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | tee /etc/apt/trusted.gpg.d/google.asc >/dev/null
+      # curl is needed by the node/install command with the node-version parameter, but isn't in the cypress image
+      - run:
+          name: Install curl
+          command: 'apt-get update && apt-get install curl -y'
+      - node/install:
+          node-version: '20' # node/install doesn't have a working_directory parameter, but the .nvmrc file is in a
+                             # sub-directory (make-recall-decision-e2e-tests), so we need to set the node version here
+      - run:
+          working_directory: make-recall-decision-e2e-tests
+          name: Install packages
+          command: 'npm run setup'
+      - run:
+          working_directory: make-recall-decision-e2e-tests
+          environment:
+            FEATURE_FLAG_QUERY_PARAMETERS_ENABLED: 'true'
+          name: E2E Check - << parameters.environment >>
+          command: |
+            echo $(pwd)
+            shopt -s globstar
+
+            SPECS=$(circleci tests glob "e2e_tests/features/e2eTests/*.feature" | circleci tests split --show-counts)
+            echo $SPECS
+
+            npx cypress run \
+              --env TAGS='<< parameters.e2e-tags >>',USERNAME_PO=${<< parameters.environment >>_CYPRESS_USERNAME_PO},PASSWORD_PO=${<< parameters.environment >>_CYPRESS_PASSWORD_PO},USERNAME_SPO=${<< parameters.environment >>_CYPRESS_USERNAME_SPO},PASSWORD_SPO=${<< parameters.environment >>_CYPRESS_PASSWORD_SPO},USERNAME_ACO=${<< parameters.environment >>_CYPRESS_USERNAME_ACO},PASSWORD_ACO=${<< parameters.environment >>_CYPRESS_PASSWORD_ACO},CRN=${CRN_<< parameters.environment >>},CRN2=${CRN2_<< parameters.environment >>},CRN3=${CRN3_<< parameters.environment >>},CRN4=${CRN4_<< parameters.environment >>},CRN5=${CRN5_<< parameters.environment >>},ENV=<< parameters.environment >> \
+              --config-file e2e_tests/cypress.config.ts \
+              --config baseUrl=https://make-recall-decision-<< parameters.environment >>.hmpps.service.justice.gov.uk \
+              --spec $SPECS \
+              --browser chrome \
+              --record false
+            node scripts/fix-junit-reports.js
+      - store_artifacts:
+          path: make-recall-decision-e2e-tests/e2e_tests/screenshots
+          destination: screenshots
+      - store_artifacts:
+          path: make-recall-decision-e2e-tests/e2e_tests/videos
+          destination: videos
+      - store_artifacts:
+          path: make-recall-decision-e2e-tests/e2e_tests/logs
+          destination: test-logs
+      - store_artifacts:
+          path: make-recall-decision-e2e-tests/e2e_tests/junit
+          destination: junit
+      - store_test_results:
+          path: make-recall-decision-e2e-tests/e2e_tests/junit
+
   e2e_local_test:
     machine:
       image: ubuntu-2204:current
@@ -267,6 +333,15 @@ workflows:
       - integration_tests:
           context:
             - hmpps-common-vars
+          <<: *slack-fail-post-step
+
+      - e2e_environment_test:
+          context:
+            - hmpps-common-vars
+            - make-recall-decision-circleci-auth
+          filters:
+            branches:
+              ignore: main
           <<: *slack-fail-post-step
 
 #      - hmpps/build_docker:
