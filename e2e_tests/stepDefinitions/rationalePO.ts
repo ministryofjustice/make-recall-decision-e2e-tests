@@ -804,12 +804,13 @@ const validateLastCompletedDocumentTabDetails = function (letterType: string) {
 }
 
 const updateContactInformation = function (question: string) {
+  const govUkEmail = `${faker.internet.userName().toLowerCase()}@justice.gov.uk`
   if (question === 'Who completed this Part A?') {
     cy.clickLink(currentPage)
     cy.logPageTitle(currentPage)
     testData.thePersonCompletingTheForm = {} // Populates Q25 of Part A document when Probation Admin flag is set
     cy.get(`#name`).type((testData.thePersonCompletingTheForm.name = faker.name.fullName()))
-    cy.get(`#email`).type((testData.thePersonCompletingTheForm.email = faker.internet.email()))
+    cy.get('#email').type((testData.thePersonCompletingTheForm.email = govUkEmail))
     cy.get(`#telephone`).type((testData.thePersonCompletingTheForm.telephone = faker.phone.number('01277 ### ###')))
     cy.get(`#region`).select(
       (testData.thePersonCompletingTheForm.region = faker.helpers.arrayElement(Object.values(Regions)))
@@ -822,7 +823,7 @@ const updateContactInformation = function (question: string) {
     cy.logPageTitle(`${currentPage}?`)
     testData.offenderManager = {} // Populates Q26 of Part A document when Probation Admin flag is set
     cy.get(`#name`).type((testData.offenderManager.name = faker.name.fullName()))
-    cy.get(`#email`).type((testData.offenderManager.email = faker.internet.email()))
+    cy.get(`#email`).type((testData.offenderManager.email = govUkEmail))
     cy.get(`#telephone`).type((testData.offenderManager.telephone = faker.phone.number('012## ### ###')))
     cy.get(`#region`).select((testData.offenderManager.region = faker.helpers.arrayElement(Object.values(Regions))))
     cy.get(`#localDeliveryUnit`).type((testData.offenderManager.LDU = faker.address.cityName()))
@@ -830,9 +831,9 @@ const updateContactInformation = function (question: string) {
   } else {
     cy.clickLink(currentPage)
     cy.logPageTitle(currentPage)
-    cy.get(`#email_0`).type(faker.internet.email())
+    cy.get(`#email_0`).type(govUkEmail)
     cy.clickButton('Add another email')
-    cy.get(`#email_1`).type(faker.internet.email())
+    cy.get(`#email_1`).type(govUkEmail)
     cy.clickButton('Continue')
   }
 }

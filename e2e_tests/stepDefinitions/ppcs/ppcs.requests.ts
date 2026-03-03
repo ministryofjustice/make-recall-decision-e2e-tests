@@ -48,7 +48,8 @@ export const startRecallRecommendationStatusRequest: () => UpdateRecommendationS
 
 export const postPORecallRecommendationRequest: () => UpdateRecommendationRequest = () => {
     const decisionDateTime = faker.date.recent(7) // Some time within the last week
-    const decisionDateTimeReduced = [
+  const govUkEmail = `${faker.internet.userName().toLowerCase()}@justice.gov.uk`
+  const decisionDateTimeReduced = [
         decisionDateTime.getFullYear(),
         decisionDateTime.getMonth() + 1,
         decisionDateTime.getDate(),
@@ -136,7 +137,7 @@ export const postPORecallRecommendationRequest: () => UpdateRecommendationReques
         },
         whoCompletedPartA: {
             name: faker.name.fullName(),
-            email: faker.internet.email(),
+            email: govUkEmail,
             region: 'N54',
             telephone: faker.phone.number(),
             localDeliveryUnit: faker.lorem.word(),
