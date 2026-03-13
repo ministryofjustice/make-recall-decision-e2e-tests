@@ -4,10 +4,9 @@ Feature: Preview Part A Document from the Task List
 
   Scenario: Contact information section is present when PO tries to complete Part A task list
     Given a PO has created a recommendation to recall with:
-      | Indeterminate     | No      |
-      | Extended          | No      |
-      | LicenceConditions | All     |
-      | AlternativesTried | Some    |
+      | SentenceGroup     | ADULT_SDS |
+      | LicenceConditions | All       |
+      | AlternativesTried | Some      |
     And PO has created a Part A form without requesting SPO review with:
       | RecallType          | STANDARD   |
       | InCustody           | Yes Police |

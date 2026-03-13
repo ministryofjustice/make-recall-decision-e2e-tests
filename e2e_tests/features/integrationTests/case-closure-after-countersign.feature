@@ -11,8 +11,7 @@ Feature: Case closure after SPO/ACO countersign scenario
   @MRD-1466
   Scenario: Case is closed when PO downloads Part A after rationale is recorded and SPO/ACO countersigns
     Given a PO has created a recommendation to recall with:
-      | Indeterminate | No |
-      | Extended      | No |
+      | SentenceGroup | ADULT_SDS |
     And PO has created a Part A form without requesting SPO review with:
       | RecallType          | STANDARD   |
       | InCustody           | Yes Police |

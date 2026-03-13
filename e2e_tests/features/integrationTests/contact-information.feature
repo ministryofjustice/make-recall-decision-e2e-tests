@@ -5,8 +5,7 @@ Feature: Contact Information section on the Task List
   @MRD-1723 @MRD-1731 @MRD-1756
   Scenario: Contact information section is present when PO tries to complete Part A task list
     Given a PO has created a recommendation to recall with:
-      | Indeterminate | No |
-      | Extended      | No |
+      | SentenceGroup | ADULT_SDS |
     And PO has started creating the Part A form without requesting SPO review
     When PO has updated "Who completed this Part A?" under Contact Information section
     And PO has updated "Where should the revocation order be sent?" under Contact Information section

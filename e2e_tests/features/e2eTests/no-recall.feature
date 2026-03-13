@@ -5,8 +5,7 @@ Feature: E2E Decision Not To Recall scenarios
 
   Scenario: E2E - Decision Not To Recall Letter details are correct when PO and SPO records rationale during review and countersign
     Given a PO has created a recommendation of no-recall with:
-      | Indeterminate  | No |
-      | Extended       | No |
+      | SentenceGroup | ADULT_SDS |
     And PO has requested an SPO to review recommendation
     And SPO has visited the review link
     When SPO has recorded a review decision of NO_RECALL
