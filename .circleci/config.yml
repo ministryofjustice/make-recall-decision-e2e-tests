@@ -183,7 +183,7 @@ jobs:
           command: |
             git clone https://github.com/ministryofjustice/make-recall-decision-ui.git
             cd make-recall-decision-ui
-            git checkout main
+            git checkout make-ftr54-flag-configurable-in-docker-compose
       - node/install:
           node-version: '20' # node/install doesn't have a working_directory parameter, but the .nvmrc file is in a
                              # sub-directory (make-recall-decision-e2e-tests), so we need to set the node version here
