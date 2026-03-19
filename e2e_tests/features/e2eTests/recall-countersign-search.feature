@@ -13,8 +13,7 @@ Feature: E2E scenarios - Recall
   @MRD-1320 @MRD-1268 @MRD-1305 @MRD-1252 @MRD-1267 @MRD-1449 @MRD-1465
   Scenario Outline: E2E - PO records a recall and SPO & ACO countersigns - login & search
     Given a PO has created a recommendation to recall with:
-      | Indeterminate  | <Indeterminate>  |
-      | Extended       | <Extended>       |
+      | SentenceGroup  | <SentenceGroup>  |
       | TypeOfSentence | <TypeOfSentence> |
     And PO has created a Part A form without requesting SPO review with:
       | RecallType          | <RecallType> |
@@ -39,6 +38,6 @@ Feature: E2E scenarios - Recall
     And Part A details are correct
 
     Examples:
-      | Indeterminate | Extended | TypeOfSentence | RecallType | InCustody  |
-      | Yes           | Yes      | IPP            | EMERGENCY  | Yes Police |
-#      | Yes           | Yes      | DPP            | EMERGENCY  | No         |
+      | SentenceGroup | TypeOfSentence | RecallType | InCustody  |
+      | INDETERMINATE | IPP            | EMERGENCY  | Yes Police |
+#      | INDETERMINATE | DPP            | EMERGENCY  | No         |

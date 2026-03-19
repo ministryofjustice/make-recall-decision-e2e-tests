@@ -14,6 +14,7 @@ import {
   NonIndeterminateRecallType,
   REGEXP_SPECIAL_CHAR,
   ROSHLevels,
+  SentenceGroup,
   YesNoNAType,
   YesNoType,
 } from '../support/enums'
@@ -42,7 +43,6 @@ const partASections = {
   17: '17. Tick all standard licence conditions which have been breached',
   18: '18. If any additional licence condition(s) has been breached',
   19: '19. Detail the circumstances and behaviours leading to the recall',
-  20: '20. Provide details of how the offender has responded to supervision to date',
   21: '21. What alternatives to recall have been taken to try to secure compliance',
   22: '22. Select the proposed recall type, having considered the information above',
   23: '23. If you are proposing a Fixed Term Recall',
@@ -401,12 +401,6 @@ export const q19CircumstancesLeadingToRecall = (contents: string, details: strin
   expectSoftly(contents, 'Circumstance leading to recall').to.contain(details)
 }
 
-export const q20ResponseToSupervision = (contents: string, details: string) => {
-  // eslint-disable-next-line no-param-reassign
-  contents = contents.substring(contents.indexOf(partASections[20]), contents.indexOf(partASections[21]))
-  expectSoftly(contents, 'Response to Supervision').to.contain(details)
-}
-
 export const q21Alternatives = (contents: string, details: Record<string, string>[] | string[]) => {
   // eslint-disable-next-line no-param-reassign
   contents = contents.substring(contents.indexOf(partASections[21]), contents.indexOf(partASections[22]))
@@ -428,17 +422,17 @@ export const q21Alternatives = (contents: string, details: Record<string, string
 export const q22RecallType = (contents: string, details: Record<string, string>) => {
   // eslint-disable-next-line no-param-reassign
   contents = contents.substring(contents.indexOf(partASections[22]), contents.indexOf(partASections[23]))
-  if (details.indeterminate === 'NO' && details.extended === 'NO') {
+  if (details.sentenceGroup !== SentenceGroup.INDETERMINATE && details.sentenceGroup !== SentenceGroup.EXTENDED) {
     // eslint-disable-next-line no-param-reassign
     details.type = NonIndeterminateRecallType[details.recallType]
     // eslint-disable-next-line no-param-reassign
     details.reason = details.partARecallReason
-  } else if (details.indeterminate === 'NO' && details.extended === 'YES') {
+  } else if (details.sentenceGroup === SentenceGroup.EXTENDED) {
     // eslint-disable-next-line no-param-reassign
     details.type = 'N/A (extended sentence recall)'
     // eslint-disable-next-line no-param-reassign
     details.reason = 'N/A (extended sentence recall)'
-  } else if (details.indeterminate === 'YES') {
+  } else if (details.sentenceGroup === SentenceGroup.INDETERMINATE) {
     // eslint-disable-next-line no-param-reassign
     details.type = 'N/A (not a determinate recall)'
     // eslint-disable-next-line no-param-reassign
@@ -457,7 +451,7 @@ export const q23LicenceConditionsToAdd = (contents: string, details: Record<stri
   contents = contents.substring(contents.indexOf(partASections[23]), contents.indexOf(partASections[24]))
   expectSoftly(contents, 'Licence Conditions to Add').to.contain(
     // eslint-disable-next-line no-nested-ternary
-    details.recallType === 'STANDARD' && details.extended === 'YES'
+    details.recallType === 'STANDARD' && details.sentenceGroup === SentenceGroup.EXTENDED
       ? 'N/A (extended sentence recall)'
       : /* eslint-disable-next-line no-nested-ternary */
       details.recallType === 'STANDARD'
@@ -466,9 +460,9 @@ export const q23LicenceConditionsToAdd = (contents: string, details: Record<stri
       details.recallType === 'FIXED_TERM' && details.fixedTermRecall === 'NO'
       ? ''
       : /* eslint-disable-next-line no-nested-ternary */
-      details.indeterminate === 'YES'
+      details.sentenceGroup === SentenceGroup.INDETERMINATE
       ? 'N/A (not a determinate recall)'
-      : details.extended === 'YES'
+      : details.sentenceGroup === SentenceGroup.EXTENDED
       ? 'N/A (extended sentence recall)'
       : details.fixedTermRecallNotes
   )

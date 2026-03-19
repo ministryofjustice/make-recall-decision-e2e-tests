@@ -5,8 +5,7 @@ Feature: Task list after countersigning
   @MRD-1320 @MRD-1252 @MRD-1449 @MRD-1465
   Scenario: SPO & PO task-lists are updated with right status after SPO countersigning
     Given a PO has created a recommendation to recall with:
-      | Indeterminate | No |
-      | Extended      | No |
+      | SentenceGroup | ADULT_SDS |
     And PO has created a Part A form without requesting SPO review with:
       | RecallType          | STANDARD   |
       | InCustody           | Yes Police |
@@ -26,8 +25,7 @@ Feature: Task list after countersigning
   @MRD-1268 @MRD-1252 @MRD-1449 @MRD-1465
   Scenario: ACO & PO task-lists are updated with right status after ACO countersigning
     Given a PO has created a recommendation to recall with:
-      | Indeterminate | No |
-      | Extended      | No |
+      | SentenceGroup | ADULT_SDS |
     And PO has created a Part A form without requesting SPO review with:
       | RecallType          | STANDARD   |
       | InCustody           | Yes Police |

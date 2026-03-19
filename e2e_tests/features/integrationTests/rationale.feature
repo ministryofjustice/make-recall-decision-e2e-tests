@@ -11,8 +11,7 @@ Feature: Rationale for a Recall decision
   @MRD-1305 @MRD-1320 @MRD-1449 @MRD-1465
   Scenario: SPO is able to see the ACO countersigning link on SPO countersigning page
     Given a PO has created a recommendation to recall with:
-      | Indeterminate | No |
-      | Extended      | No |
+      | SentenceGroup | ADULT_SDS |
     And PO has created a Part A form without requesting SPO review with:
       | RecallType          | STANDARD   |
       | InCustody           | Yes Police |
@@ -27,8 +26,7 @@ Feature: Rationale for a Recall decision
   @MRD-1465 @MRD-1449
   Scenario: SPO is able to record rationale even after ACO has countersigned
     Given a PO has created a recommendation to recall with:
-      | Indeterminate | No |
-      | Extended      | No |
+      | SentenceGroup | ADULT_SDS |
     And PO has created a Part A form without requesting SPO review with:
       | RecallType          | STANDARD   |
       | InCustody           | Yes Police |

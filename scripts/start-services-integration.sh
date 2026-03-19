@@ -26,6 +26,7 @@ popd
 
 pushd "${UI_DIR}"
 printf "\n\nBuilding/starting UI components...\n\n"
+export FEATURE_FLAGFTR56ENABLED=2026-03-13T00:00Z # remove once FTR56 is released
 docker compose build
 docker compose up -d
 popd

@@ -1,3 +1,10 @@
+export enum SentenceGroup {
+  ADULT_SDS = 'ADULT_SDS',
+  INDETERMINATE = 'INDETERMINATE',
+  EXTENDED = 'EXTENDED',
+  YOUTH_SDS = 'YOUTH_SDS',
+}
+
 export enum YesNoType {
   'YES' = 'Yes',
   'NO' = 'No',

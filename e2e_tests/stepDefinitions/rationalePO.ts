@@ -24,6 +24,7 @@ import {
   NonIndeterminateRecallType,
   Regions,
   ROSHLevels,
+  SentenceGroup,
   Vulnerabilities,
   WhyConsiderRecall,
   YesNoNAType,
@@ -39,99 +40,57 @@ const expectSoftly = proxy(expect)
 let testData: Record<string, any> = {}
 let currentPage
 
-export const makeRecommendation = function (crn, recommendationDetails?: Record<string, string>) {
-  testData = {
-    licenceConditions: { standard: [], advanced: [] },
-    alternativesTried: [],
-    vulnerabilities: [],
-  }
+function completeTriggerLeadingToRecallConsideration(offenderName: string) {
+  testData.recallReason = faker.hacker.phrase()
+  cy.fillInput(`What has made you consider recalling ${offenderName}`, testData.recallReason)
+  cy.clickButton('Continue')
+}
 
-  cy.clickLink('Start now')
-  cy.clickLink('Search by case reference number (CRN)')
-  cy.fillInputByName('crn', crn)
-  cy.clickButton('Search')
-  // get offender name for use in subsequent pages
-  cy.get(`[data-qa="row-${crn}"] [data-qa="name"]`)
-    .first()
-    .click()
-    .invoke('text')
-    .as('offenderName')
-    .then(offenderName => {
-      deleteOpenRecommendation()
-      // Create a new recommendation - START
-      cy.clickLink('Make a recommendation')
-      cy.clickButton('Continue')
-      cy.clickLink(`What has made you consider recalling ${offenderName}`)
-      testData.recallReason = faker.hacker.phrase()
-      cy.fillInput(`What has made you consider recalling ${offenderName}`, testData.recallReason)
-      cy.clickButton('Continue')
-      cy.clickLink(`How has ${offenderName} responded to probation so far`)
-      testData.probationResponse = faker.hacker.phrase()
-      cy.fillInput(`How has ${offenderName} responded to probation so far`, testData.probationResponse)
-      cy.clickButton('Continue')
-      cy.clickLink(`What licence conditions has ${offenderName} breached`)
-      // select all standard recommendation if recommendationDetails.LicenceConditions === 'all' passed else choose a few randomly
-      cy.get('input[id^=standard-]').then(standardLicenceConditions => {
-        const stdConditions =
-          recommendationDetails?.LicenceConditions?.toLowerCase() === 'all'
-            ? standardLicenceConditions.toArray()
-            : faker.helpers.arrayElements(standardLicenceConditions.toArray())
-        stdConditions.forEach(htmlElement => {
-          htmlElement.click()
-          testData.licenceConditions.standard.push(htmlElement.getAttribute('value').replace('standard|', ''))
-        })
-      })
-      // select additional licence randomly or if recommendationDetails.LicenceConditions === 'all' is passed
-      if (faker.datatype.boolean() || (recommendationDetails?.LicenceConditions?.length ?? 0) !== 0) {
-        cy.get('body').then($body => {
-          if ($body.find('input[id^=additional-]').length !== 0) {
-            cy.get('input[id^=additional-]').then(advancedLicenceConditions => {
-              const addConditions =
-                recommendationDetails?.LicenceConditions?.toLowerCase() === 'all'
-                  ? advancedLicenceConditions.toArray()
-                  : faker.helpers.arrayElements(advancedLicenceConditions.toArray())
-              addConditions.forEach(htmlElement => {
-                htmlElement.click()
-                cy.wrap(htmlElement)
-                  .next('label')
-                  .next('div')
-                  .invoke('text')
-                  .then(text => {
-                    testData.licenceConditions.advanced.push(
-                      text
-                        .replace(/\n/g, '')
-                        .replace(/\s{2,}/g, '')
-                        .replace('Notes', 'Note: ')
-                        .trim()
-                    )
-                  })
+function completeLicenceConditions(recommendationDetails: Record<string, string>) {
+  // select all standard recommendation if recommendationDetails.LicenceConditions === 'all' passed else choose a few randomly
+  cy.get('input[id^=standard-]').then(standardLicenceConditions => {
+    const stdConditions =
+      recommendationDetails?.LicenceConditions?.toLowerCase() === 'all'
+        ? standardLicenceConditions.toArray()
+        : faker.helpers.arrayElements(standardLicenceConditions.toArray())
+    stdConditions.forEach(htmlElement => {
+      htmlElement.click()
+      testData.licenceConditions.standard.push(htmlElement.getAttribute('value').replace('standard|', ''))
+    })
+  })
+  // select additional licence randomly or if recommendationDetails.LicenceConditions === 'all' is passed
+  if (faker.datatype.boolean() || (recommendationDetails?.LicenceConditions?.length ?? 0) !== 0) {
+    cy.get('body').then($body => {
+      if ($body.find('input[id^=additional-]').length !== 0) {
+        cy.get('input[id^=additional-]').then(advancedLicenceConditions => {
+          const addConditions =
+            recommendationDetails?.LicenceConditions?.toLowerCase() === 'all'
+              ? advancedLicenceConditions.toArray()
+              : faker.helpers.arrayElements(advancedLicenceConditions.toArray())
+          addConditions.forEach(htmlElement => {
+            htmlElement.click()
+            cy.wrap(htmlElement)
+              .next('label')
+              .next('div')
+              .invoke('text')
+              .then(text => {
+                testData.licenceConditions.advanced.push(
+                  text
+                    .replace(/\n/g, '')
+                    .replace(/\s{2,}/g, '')
+                    .replace('Notes', 'Note: ')
+                    .trim()
+                )
               })
-            })
-          }
+          })
         })
-      }
-      cy.clickButton('Continue')
-      // Select if offender is on indeterminate sentence
-      cy.clickLink(`Is ${offenderName} on an indeterminate sentence`)
-      testData.indeterminate = recommendationDetails?.Indeterminate
-        ? recommendationDetails.Indeterminate.toString().toUpperCase()
-        : faker.helpers.arrayElement(Object.keys(YesNoType))
-      cy.selectRadioByValue(`Is ${offenderName} on an indeterminate sentence`, testData.indeterminate)
-      cy.clickButton('Continue')
-      testData.extended = recommendationDetails?.Extended
-        ? recommendationDetails.Extended.toString().toUpperCase()
-        : faker.helpers.arrayElement(Object.keys(YesNoType))
-      cy.selectRadioByValue(`Is ${offenderName} on an extended sentence`, testData.extended)
-      cy.clickButton('Continue')
-      if (recommendationDetails?.Indeterminate.toString().toUpperCase() === 'YES') {
-        testData.TypeOfSentence = recommendationDetails?.TypeOfSentence
-          ? recommendationDetails.TypeOfSentence.toString().toUpperCase()
-          : faker.helpers.arrayElement(['LIFE', 'IPP', 'DPP'])
-        cy.selectRadioByValue(`What type of sentence is ${offenderName} on`, testData.TypeOfSentence)
-        cy.clickButton('Continue')
       }
     })
-  cy.clickLink(`What alternatives to recall have been tried already`)
+  }
+  cy.clickButton('Continue')
+}
+
+function completeAlternativesTried(recommendationDetails: Record<string, string>) {
   const alternativesTried = recommendationDetails?.AlternativesTried
   if (['All', 'Some'].includes(alternativesTried)) {
     cy.get('.govuk-checkboxes input:not([data-behaviour="exclusive"])').then(alternatives => {
@@ -168,6 +127,60 @@ export const makeRecommendation = function (crn, recommendationDetails?: Record<
     })
   }
   cy.clickButton('Continue')
+}
+
+function completeSentenceInformation(recommendationDetails: Record<string, string>, offenderName: string) {
+  testData.sentenceGroup = recommendationDetails?.SentenceGroup
+    ? recommendationDetails.SentenceGroup
+    : faker.helpers.arrayElement(Object.values(SentenceGroup))
+  cy.selectRadioByValue(`Which sentence group does ${offenderName}'s sentence type fall into?`, testData.sentenceGroup)
+  cy.clickButton('Continue')
+}
+
+function completeIndeterminateSentenceType(recommendationDetails: Record<string, string>, offenderName: string) {
+  testData.TypeOfSentence = recommendationDetails?.TypeOfSentence
+    ? recommendationDetails.TypeOfSentence.toString().toUpperCase()
+    : faker.helpers.arrayElement(['LIFE', 'IPP', 'DPP'])
+  cy.selectRadioByValue(`What type of sentence is ${offenderName} on`, testData.TypeOfSentence)
+  cy.clickButton('Continue')
+}
+
+export const makeRecommendation = function (crn, recommendationDetails?: Record<string, string>) {
+  testData = {
+    licenceConditions: { standard: [], advanced: [] },
+    alternativesTried: [],
+    vulnerabilities: [],
+  }
+
+  cy.clickLink('Start now')
+  cy.clickLink('Search by case reference number (CRN)')
+  cy.fillInputByName('crn', crn)
+  cy.clickButton('Search')
+  // get offender name for use in subsequent pages
+  cy.get(`[data-qa="row-${crn}"] [data-qa="name"]`)
+    .first()
+    .click()
+    .invoke('text')
+    .as('offenderName')
+    .then(offenderName => {
+      deleteOpenRecommendation()
+      // Create a new recommendation - START
+      cy.clickLink('Make a recommendation')
+      cy.clickButton('Continue')
+
+      cy.clickLink(`What has made you consider recalling ${offenderName}`)
+      completeTriggerLeadingToRecallConsideration(offenderName)
+
+      completeLicenceConditions(recommendationDetails)
+
+      completeAlternativesTried(recommendationDetails)
+
+      completeSentenceInformation(recommendationDetails, offenderName)
+      if (testData.sentenceGroup === SentenceGroup.INDETERMINATE) {
+        completeIndeterminateSentenceType(recommendationDetails, offenderName)
+      }
+    })
+
   cy.wrap(testData).as('testData')
   cy.clickButton('Continue')
   cy.logPageTitle('Record the consideration in NDelius')
@@ -283,7 +296,7 @@ function selectAlternativesTried(htmlElements: HTMLElement[]) {
 
 const createPartAOrNoRecallLetter = function (partADetails?: Record<string, string>) {
   cy.log(`testData before Part A creation--> ${JSON.stringify(testData)}`)
-  if (testData.indeterminate === 'NO' && testData.extended === 'YES') {
+  if (testData.sentenceGroup === SentenceGroup.EXTENDED) {
     testData.recallType = partADetails?.RecallType
       ? partADetails.RecallType.toString().toUpperCase()
       : faker.helpers.arrayElement(Object.keys(NonIndeterminateRecallType))
@@ -304,15 +317,18 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
       cy.logPageTitle('Indeterminate and extended sentences')
       testData.indeterminateAndExtendedSentencesCriteria = 'BEHAVIOUR_LEADING_TO_SEXUAL_OR_VIOLENT_OFFENCE'
       cy.get('input[type="checkbox"]').check(testData.indeterminateAndExtendedSentencesCriteria)
-      testData.indeterminatANDExtendedSentences = faker.hacker.phrase()
+      testData.indeterminateANDExtendedSentences = faker.hacker.phrase()
       cy.get(
         `#indeterminateOrExtendedSentenceDetailsDetail-${testData.indeterminateAndExtendedSentencesCriteria}`
-      ).type(testData.indeterminatANDExtendedSentences)
+      ).type(testData.indeterminateANDExtendedSentences)
     }
     cy.clickButton('Continue')
     cy.logPageTitle('Sensitive Information')
     cy.clickLink('Continue')
-  } else if (testData.indeterminate === 'NO' && testData.extended === 'NO') {
+  } else if (
+    testData.sentenceGroup !== SentenceGroup.INDETERMINATE &&
+    testData.sentenceGroup !== SentenceGroup.EXTENDED
+  ) {
     testData.recallType = partADetails?.RecallType
       ? partADetails.RecallType.toString().toUpperCase()
       : faker.helpers.arrayElement(Object.keys(NonIndeterminateRecallType))
@@ -710,7 +726,7 @@ const createDNTRLetter = function () {
 
 const recordPoDecision = function (poDecision?: string) {
   this.testData.poDecision = poDecision || faker.helpers.arrayElement(Object.keys(NonIndeterminateRecallType))
-  if (testData.indeterminate === 'NO' && testData.extended === 'NO') {
+  if (testData.sentenceGroup !== SentenceGroup.INDETERMINATE && testData.sentenceGroup !== SentenceGroup.EXTENDED) {
     cy.logPageTitle('Suitability for fixed term recall')
     testData.suitabilityForfixedTermRecall = randomiseCriteria<{
       isSentence48MonthsOrOver: string
@@ -869,7 +885,7 @@ Given('PO has started creating the Part A form without requesting SPO review', f
   cy.clickLink('Continue')
   cy.clickLink('Continue')
   cy.logPageTitle('What do you recommend?')
-  if (testData.indeterminate === 'NO' && testData.extended === 'NO') {
+  if (testData.sentenceGroup !== SentenceGroup.INDETERMINATE && testData.sentenceGroup !== SentenceGroup.EXTENDED) {
     cy.logPageTitle('Suitability for fixed term recall')
     testData.suitabilityForfixedTermRecall = randomiseCriteria<{
       isSentence48MonthsOrOver: string

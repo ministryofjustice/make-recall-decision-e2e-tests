@@ -13,8 +13,7 @@ Feature: E2E scenarios - Recall
   @MRD-1446 @MRD-1389
   Scenario Outline: E2E - SPO records rationale during review and countersigns Part A later
     Given a PO has created a recommendation to recall with:
-      | Indeterminate  | <Indeterminate>  |
-      | Extended       | <Extended>       |
+      | SentenceGroup  | <SentenceGroup>  |
       | TypeOfSentence | <TypeOfSentence> |
     And PO has requested an SPO to review recommendation
     And SPO has visited the review link
@@ -36,6 +35,6 @@ Feature: E2E scenarios - Recall
     And Part A details are correct
 
     Examples:
-      | Indeterminate | Extended | TypeOfSentence | RecallType | InCustody  | SPODecision |
-      | Yes           | No       | LIFE           | EMERGENCY  | Yes Police | RECALL      |
-#      | No            | Yes      |                | STANDARD   | No         | RECALL      |
+      | SentenceGroup | TypeOfSentence | RecallType | InCustody  | SPODecision |
+      | INDETERMINATE | LIFE           | EMERGENCY  | Yes Police | RECALL      |
+#      | EXTENDED      |                | STANDARD   | No         | RECALL      |

@@ -13,7 +13,6 @@ import {
   q18AdditionalConditions,
   q19CircumstancesLeadingToRecall,
   q1EmergencyRecall,
-  q20ResponseToSupervision,
   q21Alternatives,
   q22RecallType,
   q23LicenceConditionsToAdd,
@@ -32,8 +31,8 @@ import {
   q8ArrestIssues,
   q9LocalPoliceDetails,
 } from './assertionsPartA'
-import { CUSTODY_GROUP, CustodyType, YesNoType } from '../support/enums'
-import { loginAndSearchCrn } from "./user/user"
+import { CUSTODY_GROUP, CustodyType, SentenceGroup, YesNoType } from '../support/enums'
+import { loginAndSearchCrn } from './user/user'
 
 export const crns = {
   1: Cypress.env('CRN') || 'X514364',
@@ -110,8 +109,11 @@ Then('Part A details are correct', function () {
   cy.log(`this.testData--> ${JSON.stringify(this.testData)}`)
   const contents = this.partAContent.toString()
   q1EmergencyRecall(contents, YesNoType[this.testData.emergencyRecall])
-  q2IndeterminateSentenceType(contents, YesNoType[this.testData.indeterminate])
-  q3ExtendedSentence(contents, YesNoType[this.testData.extended])
+  q2IndeterminateSentenceType(
+    contents,
+    YesNoType[this.testData.sentenceGroup === SentenceGroup.INDETERMINATE ? 'YES' : 'NO']
+  )
+  q3ExtendedSentence(contents, YesNoType[this.testData.sentenceGroup === SentenceGroup.EXTENDED ? 'YES' : 'NO'])
   q4OffenderDetails(contents, this.testData.offenderDetails)
   q5SentenceDetails(contents, this.testData.offenceDetails)
   q6CustodyStatus(contents, CustodyType[this.testData.inCustody])
@@ -128,15 +130,13 @@ Then('Part A details are correct', function () {
   q17LicenceConditions(contents, this.testData.licenceConditions.standard)
   q18AdditionalConditions(contents, this.testData.licenceConditions.advanced)
   q19CircumstancesLeadingToRecall(contents, this.testData.reasonForRecall)
-  q20ResponseToSupervision(contents, this.testData.probationResponse)
   q21Alternatives(contents, this.testData.alternativesTried)
   q22RecallType(contents, this.testData)
   q23LicenceConditionsToAdd(contents, {
     fixedTermRecallNotes: this.testData.fixedTermRecallNotes,
     recallType: this.testData.recallType,
     fixedTermRecall: this.testData.fixedTermRecall,
-    indeterminate: this.testData.indeterminate,
-    extended: this.testData.extended,
+    sentenceGroup: this.testData.sentenceGroup,
   })
   q24ISPESP(contents, this.testData.indeterminateOrExtendedSentenceDetails)
   q25ProbationDetailsWithCaseAdmin(contents, this.testData.thePersonCompletingTheForm, this.testData)

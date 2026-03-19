@@ -3,6 +3,7 @@ import { CreateRecommendationRequest, UpdateRecommendationRequest, UpdateRecomme
 import * as OPTIONS from "./ppcs";
 import { RECOMMENDATION_STATUSES } from "../../utils/recommendations/recommendationStatuses";
 import { YESNONA } from "../../utils/standardTypes";
+import { SentenceGroup } from '../../support/enums'
 
 export const createRecommendationRequest: (crn: string) => CreateRecommendationRequest = (crn) => ({
         crn: crn, //TODO V2: toggle and crns for Dev/Pre prod that works for other services
@@ -32,8 +33,7 @@ export const initialRecomendationRequest: () => UpdateRecommendationRequest = ()
         })),
         allOptions: OPTIONS.alternativesToRecallTried
     },
-    isIndeterminateSentence: true,
-    isExtendedSentence: false,
+    sentenceGroup: SentenceGroup.INDETERMINATE,
     indeterminateSentenceType: {
         selected: faker.helpers.arrayElement(OPTIONS.indeterminateSentenceTypes).value,
         allOptions: OPTIONS.indeterminateSentenceTypes
