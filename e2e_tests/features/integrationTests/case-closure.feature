@@ -3,7 +3,7 @@ Feature: Case closure scenarios
   Tests covering different variations on how and when a recommendation case can be closed
 
   #NOTE:
-  #TypeOfSentence: supports LIFE, IPP & DPP only
+  #TypeOfSentence: supports LIFE, IPP, DPP & DHMP only
   #RecallType: supports STANDARD, FIXED_TERM & NO_RECALL for non-indeterminate/non-extended only else its EMERGENCY & NO_RECALL
   #VictimContactScheme: supports 'Yes', 'No' & 'Not applicable'
   #InCustody: supports 'Yes, prison custody', 'Yes, police custody' & 'No'
