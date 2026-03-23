@@ -53,3 +53,5 @@ Feature: E2E scenarios - Recall
       | SentenceGroup | RecallType | InCustody  | Vulnerabilities | EmergencyRecall |
       | ADULT_SDS     | STANDARD   | No         | None            |                 |
       | ADULT_SDS     | FIXED_TERM | Yes Prison | Some            | Yes             |
+      | YOUTH_SDS     | STANDARD   | No         | None            |                 |
+      | YOUTH_SDS     | FIXED_TERM | Yes Prison | Some            | Yes             |

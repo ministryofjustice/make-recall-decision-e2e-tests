@@ -339,59 +339,106 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
     }
 
     cy.logPageTitle('Suitability for fixed term recall')
-    testData.suitabilityForfixedTermRecall = randomiseCriteria<{
-      isSentence48MonthsOrOver: string
-      isUnder18: string
-      isMappaCategory4: string
-      isMappaLevel2Or3: string
-      isRecalledOnNewChargedOffence: string
-      isServingFTSentenceForTerroristOffence: string
-      hasBeenChargedWithTerroristOrStateThreatOffence: string
-    }>(
-      [
-        { key: 'isSentence48MonthsOrOver', generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)) },
-        { key: 'isUnder18', generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)) },
-        { key: 'isMappaCategory4', generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)) },
-        { key: 'isMappaLevel2Or3', generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)) },
-        { key: 'isRecalledOnNewChargedOffence', generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)) },
-        {
-          key: 'isServingFTSentenceForTerroristOffence',
-          generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
-        },
-        {
-          key: 'hasBeenChargedWithTerroristOrStateThreatOffence',
-          generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
-        },
-      ],
-      testData.recallType !== 'STANDARD'
-        ? () => true
-        : criteria => Object.keys(criteria).some(k => criteria[k] === 'YES')
-    )
-    cy.selectRadioByValue(
-      `Is ${this.offenderName}'s sentence 48 months or over?`,
-      testData.suitabilityForfixedTermRecall.isSentence48MonthsOrOver
-    )
-    cy.selectRadioByValue(`Is ${this.offenderName} under 18?`, testData.suitabilityForfixedTermRecall.isUnder18)
-    cy.selectRadioByValue(
-      `Is ${this.offenderName} in MAPPA category 4?`,
-      testData.suitabilityForfixedTermRecall.isMappaCategory4
-    )
-    cy.selectRadioByValue(
-      `Is ${this.offenderName}'s MAPPA level 2 or 3?`,
-      testData.suitabilityForfixedTermRecall.isMappaLevel2Or3
-    )
-    cy.selectRadioByValue(
-      `Is ${this.offenderName} being recalled on a new charged offence?`,
-      testData.suitabilityForfixedTermRecall.isRecalledOnNewChargedOffence
-    )
-    cy.selectRadioByValue(
-      `Is ${this.offenderName} serving a fixed term sentence for a terrorist offence?`,
-      testData.suitabilityForfixedTermRecall.isServingFTSentenceForTerroristOffence
-    )
-    cy.selectRadioByValue(
-      `Has ${this.offenderName} been charged with a terrorist or state threat offence?`,
-      testData.suitabilityForfixedTermRecall.hasBeenChargedWithTerroristOrStateThreatOffence
-    )
+
+    if (testData.sentenceGroup === SentenceGroup.ADULT_SDS) {
+       testData.suitabilityForfixedTermRecall = randomiseCriteria<{
+        isChargedWithOffence: string
+        isServingTerroristOrNationalSecurityOffence: string
+        isAtRiskOfInvolvedInForeignPowerThreat: string
+        wasReferredToParoleBoard244ZB: string
+        wasRepatriatedForMurder: string
+        isServingSOPCSentence: string
+        isServingDCRSentence: string
+      }>(
+        [
+          {
+            key: 'isChargedWithOffence',
+            generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+          },
+          {
+            key: 'isServingTerroristOrNationalSecurityOffence',
+            generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+          },
+          {
+            key: 'isAtRiskOfInvolvedInForeignPowerThreat',
+            generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+          },
+          {
+            key: 'wasReferredToParoleBoard244ZB',
+            generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+          },
+          {
+            key: 'wasRepatriatedForMurder',
+            generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+          },
+          {
+            key: 'isServingSOPCSentence',
+            generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+          },
+          {
+            key: 'isServingDCRSentence',
+            generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+          },
+        ],
+        testData.poDecision !== 'STANDARD'
+          ? () => true
+          : criteria => Object.keys(criteria).some(k => criteria[k] === 'YES')
+      )
+      cy.selectRadioByValue(`Is ${this.offenderName} being recalled because of being charged with an offence?`, testData.suitabilityForfixedTermRecall.isChargedWithOffence)
+      cy.selectRadioByValue(
+        `Is ${this.offenderName} serving a sentence for a terrorist or national security offence?`,
+        testData.suitabilityForfixedTermRecall.isServingTerroristOrNationalSecurityOffence
+      )
+      cy.selectRadioByValue(
+        `Is ${this.offenderName} considered to be a person at risk of being involved in foreign power threat activity?`,
+        testData.suitabilityForfixedTermRecall.isAtRiskOfInvolvedInForeignPowerThreat
+      )
+      cy.selectRadioByValue(
+        `Was ${this.offenderName} referred to the Parole Board under section 244ZB (power to detain) on this sentence?`,
+        testData.suitabilityForfixedTermRecall.wasReferredToParoleBoard244ZB
+      )
+      cy.selectRadioByValue(
+        `Has ${this.offenderName} been repatriated to the UK following a sentence for murder?`,
+        testData.suitabilityForfixedTermRecall.wasRepatriatedForMurder
+      )
+      cy.selectRadioByValue(
+        `Is ${this.offenderName} serving a Sentence for offenders of particular concern (SOPC)?`,
+        testData.suitabilityForfixedTermRecall.isServingSOPCSentence
+      )
+      cy.selectRadioByValue(
+        `Is ${this.offenderName} serving a Discretionary conditional release (DCR) sentence?`,
+        testData.suitabilityForfixedTermRecall.isServingDCRSentence
+      )
+    } else if (testData.sentenceGroup === SentenceGroup.YOUTH_SDS) {
+      testData.suitabilityForfixedTermRecall = randomiseCriteria<{
+        isYouthSentenceOver12Months: string
+        isYouthChargedWithSeriousOffence: string
+      }>(
+        [
+          {
+            key: 'isYouthSentenceOver12Months',
+            generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+          },
+          {
+            key: 'isYouthChargedWithSeriousOffence',
+            generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+          },
+        ],
+        testData.poDecision !== 'STANDARD'
+          ? () => true
+          : criteria => Object.keys(criteria).some(k => criteria[k] === 'YES')
+      )
+
+      cy.selectRadioByValue(
+        `Is ${this.offenderName}'s sentence 12 months or over?`, 
+        testData.suitabilityForfixedTermRecall.isYouthSentenceOver12Months
+      )
+      cy.selectRadioByValue(
+        `Is ${this.offenderName} being recalled because of being charged with a serious offence?`,
+        testData.suitabilityForfixedTermRecall.isYouthChargedWithSeriousOffence,
+      )
+    }
+
     cy.clickButton('Continue')
     cy.logPageTitle('What do you recommend?')
     cy.selectRadioByValue('Select your recommendation', testData.recallType)
@@ -735,41 +782,41 @@ const recordPoDecision = function (poDecision?: string) {
   if (testData.sentenceGroup !== SentenceGroup.INDETERMINATE && testData.sentenceGroup !== SentenceGroup.EXTENDED) {
     cy.logPageTitle('Suitability for fixed term recall')
     testData.suitabilityForfixedTermRecall = randomiseCriteria<{
-      isSentence48MonthsOrOver: string
-      isUnder18: string
-      isMappaCategory4: string
-      isMappaLevel2Or3: string
-      isRecalledOnNewChargedOffence: string
-      isServingFTSentenceForTerroristOffence: string
-      hasBeenChargedWithTerroristOrStateThreatOffence: string
+      isChargedWithOffence: string
+      isServingTerroristOrNationalSecurityOffence: string
+      isAtRiskOfInvolvedInForeignPowerThreat: string
+      wasReferredToParoleBoard244ZB: string
+      wasRepatriatedForMurder: string
+      isServingSOPCSentence: string
+      isServingDCRSentence: string
     }>(
       [
         {
-          key: 'isSentence48MonthsOrOver',
+          key: 'isChargedWithOffence',
           generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
         },
         {
-          key: 'isUnder18',
+          key: 'isServingTerroristOrNationalSecurityOffence',
           generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
         },
         {
-          key: 'isMappaCategory4',
+          key: 'isAtRiskOfInvolvedInForeignPowerThreat',
           generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
         },
         {
-          key: 'isMappaLevel2Or3',
+          key: 'wasReferredToParoleBoard244ZB',
           generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
         },
         {
-          key: 'isRecalledOnNewChargedOffence',
+          key: 'wasRepatriatedForMurder',
           generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
         },
         {
-          key: 'isServingFTSentenceForTerroristOffence',
+          key: 'isServingSOPCSentence',
           generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
         },
         {
-          key: 'hasBeenChargedWithTerroristOrStateThreatOffence',
+          key: 'isServingDCRSentence',
           generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
         },
       ],
@@ -777,30 +824,30 @@ const recordPoDecision = function (poDecision?: string) {
         ? () => true
         : criteria => Object.keys(criteria).some(k => criteria[k] === 'YES')
     )
-    cy.selectRadioByValue(`Is ${this.offenderName} under 18?`, testData.suitabilityForfixedTermRecall.isUnder18)
+    cy.selectRadioByValue(`Is ${this.offenderName} being recalled because of being charged with an offence?`, testData.suitabilityForfixedTermRecall.isChargedWithOffence)
     cy.selectRadioByValue(
-      `Is ${this.offenderName}'s sentence 48 months or over?`,
-      testData.suitabilityForfixedTermRecall.isSentence48MonthsOrOver
+      `Is ${this.offenderName} serving a sentence for a terrorist or national security offence?`,
+      testData.suitabilityForfixedTermRecall.isServingTerroristOrNationalSecurityOffence
     )
     cy.selectRadioByValue(
-      `Is ${this.offenderName} in MAPPA category 4?`,
-      testData.suitabilityForfixedTermRecall.isMappaCategory4
+      `Is ${this.offenderName} considered to be a person at risk of being involved in foreign power threat activity?`,
+      testData.suitabilityForfixedTermRecall.isAtRiskOfInvolvedInForeignPowerThreat
     )
     cy.selectRadioByValue(
-      `Is ${this.offenderName}'s MAPPA level 2 or 3?`,
-      testData.suitabilityForfixedTermRecall.isMappaLevel2Or3
+      `Was ${this.offenderName} referred to the Parole Board under section 244ZB (power to detain) on this sentence?`,
+      testData.suitabilityForfixedTermRecall.wasReferredToParoleBoard244ZB
     )
     cy.selectRadioByValue(
-      `Is ${this.offenderName} being recalled on a new charged offence?`,
-      testData.suitabilityForfixedTermRecall.isRecalledOnNewChargedOffence
+      `Has ${this.offenderName} been repatriated to the UK following a sentence for murder?`,
+      testData.suitabilityForfixedTermRecall.wasRepatriatedForMurder
     )
     cy.selectRadioByValue(
-      `Is ${this.offenderName} serving a fixed term sentence for a terrorist offence?`,
-      testData.suitabilityForfixedTermRecall.isServingFTSentenceForTerroristOffence
+      `Is ${this.offenderName} serving a Sentence for offenders of particular concern (SOPC)?`,
+      testData.suitabilityForfixedTermRecall.isServingSOPCSentence
     )
     cy.selectRadioByValue(
-      `Has ${this.offenderName} been charged with a terrorist or state threat offence?`,
-      testData.suitabilityForfixedTermRecall.hasBeenChargedWithTerroristOrStateThreatOffence
+      `Is ${this.offenderName} serving a Discretionary conditional release (DCR) sentence?`,
+      testData.suitabilityForfixedTermRecall.isServingDCRSentence
     )
     cy.clickButton('Continue')
     cy.selectRadioByValue('Select your recommendation', this.testData.poDecision)
@@ -888,78 +935,86 @@ Given('PO( has) creates/created a Part A form with:', function (dataTable: DataT
 })
 
 Given('PO has started creating the Part A form without requesting SPO review', function () {
+  cy.logPageTitle('Share this case with your manager')
   cy.clickLink('Continue')
+  cy.logPageTitle('Discuss with your manager')
   cy.clickLink('Continue')
-  cy.logPageTitle('What do you recommend?')
+  cy.logPageTitle('Check MAPPA Information')
+  cy.clickButton('Continue')
+
   if (testData.sentenceGroup !== SentenceGroup.INDETERMINATE && testData.sentenceGroup !== SentenceGroup.EXTENDED) {
     cy.logPageTitle('Suitability for fixed term recall')
     testData.suitabilityForfixedTermRecall = randomiseCriteria<{
-      isSentence48MonthsOrOver: string
-      isUnder18: string
-      isMappaCategory4: string
-      isMappaLevel2Or3: string
-      isRecalledOnNewChargedOffence: string
-      isServingFTSentenceForTerroristOffence: string
-      hasBeenChargedWithTerroristOrStateThreatOffence: string
+      isChargedWithOffence: string
+      isServingTerroristOrNationalSecurityOffence: string
+      isAtRiskOfInvolvedInForeignPowerThreat: string
+      wasReferredToParoleBoard244ZB: string
+      wasRepatriatedForMurder: string
+      isServingSOPCSentence: string
+      isServingDCRSentence: string
     }>(
       [
         {
-          key: 'isSentence48MonthsOrOver',
+          key: 'isChargedWithOffence',
           generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
         },
         {
-          key: 'isUnder18',
+          key: 'isServingTerroristOrNationalSecurityOffence',
           generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
         },
         {
-          key: 'isMappaCategory4',
+          key: 'isAtRiskOfInvolvedInForeignPowerThreat',
           generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
         },
         {
-          key: 'isMappaLevel2Or3',
+          key: 'wasReferredToParoleBoard244ZB',
           generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
         },
         {
-          key: 'isRecalledOnNewChargedOffence',
+          key: 'wasRepatriatedForMurder',
           generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
         },
         {
-          key: 'isServingFTSentenceForTerroristOffence',
+          key: 'isServingSOPCSentence',
           generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
         },
         {
-          key: 'hasBeenChargedWithTerroristOrStateThreatOffence',
+          key: 'isServingDCRSentence',
           generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
         },
       ],
-      criteria => Object.keys(criteria).some(k => criteria[k] === 'YES')
+      testData.poDecision !== 'STANDARD'
+        ? () => true
+        : criteria => Object.keys(criteria).some(k => criteria[k] === 'YES')
+    )
+    cy.selectRadioByValue(`Is ${this.offenderName} being recalled because of being charged with an offence?`, testData.suitabilityForfixedTermRecall.isChargedWithOffence)
+    cy.selectRadioByValue(
+      `Is ${this.offenderName} serving a sentence for a terrorist or national security offence?`,
+      testData.suitabilityForfixedTermRecall.isServingTerroristOrNationalSecurityOffence
     )
     cy.selectRadioByValue(
-      `Is ${this.offenderName}'s sentence 48 months or over?`,
-      testData.suitabilityForfixedTermRecall.isSentence48MonthsOrOver
-    )
-    cy.selectRadioByValue(`Is ${this.offenderName} under 18?`, testData.suitabilityForfixedTermRecall.isUnder18)
-    cy.selectRadioByValue(
-      `Is ${this.offenderName} in MAPPA category 4?`,
-      testData.suitabilityForfixedTermRecall.isMappaCategory4
+      `Is ${this.offenderName} considered to be a person at risk of being involved in foreign power threat activity?`,
+      testData.suitabilityForfixedTermRecall.isAtRiskOfInvolvedInForeignPowerThreat
     )
     cy.selectRadioByValue(
-      `Is ${this.offenderName}'s MAPPA level 2 or 3?`,
-      testData.suitabilityForfixedTermRecall.isMappaLevel2Or3
+      `Was ${this.offenderName} referred to the Parole Board under section 244ZB (power to detain) on this sentence?`,
+      testData.suitabilityForfixedTermRecall.wasReferredToParoleBoard244ZB
     )
     cy.selectRadioByValue(
-      `Is ${this.offenderName} being recalled on a new charged offence?`,
-      testData.suitabilityForfixedTermRecall.isRecalledOnNewChargedOffence
+      `Has ${this.offenderName} been repatriated to the UK following a sentence for murder?`,
+      testData.suitabilityForfixedTermRecall.wasRepatriatedForMurder
     )
     cy.selectRadioByValue(
-      `Is ${this.offenderName} serving a fixed term sentence for a terrorist offence?`,
-      testData.suitabilityForfixedTermRecall.isServingFTSentenceForTerroristOffence
+      `Is ${this.offenderName} serving a Sentence for offenders of particular concern (SOPC)?`,
+      testData.suitabilityForfixedTermRecall.isServingSOPCSentence
     )
     cy.selectRadioByValue(
-      `Has ${this.offenderName} been charged with a terrorist or state threat offence?`,
-      testData.suitabilityForfixedTermRecall.hasBeenChargedWithTerroristOrStateThreatOffence
+      `Is ${this.offenderName} serving a Discretionary conditional release (DCR) sentence?`,
+      testData.suitabilityForfixedTermRecall.isServingDCRSentence
     )
     cy.clickButton('Continue')
+
+    cy.logPageTitle('What do you recommend?')
     cy.selectRadio('Select your recommendation', NonIndeterminateRecallType.STANDARD)
   } else {
     cy.selectRadio('What do you recommend', NonIndeterminateRecallType.STANDARD)
