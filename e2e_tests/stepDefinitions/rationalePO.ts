@@ -332,6 +332,12 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
     testData.recallType = partADetails?.RecallType
       ? partADetails.RecallType.toString().toUpperCase()
       : faker.helpers.arrayElement(Object.keys(NonIndeterminateRecallType))
+
+    if (testData.sentenceGroup === SentenceGroup.ADULT_SDS) {
+      cy.logPageTitle('Check MAPPA Information')
+      cy.clickButton('Continue')
+    }
+
     cy.logPageTitle('Suitability for fixed term recall')
     testData.suitabilityForfixedTermRecall = randomiseCriteria<{
       isSentence48MonthsOrOver: string
