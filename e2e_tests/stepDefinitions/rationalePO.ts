@@ -154,6 +154,7 @@ export const makeRecommendation = function (crn, recommendationDetails?: Record<
 
   cy.clickLink('Start now')
   cy.clickLink('Search by case reference number (CRN)')
+  testData.crn = crn
   cy.fillInputByName('crn', crn)
   cy.clickButton('Search')
   // get offender name for use in subsequent pages

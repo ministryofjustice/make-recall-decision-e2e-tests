@@ -26,38 +26,36 @@ const apiDataForCrn = getTestDataPerEnvironment()
 const partASections = {
   1: '1. Is this an Emergency recall?',
   2: '2. Is the offender serving a life or IPP/DPP sentence?',
-  3: '3. Is the offender serving one of the following',
-  4: '4. Offender/Young Offender Details',
-  5: '5. Sentence details',
-  6: '6. Is the offender currently in police custody or prison custody',
-  7: '7. Last recorded address where s/he should be residing',
-  8: '8. Are there any arrest issues of which police should be aware',
-  9: '9. Local police details and the OM’s local police contact',
-  10: '10. Consider if you think this recall could affect any vulnerabilities or needs the offender may have',
-  11: '11. Do you have any suspicions that the offender is using recall to bring contraband into the prison estate',
-  12: '12. Current MAPPA Management',
-  13: '13. Registered PPO/IOM',
-  14: '14. VLO Contact',
-  15: '15. Current Risk of Serious Harm Assessment at time of this recall',
-  16: '16. Provide details of the index offence(s)',
-  17: '17. Tick all standard licence conditions which have been breached',
-  18: '18. If any additional licence condition(s) has been breached',
-  19: '19. Detail the circumstances and behaviours leading to the recall',
-  21: '21. What alternatives to recall have been taken to try to secure compliance',
-  22: '22. Select the proposed recall type, having considered the information above',
-  23: '23. If you are proposing a Fixed Term Recall',
-  24: '24. When recalling an ISP or ESP',
-  25: '25. Probation Details – PS/YOT community offender manager',
-  26: '26. If different from above, details of the current supervising PS/YOT community offender manager',
-  27: '27. Endorsement of Recall Report and Risk Assessment by PS/YOT Line Manager',
-  28: '28. Authorisation and comments by senior manager who is equivalent to the former ACO grade/YOT Manager',
-  29: '29. Attachments',
+  3: '3. Is the offender serving an extended sentence?',
+  4: '4. Offenders sentenced as a youth – Eligibility for a 14/28-day FTR',
+  5: '5. To be eligible for a mandated 56-day FTR all answers must be “NO”',
+  6: '6. Offender/Young Offender Details',
+  7: '7. Sentence details',
+  8: '8. VICTIMS: (Any information presented here should be disclosable to the prisoner)',
+  9: '9. Police Information',
+  10: '10. Last recorded address where s/he should be residing',
+  11: '11. Could this recall affect any vulnerabilities or needs that the offender may have?',
+  12: '12. Do you have any suspicions that the offender is using recall to bring contraband into the prison estate?',
+  13: '13. Current MAPPA Management',
+  14: '14. Current Risk of Serious Harm Assessment at time of this recall',
+  15: '15. Provide details of the index offence(s) and write a succinct offence analysis',
+  16: '16. Tick all standard licence conditions which have been breached',
+  17: '17. If any additional licence condition(s) has been breached, write out each breached condition',
+  18: '18. Detail the circumstances and behaviours leading to the recall and provide an analysis on why the risk is no longer manageable in the community.',
+  19: '19. Describe any measures taken to continue to manage risk in the community',
+  20: '20. Proposed recall type',
+  21: '21. For Fixed Term Recalls, a new licence will be prepared by the prison.',
+  22: '22. When recalling an ISP or ESP, the law requires that there is a link',
+  23: '23. Probation Details – PS Probation Practitioner completing the Recall Report and Risk Assessment',
+  24: '24. Endorsement of Recall Report and Risk Assessment by PS Line Manager',
+  25: '25. Authorisation and comments by senior manager who is equivalent to the former ACO grade',
+  26: '26. Attachments',
 }
 
 export const q1EmergencyRecall = (contents: string, answer: string) => {
   // eslint-disable-next-line no-param-reassign
   contents = contents.substring(contents.indexOf(partASections[1]), contents.indexOf(partASections[2]))
-  expectSoftly(contents, 'Emergency Recall').to.contain(`until PPCS has issued the revocation order.  ${answer}`)
+  expectSoftly(contents, 'Emergency Recall').to.contain(`Is this an Emergency recall? ${answer}`)
 }
 
 export const q2IndeterminateSentenceType = (contents: string, answer: string) => {
@@ -71,14 +69,64 @@ export const q2IndeterminateSentenceType = (contents: string, answer: string) =>
 export const q3ExtendedSentence = (contents: string, answer: string) => {
   // eslint-disable-next-line no-param-reassign
   contents = contents.substring(contents.indexOf(partASections[3]), contents.indexOf(partASections[4]))
-  expectSoftly(contents, 'Extended Sentence').to.contain(`Is the offender serving one of the following:  ${answer}`)
+  expectSoftly(contents, 'Extended Sentence').to.contain(`Is the offender serving an extended sentence? ${answer}`)
 }
 
-export const q4OffenderDetails = function (contents: string, context: Record<string, string>) {
+export const q4OffendersSentencedAsYouth = (contents: string, context: Record<string, string>) => {
+  const sectionContents = contents.substring(contents.indexOf(partASections[4]), contents.indexOf(partASections[5]))
+  const isYouthSentence = context.isYouthSentence ? YesNoType.YES : YesNoType.NO
+  expectSoftly(sectionContents, 'Is serving youth sentence').to.contain(
+    `Is the offender only serving sentence(s) under s91 of the PCC(S)A 2000 or s.250 of the Sentencing Code? ${isYouthSentence}`
+  )
+
+  // TODO MRD-3097 fill in section 4b parts
+  // expectSoftly(sectionContents, 'MAPPA level 2 or 3').to.contain(`Are they MAPPA level 2 or 3? ${}`)
+  // expectSoftly(sectionContents, 'Recalled due to charge of serious offence').to.contain(
+  //   `Are they being recalled on account of being charged with a serious offence? ${}`)
+}
+
+export const q5FTR56AdultSuitabilityCriteria = (contents: string, context: Record<string, string>) => {
+  // TODO MRD-3097 fill in section 5 parts
+  const sectionContents = contents.substring(contents.indexOf(partASections[5]), contents.indexOf(partASections[6]))
+
+  // expectSoftly(sectionContents, 'FTR56 suitability- MAPPA level 2 or 3').to.contain(
+  //   `Is their MAPPA level 2 or 3? ${}`
+  // )
+  // expectSoftly(sectionContents, 'FTR56 suitability- Charged with offence').to.contain(
+  //   `Are they being recalled on account of being charged with an offence? ${}`
+  // )
+  // expectSoftly(sectionContents, 'FTR56 suitability- SOPC').to.contain(
+  //   `Are they serving a sentence for offenders of particular concern (SOPC)? ${}`
+  // )
+  // expectSoftly(sectionContents, 'FTR56 suitability- DCR').to.contain(
+  //   `Are they serving a Discretionary Conditional Release (DCR) sentence? ${}`
+  // )
+  // expectSoftly(sectionContents, 'FTR56 suitability- Parole Board').to.contain(
+  //   `Were they referred to the Parole Board under section 244ZB (power to detain) on this sentence? ${}`
+  // )
+  // expectSoftly(sectionContents, 'FTR56 suitability- Repatriated for murder').to.contain(
+  //   `Have they been repatriated to the UK following a sentence for murder? ${}`
+  // )
+  // expectSoftly(sectionContents, 'FTR56 suitability- MAPPA category 4').to.contain(
+  //   `Are they MAPPA category 4? ${}`
+  // )
+  // expectSoftly(sectionContents, 'FTR56 suitability- Foreign power threat activity').to.contain(
+  //   `Are they considered to be a person who may be at risk of involvement in foreign power threat activity? ${}`
+  // )
+  // expectSoftly(sectionContents, 'FTR56 suitability- MAPPA level 2 or 3').to.contain(
+  //   `Are they serving a sentence for a terrorist or national security offence? ${}`
+  // )
+}
+
+export const q6OffenderDetails = function (
+  contents: string,
+  context: Record<string, string>,
+  crn: string,
+  dateOfRelease: string
+) {
   // eslint-disable-next-line no-param-reassign
-  contents = contents.substring(contents.indexOf(partASections[4]), contents.indexOf(partASections[5]))
+  contents = contents.substring(contents.indexOf(partASections[6]), contents.indexOf(partASections[7]))
   expectSoftly(contents, 'Offender-Full Name').to.contain(`Full name: ${context.fullName}`)
-  expectSoftly(contents, 'Offender-Gender').to.contain(`Gender: ${context.gender}`)
   expectSoftly(contents, 'Offender-Date of birth').to.contain(
     `Date of birth: ${changeDateFromLongFormatToShort(context.dateOfBirth)}`
   )
@@ -87,6 +135,10 @@ export const q4OffenderDetails = function (contents: string, context: Record<str
       ? new RegExp(`Ethnic category: ${context.ethnicity.replace(REGEXP_SPECIAL_CHAR, '\\$&')}`)
       : (apiDataForCrn.ethnicity as RegExp)
   )
+  expectSoftly(contents, 'Offender-Written language').to.contain(`Written: ${context.writtenLanguage}`)
+  expectSoftly(contents, 'Offender-Written language').to.contain(`Spoken: ${context.spokenLanguage}`)
+  expectSoftly(contents, 'Offender-Gender').to.contain(`Gender: ${context.gender}`)
+  expectSoftly(contents, 'Offender-CRN').to.contain(`CRN: ${crn}`)
   expectSoftly(contents, 'Offender-CRO').to.match(
     context.cro || context.cro === ''
       ? new RegExp(`CRO No: ${context.cro.replace(REGEXP_SPECIAL_CHAR, '\\$&')}`)
@@ -107,42 +159,15 @@ export const q4OffenderDetails = function (contents: string, context: Record<str
       ? new RegExp(`PNOMIS No: ${context.noms.replace(REGEXP_SPECIAL_CHAR, '\\$&')}`)
       : (apiDataForCrn.noms as RegExp)
   )
-  expectSoftly(contents, 'Offender-Last Release Details').to.contain(
-    `Last release: ${context.lastReleaseDate ? changeDateFromLongFormatToShort(context.lastReleaseDate) : ''}`
-  )
-  expectSoftly(contents, 'Offender-Previous Releases').to.contain(
-    // eslint-disable-next-line no-nested-ternary
-    context.previousReleaseDates === ''
-      ? 'Previous releases:'
-      : context.previousReleaseDates && context.previousReleaseDates.length > 0
-      ? `Previous releases: ${context.previousReleaseDates
-          .split(',')
-          .map(previousReleaseDate => changeDateFromLongFormatToShort(previousReleaseDate.trim()))
-          .join(', ')}`
-      : `Previous releases: ${apiDataForCrn.previousReleaseDates[0].shortFormat}, ${apiDataForCrn.previousReleaseDates[1].shortFormat}`
-  )
-  const lastRecallDateFormatted = context.lastRecallDate
-    ? `${changeDateFromLongFormatToShort(context.lastRecallDate)}, `
-    : ''
-  expectSoftly(contents, 'Offender-Dates of previous recalls').to.contain(
-    // eslint-disable-next-line no-nested-ternary
-    context.previousRecallDates === ''
-      ? 'Dates of previous recalls on this sentence:'
-      : context.previousRecallDates && context.previousRecallDates.length > 0
-      ? `Dates of previous recalls on this sentence: ${context.previousRecallDates
-          .split(',')
-          .map(previousRecallDate => changeDateFromLongFormatToShort(previousRecallDate.trim()))
-          .join(', ')}`
-      : `Dates of previous recalls on this sentence: ${lastRecallDateFormatted}${apiDataForCrn.previousRecallDates[0].shortFormat}, ${apiDataForCrn.previousRecallDates[1].shortFormat}`
-  )
   expectSoftly(contents, 'Releasing prison or custodial establishment').to.contain(
     `Releasing prison/Custodial establishment: ${context.releasingPrison ? context.releasingPrison : ''}`
   )
+  expectSoftly(contents, 'Release date').to.contain(`Date of Current Release: ${dateOfRelease ?? ''}`)
 }
 
-export const q5SentenceDetails = function (contents: string, context: Record<string, string>) {
+export const q7SentenceDetails = function (contents: string, context: Record<string, string>) {
   // eslint-disable-next-line no-param-reassign
-  contents = contents.substring(contents.indexOf(partASections[5]), contents.indexOf(partASections[6]))
+  contents = contents.substring(contents.indexOf(partASections[7]), contents.indexOf(partASections[8]))
   cy.log(`q5: ${JSON.stringify(context)} ${contents}`)
   expectSoftly(contents, 'Sentence Details-Index offence').to.contain(
     `Index offence of current sentence which has led to the offender’s recall: ${context.indexOffenceDescription}`
@@ -214,55 +239,62 @@ export const q5SentenceDetails = function (contents: string, context: Record<str
     context.extendedTerm === ''
       ? /Extended term:/
       : context.extendedTerm && context.extendedTerm.length > 0
-      ? new RegExp(`Extended term:\\t${context.extendedTerm.replace(REGEXP_SPECIAL_CHAR, '\\$&')}`)
+      ? new RegExp(`Extended term: \\t${context.extendedTerm.replace(REGEXP_SPECIAL_CHAR, '\\$&')}`)
       : (apiDataForCrn.extendedTerm as RegExp)
   )
 }
 
-export const q6CustodyStatus = (contents: string, answer: string) => {
-  // eslint-disable-next-line no-param-reassign
-  contents = contents.substring(contents.indexOf(partASections[6]), contents.indexOf(partASections[7]))
-  expectSoftly(contents, 'Custody Status').to.contain(
-    `Is the offender currently in police custody or prison custody? ${answer}`
-  )
-}
-
-export const q7Addresses = (contents: string, answer = '') => {
-  // eslint-disable-next-line no-param-reassign
-  contents = contents.substring(contents.indexOf(partASections[7]), contents.indexOf(partASections[8]))
-  expectSoftly(contents, 'Police Custody Address').to.contain(
-    `If the offender is in police custody, state where: ${answer}`
-  )
-}
-
-export const q8ArrestIssues = (contents: string, answer = '', details = '') => {
+export const q8VLOContact = (contents: string, details) => {
   // eslint-disable-next-line no-param-reassign
   contents = contents.substring(contents.indexOf(partASections[8]), contents.indexOf(partASections[9]))
-  expectSoftly(contents, 'Arrests Police should be aware of').to.contain(
-    `Are there any arrest issues of which police should be aware?  ${answer}`
+  expectSoftly(contents, 'VLO status').to.contain(
+    `Are any victim(s) eligible for the Victim Contact Scheme? ${YesNoNAType[details.inVLOScheme]}`
   )
-  expectSoftly(contents, 'Additional arrests information').to.contain(
-    `If yes, provide details below, including information about any children or vulnerable adults linked to any of the above addresses: ${details}`
+  expectSoftly(contents, 'VLO Date').to.contain(
+    `Date contact was made with the Victim Liaison Officer: ${
+      details.vloDate
+        ? formatObjectDateToLongFormat({
+            day: details.vloDate.getDate().toString(),
+            month: (details.vloDate.getMonth() + 1).toString(),
+            year: details.vloDate.getFullYear().toString(),
+          })
+        : ''
+    }`
   )
 }
 
-export const q9LocalPoliceDetails = (contents: string, details: Record<string, string>) => {
-  if (details) {
-    // eslint-disable-next-line no-param-reassign
-    contents = contents.substring(contents.indexOf(partASections[9]), contents.indexOf(partASections[10]))
+export const q9PoliceInformation = (
+  contents: string,
+  custodyStatus: string,
+  localPoliceDetails: Record<string, string>,
+  hasArrestIssues = '',
+  arrestIssuesDetails = ''
+) => {
+  // eslint-disable-next-line no-param-reassign
+  contents = contents.substring(contents.indexOf(partASections[9]), contents.indexOf(partASections[10]))
+  expectSoftly(contents, 'Custody Status').to.contain(
+    `Is the offender currently in police custody or prison custody? ${custodyStatus}`
+  )
+  expectSoftly(contents, 'Arrests Police should be aware of').to.contain(
+    `Are there any arrest issues of which police should be aware? ${hasArrestIssues}`
+  )
+  expectSoftly(contents, 'Additional arrests information').to.contain(
+    `If yes, provide details below, including information about risks to staff, any children or vulnerable adults linked to any of the above addresses: ${arrestIssuesDetails}`
+  )
+
+  if (localPoliceDetails) {
     expectSoftly(contents, 'Local Police-Contact name').to.contain(
-      `Police single point of contact name: ${details.contact}`
+      `Police single point of contact name: ${localPoliceDetails.contact ?? ''}`
     )
-    expectSoftly(contents, 'Local Police-Contact Number').to.contain(
-      `Current contact telephone number: ${details.phoneNumber}`
-    )
-    expectSoftly(contents, 'Local Police-Email').to.contain(`Email address: ${details.email}`)
+    expectSoftly(contents, 'Local Police-Email').to.contain(`Email Address: ${localPoliceDetails.email ?? ''}`)
   }
 }
 
-export const q10Vulnerabilities = (contents: string, details: Record<string, string>[] | string[]) => {
+// TODO not sure how to check address details (Q10), as they come from NDelius details, not from user input
+
+export const q11Vulnerabilities = (contents: string, details: Record<string, string>[] | string[]) => {
   // eslint-disable-next-line no-param-reassign
-  contents = contents.substring(contents.indexOf(partASections[10]), contents.indexOf(partASections[11]))
+  contents = contents.substring(contents.indexOf(partASections[11]), contents.indexOf(partASections[12]))
   if (details && typeof details[0] === 'string') {
     if (details[0] === 'None') {
       expectSoftly(contents, 'Vulnerabilities status').to.contain(
@@ -286,24 +318,21 @@ export const q10Vulnerabilities = (contents: string, details: Record<string, str
     })
   }
 }
-export const q11Contraband = (contents: string, details: Record<string, string>) => {
+
+export const q12Contraband = (contents: string, details: Record<string, string>) => {
   // eslint-disable-next-line no-param-reassign
-  contents = contents.substring(contents.indexOf(partASections[11]), contents.indexOf(partASections[12]))
+  contents = contents.substring(contents.indexOf(partASections[12]), contents.indexOf(partASections[13]))
   expectSoftly(contents, 'Contraband risk').to.contain(
     `Do you have any suspicions that the offender is using recall to bring contraband into the prison estate? ${
       YesNoType[details.hasRisk]
     }`
   )
-  expectSoftly(contents, 'Contraband details').to.contain(
-    `If yes, provide details and contact your local police SPOC to share information or concerns: ${
-      details.riskDetails ? details.riskDetails : ' '
-    }`
-  )
+  expectSoftly(contents, 'Contraband details').to.contain(`If yes, provide details: ${details.riskDetails ?? ''}`)
 }
 
-export const q12MappaDetails = (contents: string, details?: Record<string, string>) => {
+export const q13MappaDetails = (contents: string, details?: Record<string, string>) => {
   // eslint-disable-next-line no-param-reassign
-  contents = contents.substring(contents.indexOf(partASections[12]), contents.indexOf(partASections[13]))
+  contents = contents.substring(contents.indexOf(partASections[13]), contents.indexOf(partASections[14]))
   expectSoftly(contents, 'MAPPA Category').to.match(
     details
       ? new RegExp(`MAPPA Category: ${details.mappaCategory.replace(REGEXP_SPECIAL_CHAR, '\\$&')}`)
@@ -316,36 +345,9 @@ export const q12MappaDetails = (contents: string, details?: Record<string, strin
   )
 }
 
-export const q13RegisteredPPOIOM = (contents: string, details: string) => {
-  // eslint-disable-next-line no-param-reassign
-  contents = contents.substring(contents.indexOf(partASections[13]), contents.indexOf(partASections[14]))
-  expectSoftly(contents, 'IOM state').to.contain(`Registered PPO/IOM: ${YesNoNAType[details]}`)
-}
-
-export const q14VLOContact = (contents: string, details) => {
+export const q14RoshLevels = (contents: string, details?: Record<string, string>) => {
   // eslint-disable-next-line no-param-reassign
   contents = contents.substring(contents.indexOf(partASections[14]), contents.indexOf(partASections[15]))
-  expectSoftly(contents, 'VLO status').to.contain(
-    `Is there a victim(s) involved in the victim contact scheme (contact must be made with the VLO if there is victim involvement)? ${
-      YesNoNAType[details.inVLOScheme]
-    }`
-  )
-  expectSoftly(contents, 'VLO Date').to.contain(
-    `Confirm the date the VLO was informed of the above: ${
-      details.vloDate
-        ? formatObjectDateToLongFormat({
-            day: details.vloDate.getDate().toString(),
-            month: (details.vloDate.getMonth() + 1).toString(),
-            year: details.vloDate.getFullYear().toString(),
-          })
-        : ''
-    }`
-  )
-}
-
-export const q15RoshLevels = (contents: string, details?: Record<string, string>) => {
-  // eslint-disable-next-line no-param-reassign
-  contents = contents.substring(contents.indexOf(partASections[15]), contents.indexOf(partASections[16]))
   expectSoftly(contents, 'ROSH Level-Risk to public').to.contain(
     `Public: ${
       details?.riskToPublic ? ROSHLevels[details.riskToPublic] : apiDataForCrn.currentRoshForPartA.riskToPublic
@@ -371,39 +373,39 @@ export const q15RoshLevels = (contents: string, details?: Record<string, string>
   ) // case doesn't match with value in apiDataForCrn.currentRoshForPartA.riskToPublic
 }
 
-export const q16IndexOffenceDetails = (contents: string, answer: string = apiDataForCrn.offenceAnalysis) => {
+export const q15IndexOffenceDetails = (contents: string, answer: string = apiDataForCrn.offenceAnalysis) => {
   // eslint-disable-next-line no-param-reassign
-  contents = contents.substring(contents.indexOf(partASections[16]), contents.indexOf(partASections[17]))
+  contents = contents.substring(contents.indexOf(partASections[15]), contents.indexOf(partASections[16]))
   expectSoftly(contents, 'Offence Analysis').to.contain(answer)
 }
 
-export const q17LicenceConditions = (contents: string, details: string[]) => {
+export const q16LicenceConditions = (contents: string, details: string[]) => {
   // eslint-disable-next-line no-param-reassign
-  contents = contents.substring(contents.indexOf(partASections[17]), contents.indexOf(partASections[18]))
-  details.forEach(detail => {
-    expectSoftly(contents, 'Licence Conditions').to.match(
-      new RegExp(`${LicenceConditions[detail].replace(REGEXP_SPECIAL_CHAR, '\\$&')}\\s*✓`)
+  contents = contents.substring(contents.indexOf(partASections[16]), contents.indexOf(partASections[17]))
+  Object.keys(LicenceConditions).forEach(licenceCondition => {
+    expectSoftly(contents, 'Licence Conditions').to.contain(
+      `${details.includes(licenceCondition) ? '☒' : '☐'} ${LicenceConditions[licenceCondition]}`
     )
   })
 }
 
-export const q18AdditionalConditions = (contents: string, details: string[]) => {
+export const q17AdditionalConditions = (contents: string, details: string[]) => {
   // eslint-disable-next-line no-param-reassign
-  contents = contents.substring(contents.indexOf(partASections[18]), contents.indexOf(partASections[19]))
+  contents = contents.substring(contents.indexOf(partASections[17]), contents.indexOf(partASections[18]))
   details.forEach(detail => {
     expectSoftly(contents, 'Additional Licence Conditions').to.contain(detail)
   })
 }
 
-export const q19CircumstancesLeadingToRecall = (contents: string, details: string) => {
+export const q18CircumstancesLeadingToRecall = (contents: string, details: string) => {
   // eslint-disable-next-line no-param-reassign
-  contents = contents.substring(contents.indexOf(partASections[19]), contents.indexOf(partASections[20]))
+  contents = contents.substring(contents.indexOf(partASections[18]), contents.indexOf(partASections[19]))
   expectSoftly(contents, 'Circumstance leading to recall').to.contain(details)
 }
 
-export const q21Alternatives = (contents: string, details: Record<string, string>[] | string[]) => {
+export const q19Alternatives = (contents: string, details: Record<string, string>[] | string[]) => {
   // eslint-disable-next-line no-param-reassign
-  contents = contents.substring(contents.indexOf(partASections[21]), contents.indexOf(partASections[22]))
+  contents = contents.substring(contents.indexOf(partASections[19]), contents.indexOf(partASections[20]))
   if (details && typeof details[0] === 'object') {
     details.forEach(detail => {
       expectSoftly(contents, 'Alternatives').to.contain(
@@ -419,9 +421,9 @@ export const q21Alternatives = (contents: string, details: Record<string, string
   }
 }
 
-export const q22RecallType = (contents: string, details: Record<string, string>) => {
+export const q20RecallType = (contents: string, details: Record<string, string>) => {
   // eslint-disable-next-line no-param-reassign
-  contents = contents.substring(contents.indexOf(partASections[22]), contents.indexOf(partASections[23]))
+  contents = contents.substring(contents.indexOf(partASections[20]), contents.indexOf(partASections[21]))
   if (details.sentenceGroup !== SentenceGroup.INDETERMINATE && details.sentenceGroup !== SentenceGroup.EXTENDED) {
     // eslint-disable-next-line no-param-reassign
     details.type = NonIndeterminateRecallType[details.recallType]
@@ -438,17 +440,13 @@ export const q22RecallType = (contents: string, details: Record<string, string>)
     // eslint-disable-next-line no-param-reassign
     details.reason = 'N/A (not a determinate recall)'
   }
-  expectSoftly(contents, 'Recall Type').to.contain(
-    `Select the proposed recall type, having considered the information above: ${details.type}`
-  )
-  expectSoftly(contents, 'Recall Type Reason').to.contain(
-    `Explain your reasons for the above recall type recommendation: ${details.reason}`
-  )
+  expectSoftly(contents, 'Recall Type').to.contain(`Proposed recall type: ${details.type}`)
+  expectSoftly(contents, 'Recall Type Reason').to.contain(`Explain the reasons for the recall type: ${details.reason}`)
 }
 
-export const q23LicenceConditionsToAdd = (contents: string, details: Record<string, string>) => {
+export const q21LicenceConditionsToAdd = (contents: string, details: Record<string, string>) => {
   // eslint-disable-next-line no-param-reassign
-  contents = contents.substring(contents.indexOf(partASections[23]), contents.indexOf(partASections[24]))
+  contents = contents.substring(contents.indexOf(partASections[21]), contents.indexOf(partASections[22]))
   expectSoftly(contents, 'Licence Conditions to Add').to.contain(
     // eslint-disable-next-line no-nested-ternary
     details.recallType === 'STANDARD' && details.sentenceGroup === SentenceGroup.EXTENDED
@@ -468,65 +466,97 @@ export const q23LicenceConditionsToAdd = (contents: string, details: Record<stri
   )
 }
 
-export const q24ISPESP = (contents: string, details: Record<string, string>) => {
+export const q22IndeterminateAndExtendedSentenceCircumstances = (contents: string, details: Record<string, string>) => {
   // eslint-disable-next-line no-param-reassign
-  contents = contents.substring(contents.indexOf(partASections[24]), contents.indexOf(partASections[25]))
+  contents = contents.substring(contents.indexOf(partASections[22]), contents.indexOf(partASections[23]))
   if (details) {
     Object.keys(IndeterminateOrExtendedSentenceDetailType).forEach(k => {
       if (details[k]) {
         expectSoftly(contents, `${k} Yes/No`).to.contain(`${IndeterminateOrExtendedSentenceDetailType[k]} Yes`)
-        expectSoftly(contents, `${k} comments`).to.contain(`Please Comment: ${details[k]}`)
+        expectSoftly(contents, `${k} comments`).to.contain(`Provide details: ${details[k]}`)
       } else expectSoftly(contents, `${k} Yes/No`).to.contain(`${IndeterminateOrExtendedSentenceDetailType[k]} No`)
     })
+    if (details.OUT_OF_TOUCH) {
+      expectSoftly(contents, 'Out of Touch details').to.contain(
+        `Where the offender is out of touch or their whereabouts is unknown, provide details on why the assumption can be made that (i), (ii) or (iii) may arise? ${details.OUT_OF_TOUCH}`
+      )
+    }
   }
 }
 
-export const q25ProbationDetailsWithCaseAdmin = (contents: string, details: Record<string, string>, date:Record<string, string>) => {
+export const q23ProbationDetailsWithCaseAdmin = (
+  contents: string,
+  whoCompletedPartADetails: Record<string, string>,
+  probationPractitionerForPartADetails: Record<string, string>,
+  date: Record<string, string>
+) => {
   // eslint-disable-next-line no-param-reassign
-  contents = contents.substring(contents.indexOf(partASections[25]), contents.indexOf(partASections[26]))
-  expectSoftly(contents, 'Probation-Officer-Name').to.contain(`Name of person completing the form: ${details.name}`)
-  expectSoftly(contents, 'Probation-Officer-Email').to.contain(`Email Address: ${details.email}`)
-  expectSoftly(contents, 'Probation-Officer-Telephone').to.contain(`Telephone Number: ${details.telephone}`)
-  expectSoftly(contents, 'Probation-Officer-Region').to.contain(`Region: ${details.region}`)
-  expectSoftly(contents, 'Probation-Officer-LDU').to.contain(`LDU: ${details.LDU}`)
-  expectSoftly(contents, 'Probation-Date of Decision').to.contain(`Date of decision to request revocation: ${formatDateFromUTCLongToShortFormat(date.recallDateBySPO)}`)
-  // expectSoftly(contents, 'Probation-Time of Decision').to.contain(`Time (24 hour) of decision to request information: ${extractTimeFromUTCDateFormat(date.recallDateBySPO)}`)
-}
-
-export const q26OffenderManager = (contents: string, details: Record<string, string>) => {
-  // eslint-disable-next-line no-param-reassign
-  contents = contents.substring(contents.indexOf(partASections[26]), contents.indexOf(partASections[27]))
-  cy.log(`Q26: ${JSON.stringify(details)} ${contents}`)
-  expectSoftly(contents, 'Offender-Manager-Name').to.contain(`Name of OM/YOT worker: ${details.name}`)
-  expectSoftly(contents, 'Offender-Manager-Email').to.contain(`Email Address: ${details.email}`)
-  expectSoftly(contents, 'Offender-Manager-Telephone').to.contain(`Telephone Number: ${details.telephone}`)
-  expectSoftly(contents, 'Offender-Manager-Region').to.contain(`Region: ${details.region}`)
-  expectSoftly(contents, 'Offender-Manager-LDU').to.contain(`LDU: ${details.LDU}`)
-}
-
-export const q27SPOEndorsement = function (contents: string, details: Record<string, string>) {
-  // eslint-disable-next-line no-param-reassign
-  contents = contents.substring(contents.indexOf(partASections[27]), contents.indexOf(partASections[28]))
-  cy.log(`Q27: ${JSON.stringify(details)} ${contents}`)
-  expectSoftly(contents, 'SPO Name').to.contain(`Name of person completing this form: ${this.SPO ? this.SPO.name : ''}`)
-  expectSoftly(contents, 'SPO Email').to.contain(`${this.SPO ? this.SPO.email : ''}`)
-  expectSoftly(contents, 'SPO Telephone').to.contain(`Telephone Number: ${details.telephone ? details.telephone : ''}`)
-  expectSoftly(contents, 'SPO Reason').to.contain(`Please provide additional information:${details.reason}`)
-}
-export const q28ACOAuthorisation = function (contents: string, details: Record<string, string>) {
-  // eslint-disable-next-line no-param-reassign
-  contents = contents.substring(contents.indexOf(partASections[28]), contents.indexOf(partASections[29]))
-  cy.log(`Q28: ${JSON.stringify(details)} ${contents}`)
-  expectSoftly(contents, 'ACO Name').to.contain(`Name of person completing this form: ${this.ACO ? this.ACO.name : ''}`)
-  expectSoftly(contents, 'ACO Email').to.contain(`${this.ACO ? this.ACO.email : ''}`)
-  expectSoftly(contents, 'ACO Telephone').to.contain(`Telephone Number: ${details.telephone ? details.telephone : ''}`)
-  expectSoftly(contents, 'ACO Reason').to.contain(
-    `This means you are endorsing both the recall and the quality and content of the recall report.${details.reason}`
+  contents = contents.substring(contents.indexOf(partASections[23]), contents.indexOf(partASections[24]))
+  expectSoftly(contents, 'Probation-Officer-Name').to.contain(
+    `Name of Probation Practitioner: ${probationPractitionerForPartADetails.name}`
+  )
+  expectSoftly(contents, 'Probation-Officer-Telephone').to.contain(
+    `Telephone Number: ${probationPractitionerForPartADetails.telephone}`
+  )
+  expectSoftly(contents, 'Probation-Officer-Email').to.contain(
+    `Email Address: ${probationPractitionerForPartADetails.email}`
+  )
+  expectSoftly(contents, 'Report-Author-Name').to.contain(
+    `Name of Report Author (if different): ${whoCompletedPartADetails.name}`
+  )
+  expectSoftly(contents, 'Probation-Officer-Telephone').to.contain(
+    `Report Author’s Telephone Number: ${whoCompletedPartADetails.telephone}`
+  )
+  expectSoftly(contents, 'Probation-Officer-Email').to.contain(
+    `Report Author’s Email Address: ${whoCompletedPartADetails.email}`
+  )
+  expectSoftly(contents, 'Probation-Officer-Region').to.contain(`Region: ${whoCompletedPartADetails.region}`)
+  expectSoftly(contents, 'Probation-Officer-LDU').to.contain(`LDU: ${whoCompletedPartADetails.LDU}`)
+  expectSoftly(contents, 'Probation-Date of Decision').to.contain(
+    `Date of decision to request revocation: ${formatDateFromUTCLongToShortFormat(date.recallDateBySPO)}`
+  )
+  // TODO check PPCS responses e-mail address once task-list-consider-recall changes merged
+  expectSoftly(contents, 'Probation-Date of Decision').to.contain(
+    `Date of decision to request revocation: ${formatDateFromUTCLongToShortFormat(date.recallDateBySPO)}`
+  )
+  expectSoftly(contents, 'Probation-Time of Decision').to.contain(
+    `Time (24 hour) of decision to request information: ${extractTimeFromUTCDateFormat(date.recallDateBySPO)}`
   )
 }
 
-export const q29Attachments = (contents: string, details: Record<string, string>[] | string) => {
+export const q24SPOEndorsement = function (
+  contents: string,
+  details: Record<string, string>,
+  dateSPOAgreedRecall: Date
+) {
+  // eslint-disable-next-line no-param-reassign
+  contents = contents.substring(contents.indexOf(partASections[24]), contents.indexOf(partASections[25]))
+  cy.log(`Q24: ${JSON.stringify(details)} ${contents}`)
+  expectSoftly(contents, 'SPO Reason').to.contain(`Please provide your view on the recall:${details.reason}`)
+  expectSoftly(contents, 'SPO Name').to.contain(`Name of person completing this form: ${this.SPO ? this.SPO.name : ''}`)
+  expectSoftly(contents, 'SPO Email').to.contain(`Email address: ${this.SPO ? this.SPO.email : ''}`)
+  expectSoftly(contents, 'SPO Telephone').to.contain(`Telephone Number: ${details.telephone ? details.telephone : ''}`)
+  expectSoftly(contents, 'SPO Date and time of endorsement').to.contain(
+    `Date and time (24 hour) SPO initiated the recall request: ${DateTime.fromJSDate(dateSPOAgreedRecall).toFormat(
+      'dd/MM/yyyy HH:mm'
+    )}`
+  )
+  // We don't check the date and time of countersignature, as they vary with each run and aren't accessible from the UI
+}
+
+export const q25ACOAuthorisation = function (contents: string, details: Record<string, string>) {
+  // eslint-disable-next-line no-param-reassign
+  contents = contents.substring(contents.indexOf(partASections[25]), contents.indexOf(partASections[26]))
+  cy.log(`Q25: ${JSON.stringify(details)} ${contents}`)
+  expectSoftly(contents, 'ACO Reason').to.contain(`Provide details ${details.reason}`)
+  expectSoftly(contents, 'ACO Name').to.contain(`Name of person completing this form: ${this.ACO ? this.ACO.name : ''}`)
+  expectSoftly(contents, 'ACO Telephone').to.contain(`Telephone Number: ${details.telephone ? details.telephone : ''}`)
+  expectSoftly(contents, 'ACO Email').to.contain(`Email Address: ${this.ACO ? this.ACO.email : ''}`)
+  // We don't check the date and time of countersignature, as they vary with each run and aren't accessible from the UI
+}
+
+export const q26Attachments = (contents: string, details: Record<string, string>[] | string) => {
   // eslint-disable-next-line no-param-reassign
   contents = contents.substring(contents.indexOf(partASections[29]))
-  cy.log(`Q29: ${JSON.stringify(details)} ${contents}`)
+  cy.log(`Q26: ${JSON.stringify(details)} ${contents}`)
 }
