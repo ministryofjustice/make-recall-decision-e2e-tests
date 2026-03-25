@@ -25,6 +25,8 @@ import {
   q6OffenderDetails,
   q7SentenceDetails,
   q9PoliceInformation,
+  q4OffendersSentencedAsYouth,
+  q5FTR56AdultSuitabilityCriteria,
 } from './assertionsPartA'
 import { CUSTODY_GROUP, CustodyType, SentenceGroup, YesNoType } from '../support/enums'
 import { loginAndSearchCrn } from './user/user'
@@ -109,6 +111,8 @@ Then('Part A details are correct', function () {
     YesNoType[this.testData.sentenceGroup === SentenceGroup.INDETERMINATE ? 'YES' : 'NO']
   )
   q3ExtendedSentence(contents, YesNoType[this.testData.sentenceGroup === SentenceGroup.EXTENDED ? 'YES' : 'NO'])
+  q4OffendersSentencedAsYouth(contents, this.testData)
+  q5FTR56AdultSuitabilityCriteria(contents, this.testData)
   q6OffenderDetails(contents, this.testData.offenderDetails, this.testData.crn, this.testData.ecslDateOfRelease) // TODO date of release may need to change with MRD-3090
   q7SentenceDetails(contents, this.testData.offenceDetails)
   q8VLOContact(contents, this.testData.vlo)

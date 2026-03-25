@@ -122,7 +122,7 @@ export const q6OffenderDetails = function (
   contents: string,
   context: Record<string, string>,
   crn: string,
-  dateOfRelease: string
+  dateOfRelease: Date
 ) {
   // eslint-disable-next-line no-param-reassign
   contents = contents.substring(contents.indexOf(partASections[6]), contents.indexOf(partASections[7]))
@@ -162,7 +162,9 @@ export const q6OffenderDetails = function (
   expectSoftly(contents, 'Releasing prison or custodial establishment').to.contain(
     `Releasing prison/Custodial establishment: ${context.releasingPrison ? context.releasingPrison : ''}`
   )
-  expectSoftly(contents, 'Release date').to.contain(`Date of Current Release: ${dateOfRelease ?? ''}`)
+  expectSoftly(contents, 'Release date').to.contain(
+    `Date of Current Release: ${dateOfRelease ? DateTime.fromJSDate(dateOfRelease).toFormat('dd/MM/yyyy') : ''}`
+  )
 }
 
 export const q7SentenceDetails = function (contents: string, context: Record<string, string>) {
