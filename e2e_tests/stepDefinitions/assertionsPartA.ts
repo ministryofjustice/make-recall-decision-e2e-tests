@@ -380,9 +380,13 @@ export const q16IndexOffenceDetails = (contents: string, answer: string = apiDat
 export const q17LicenceConditions = (contents: string, details: string[]) => {
   // eslint-disable-next-line no-param-reassign
   contents = contents.substring(contents.indexOf(partASections[17]), contents.indexOf(partASections[18]))
-  details.forEach(detail => {
+  Object.keys(LicenceConditions).forEach(licenceCondition => {
     expectSoftly(contents, 'Licence Conditions').to.match(
-      new RegExp(`${LicenceConditions[detail].replace(REGEXP_SPECIAL_CHAR, '\\$&')}\\s*✓`)
+      new RegExp(
+        `${LicenceConditions[licenceCondition].replace(REGEXP_SPECIAL_CHAR, '\\$&')}\\s*${
+          details.includes(licenceCondition) ? '☒' : '☐'
+        }`
+      )
     )
   })
 }
