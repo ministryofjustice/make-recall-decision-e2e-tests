@@ -69,7 +69,6 @@ export enum LicenceConditions {
   NO_TRAVEL_OUTSIDE_UK = 'not to travel outside the United Kingdom, the Channel Islands or the Isle of Man except with the prior permission of your supervising officer or for the purpose of immigration deportation or removal.',
   NAME_CHANGE = 'Tell your supervising officer if you use a name which is different to the name or names which appear on your licence.',
   CONTACT_DETAILS = 'Tell your supervising officer if you change or add any contact details, including phone number or email.',
-  'NLC8|NSTT8' = 'To only attend places of worship which have been previously agreed with your supervising officer.',
 }
 
 export enum WhyConsiderRecall {
