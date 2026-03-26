@@ -196,9 +196,7 @@ function selectVulnerabilitiesWhenRiskToSelfFlagEnabled(
     'equal',
     `Consider if this recall could affect any vulnerabilities or needs ${offenderName} may have`
   )
-  cy.logPageTitle(
-    `Consider if this recall could affect any vulnerabilities or needs ${offenderName} may have`
-  )
+  cy.logPageTitle(`Consider if this recall could affect any vulnerabilities or needs ${offenderName} may have`)
   Object.entries(Vulnerabilities)
     .filter(vu => selectedVulnerabilities.includes(vu[1]))
     .forEach(selectedVulnerabilityEntry => {
@@ -718,12 +716,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
     }
   })
   cy.clickLink('Continue')
-  currentPage = 'Who completed this Part A?'
-  updateContactInformation(currentPage)
-  currentPage = 'Where should the revocation order be sent?'
-  updateContactInformation(currentPage)
-  currentPage = 'Where should PPCS respond with questions?'
-  updateContactInformation(currentPage)
+  completeContactInformationForPartA()
 }
 
 const createDNTRLetter = function () {
@@ -869,38 +862,65 @@ const validateLastCompletedDocumentTabDetails = function (letterType: string) {
   })
 }
 
-const updateContactInformation = function (question: string) {
-  const govUkEmail = `${faker.internet.userName().toLowerCase()}@justice.gov.uk`
-  if (question === 'Who completed this Part A?') {
-    cy.clickLink(currentPage)
-    cy.logPageTitle(currentPage)
-    testData.thePersonCompletingTheForm = {} // Populates Q25 of Part A document when Probation Admin flag is set
-    cy.get(`#name`).type((testData.thePersonCompletingTheForm.name = faker.name.fullName()))
-    cy.get('#email').type((testData.thePersonCompletingTheForm.email = govUkEmail))
-    cy.get(`#telephone`).type((testData.thePersonCompletingTheForm.telephone = faker.phone.number('01277 ### ###')))
-    cy.get(`#region`).select(
-      (testData.thePersonCompletingTheForm.region = faker.helpers.arrayElement(Object.values(Regions)))
-    )
-    cy.get(`#localDeliveryUnit`).type((testData.thePersonCompletingTheForm.LDU = faker.address.cityName()))
+function completeWhoCompletedThisPartAInformation() {
+  cy.clickLink('Who completed this Part A?')
+  cy.logPageTitle('Who completed this Part A?')
+  testData.thePersonCompletingTheForm = {} // Populates Q25 of Part A document when Probation Admin flag is set
+  cy.get(`#name`).type((testData.thePersonCompletingTheForm.name = faker.name.fullName()))
+  cy.get('#email').type(
+    (testData.thePersonCompletingTheForm.email = `${faker.internet.userName().toLowerCase()}@justice.gov.uk`)
+  )
+  cy.get(`#telephone`).type((testData.thePersonCompletingTheForm.telephone = faker.phone.number('01277 ### ###')))
+  cy.get(`#region`).select(
+    (testData.thePersonCompletingTheForm.region = faker.helpers.arrayElement(Object.values(Regions)))
+  )
+  cy.get(`#localDeliveryUnit`).type((testData.thePersonCompletingTheForm.LDU = faker.address.cityName()))
 
-    cy.selectRadio('Is this person the probation practitioner', 'No')
-    cy.clickButton('Continue')
-    currentPage = `Practitioner for ${this.offenderName}`
-    cy.logPageTitle(`${currentPage}?`)
-    testData.offenderManager = {} // Populates Q26 of Part A document when Probation Admin flag is set
-    cy.get(`#name`).type((testData.offenderManager.name = faker.name.fullName()))
-    cy.get(`#email`).type((testData.offenderManager.email = govUkEmail))
-    cy.get(`#telephone`).type((testData.offenderManager.telephone = faker.phone.number('012## ### ###')))
-    cy.get(`#region`).select((testData.offenderManager.region = faker.helpers.arrayElement(Object.values(Regions))))
-    cy.get(`#localDeliveryUnit`).type((testData.offenderManager.LDU = faker.address.cityName()))
-    cy.clickButton('Continue')
-  } else {
-    cy.clickLink(currentPage)
-    cy.logPageTitle(currentPage)
-    cy.get(`#email_0`).type(govUkEmail)
-    cy.clickButton('Add another email')
-    cy.get(`#email_1`).type(govUkEmail)
-    cy.clickButton('Continue')
+  cy.selectRadio('Is this person the probation practitioner', 'No')
+  cy.clickButton('Continue')
+  completePractitionerForPartAInformation()
+}
+
+function completePractitionerForPartAInformation() {
+  cy.logPageTitle(`Practitioner for ${this.offenderName}`)
+  testData.offenderManager = {} // Populates Q26 of Part A document when Probation Admin flag is set
+  cy.get(`#name`).type((testData.offenderManager.name = faker.name.fullName()))
+  cy.get(`#email`).type((testData.offenderManager.email = `${faker.internet.userName().toLowerCase()}@justice.gov.uk`))
+  cy.get(`#telephone`).type((testData.offenderManager.telephone = faker.phone.number('012## ### ###')))
+  cy.clickButton('Continue')
+}
+
+function completeRevocationOrderContactInformation() {
+  cy.clickLink('Where should the revocation order be sent?')
+  cy.logPageTitle('Where should the revocation order be sent?')
+  cy.get(`#email_0`).type(`${faker.internet.userName().toLowerCase()}@justice.gov.uk`)
+  cy.clickButton('Add another email')
+  cy.get(`#email_1`).type(`${faker.internet.userName().toLowerCase()}@justice.gov.uk`)
+  cy.clickButton('Continue')
+}
+
+function completePPCSResponsesContactInformation() {
+  cy.clickLink('Where should PPCS respond with questions?')
+  cy.logPageTitle('Where should PPCS respond with questions?')
+  cy.get(`#email_0`).type(`${faker.internet.userName().toLowerCase()}@justice.gov.uk`)
+  cy.clickButton('Add another email')
+  cy.get(`#email_1`).type(`${faker.internet.userName().toLowerCase()}@justice.gov.uk`)
+  cy.clickButton('Continue')
+}
+
+function completeContactInformationForPartA() {
+  completeWhoCompletedThisPartAInformation()
+  completeRevocationOrderContactInformation()
+  completePPCSResponsesContactInformation()
+}
+
+const updateContactInformation = function (question: string) {
+  if (question === 'Who completed this Part A?') {
+    completeWhoCompletedThisPartAInformation()
+  } else if (question === 'Where should the revocation order be sent?') {
+    completeRevocationOrderContactInformation()
+  } else if (question === 'Where should PPCS respond with questions?') {
+    completePPCSResponsesContactInformation()
   }
 }
 
@@ -1152,17 +1172,11 @@ Then('Decision Not To Recall letter details are correct', function () {
 })
 
 When('PO has updated {string} under Contact Information section', function (question: string) {
-  currentPage = question
-  updateContactInformation(currentPage)
+  updateContactInformation(question)
 })
 
 When('PO has updated the Contact Information section', function () {
-  currentPage = 'Who completed this Part A?'
-  updateContactInformation(currentPage)
-  currentPage = 'Where should the revocation order be sent?'
-  updateContactInformation(currentPage)
-  currentPage = 'Where should PPCS respond with questions?'
-  updateContactInformation(currentPage)
+  completeContactInformationForPartA()
 })
 
 When('PO selects Preview Part A option', function () {
