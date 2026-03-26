@@ -462,10 +462,6 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
   currentPage = `Is ${this.offenderName} in custody now`
   cy.logPageTitle(`${currentPage}?`)
   cy.selectRadioByValue(currentPage, testData.inCustody)
-  if (testData.inCustody === 'YES_POLICE') {
-    testData.custodyAddress = faker.address.streetAddress(true)
-    cy.get('#custodyStatusDetailsYesPolice').type(testData.custodyAddress)
-  }
   cy.clickButton('Continue')
   cy.clickLink('Continue') // Share with a case admin
   cy.clickLink(`When did the SPO agree this recall?`)
