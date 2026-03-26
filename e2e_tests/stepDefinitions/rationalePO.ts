@@ -509,6 +509,8 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
   cy.selectRadioByValue(currentPage, testData.inCustody)
   cy.clickButton('Continue')
   cy.clickLink('Continue') // Share with a case admin
+
+  // Task list
   cy.clickLink(`When did the SPO agree this recall?`)
   cy.logPageTitle('When did the SPO agree this recall?')
   testData.recallDateBySPO = faker.date.recent(7)
@@ -531,18 +533,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
     testData.offenderDetails = offenderDetails
   })
   cy.clickLink('Continue')
-  cy.clickLink(`Offence details`)
-  cy.logPageTitle('Offence details')
-  cy.getOffenceDetails().then(det => {
-    testData.offenceDetails = det
-  })
-  cy.clickLink('Continue')
-  cy.clickLink(`Offence analysis`)
-  cy.logPageTitle('Offence analysis')
-  testData.offenceAnalysis = faker.hacker.phrase()
-  cy.get(`#offenceAnalysis`).type(testData.offenceAnalysis)
-  cy.clickButton('Continue')
-  cy.clickLink(`Previous releases`)
+  cy.clickLink(`Release details`)
   cy.logPageTitle('Previous releases')
   // ECSL change
   testData.releasedUnderECSL = faker.helpers.arrayElement(Object.keys(YesNoType))
@@ -581,25 +572,16 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
     Object.assign(testData.offenderDetails, previousReleases)
   })
   cy.clickButton('Continue')
-  cy.clickLink(`Previous recalls`)
-  cy.logPageTitle('Previous recalls')
-  if (partADetails?.PreviousRecalls) {
-    const previousRecalls = partADetails?.PreviousRecalls.split(',').map(s => s.trim())
-    previousRecalls.forEach(previousRelease => {
-      const dateParts = previousRelease.split('-').map(s => s.trim())
-      const recallDay = {
-        day: dateParts[0],
-        month: dateParts[1],
-        year: dateParts[2],
-      }
-      cy.clickLink(`Add a previous recall`)
-      cy.enterDateTime(recallDay)
-      cy.clickButton('Continue')
-    })
-  }
-  cy.getPreviousRecalls().then(previousRecallDates => {
-    testData.offenderDetails.previousRecallDates = previousRecallDates.join()
+  cy.clickLink(`Offence details`)
+  cy.logPageTitle('Offence details')
+  cy.getOffenceDetails().then(det => {
+    testData.offenceDetails = det
   })
+  cy.clickLink('Continue')
+  cy.clickLink(`Offence analysis`)
+  cy.logPageTitle('Offence analysis')
+  testData.offenceAnalysis = faker.hacker.phrase()
+  cy.get(`#offenceAnalysis`).type(testData.offenceAnalysis)
   cy.clickButton('Continue')
   if (!['YES_POLICE', 'YES_PRISON'].includes(testData.inCustody)) {
     cy.clickLink(`Address`)
@@ -653,14 +635,6 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
       cy.get('#hasArrestIssuesDetailsYes').type((testData.arrestIssueDetails = faker.hacker.phrase()))
     cy.clickButton('Continue')
   }
-  currentPage = `Is ${this.offenderName} under Integrated Offender Management (IOM)`
-  cy.clickLink(currentPage)
-  cy.logPageTitle(`${currentPage}?`)
-  testData.iom = partADetails?.IOM
-    ? partADetails.IOM.toString().replace(' ', '_').toUpperCase()
-    : faker.helpers.arrayElement(Object.keys(YesNoNAType))
-  cy.selectRadioByValue(currentPage, testData.iom)
-  cy.clickButton('Continue')
   currentPage = `Do you think ${this.offenderName} is using recall to bring contraband into prison`
   cy.clickLink(currentPage)
   cy.logPageTitle(`${currentPage}?`)

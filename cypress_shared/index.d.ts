@@ -108,8 +108,6 @@ declare global {
       getOffenderDetails(): Chainable<Record<string, string>>
 
       getPreviousReleases(): Chainable<Record<string, string>>
-
-      getPreviousRecalls(): Chainable<string[]>
     }
   }
 }
