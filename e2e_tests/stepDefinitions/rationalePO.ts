@@ -431,7 +431,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
       )
 
       cy.selectRadioByValue(
-        `Is ${this.offenderName}'s sentence 12 months or over?`, 
+        `Is ${this.offenderName}'s sentence 12 months or over?`,
         testData.suitabilityForfixedTermRecall.isYouthSentenceOver12Months
       )
       cy.selectRadioByValue(
@@ -443,7 +443,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
     cy.clickButton('Continue')
     cy.logPageTitle('What do you recommend?')
     cy.selectRadioByValue('Select your recommendation', testData.recallType)
-    if (testData.recallType !== 'NO_RECALL') {
+    if (testData.recallType === 'STANDARD' && testData.sentenceGroup === SentenceGroup.YOUTH_SDS) {
       testData.partARecallReason = faker.hacker.phrase()
       cy.get(
         `#recallTypeDetails${testData.recallType
@@ -1016,12 +1016,15 @@ Given('PO has started creating the Part A form without requesting SPO review', f
   } else {
     cy.selectRadio('What do you recommend', NonIndeterminateRecallType.STANDARD)
   }
-  cy.get(
-    `#recallTypeDetails${NonIndeterminateRecallType.STANDARD.toString()
-      .split('_')
-      .map(i => Cypress._.capitalize(i))
-      .join('')}`
-  ).type(faker.hacker.phrase())
+  if (testData.sentenceGroup === SentenceGroup.YOUTH_SDS) {
+    testData.partARecallReason = faker.hacker.phrase()
+    cy.get(
+      `#recallTypeDetails${NonIndeterminateRecallType.STANDARD.toString()
+        .split('_')
+        .map(i => Cypress._.capitalize(i))
+        .join('')}`
+    ).type(testData.partARecallReason)
+  }
   cy.clickButton('Continue')
   cy.selectRadio('Is this an emergency recall', 'No')
   cy.clickButton('Continue')

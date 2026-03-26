@@ -423,14 +423,25 @@ export const q19Alternatives = (contents: string, details: Record<string, string
   }
 }
 
-export const q20RecallType = (contents: string, details: Record<string, string>) => {
+export const q20RecallType = (contents: string, details: Record<string, any>) => {
   // eslint-disable-next-line no-param-reassign
   contents = contents.substring(contents.indexOf(partASections[20]), contents.indexOf(partASections[21]))
   if (details.sentenceGroup !== SentenceGroup.INDETERMINATE && details.sentenceGroup !== SentenceGroup.EXTENDED) {
     // eslint-disable-next-line no-param-reassign
     details.type = NonIndeterminateRecallType[details.recallType]
-    // eslint-disable-next-line no-param-reassign
-    details.reason = details.partARecallReason
+    if (details.partARecallReason) {
+      // eslint-disable-next-line no-param-reassign
+      details.reason = details.partARecallReason
+    } else {
+      if (details.recallType === 'STANDARD') {
+        // eslint-disable-next-line no-param-reassign
+        details.reason = `${details.offenderDetails.fullName} must get a standard recall as they are excluded from getting a fixed term.`
+      }
+      if (details.recallType === 'FIXED_TERM') {
+        // eslint-disable-next-line no-param-reassign
+        details.reason = `${details.offenderDetails.fullName} must get a fixed term recall as they meet the exclusion criteria.`
+      }
+    }
   } else if (details.sentenceGroup === SentenceGroup.EXTENDED) {
     // eslint-disable-next-line no-param-reassign
     details.type = 'N/A (extended sentence recall)'
