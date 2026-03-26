@@ -381,7 +381,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
             generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
           },
         ],
-        testData.poDecision !== 'STANDARD'
+        testData.recallType !== 'STANDARD'
           ? () => true
           : criteria => Object.keys(criteria).some(k => criteria[k] === 'YES')
       )
@@ -425,7 +425,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
             generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
           },
         ],
-        testData.poDecision !== 'STANDARD'
+        testData.recallType !== 'STANDARD'
           ? () => true
           : criteria => Object.keys(criteria).some(k => criteria[k] === 'YES')
       )
@@ -821,7 +821,7 @@ const recordPoDecision = function (poDecision?: string) {
           generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
         },
       ],
-      testData.poDecision !== 'STANDARD'
+      testData.recallType !== 'STANDARD'
         ? () => true
         : criteria => Object.keys(criteria).some(k => criteria[k] === 'YES')
     )
@@ -984,7 +984,7 @@ Given('PO has started creating the Part A form without requesting SPO review', f
           generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
         },
       ],
-      testData.poDecision !== 'STANDARD'
+      testData.recallType !== 'STANDARD'
         ? () => true
         : criteria => Object.keys(criteria).some(k => criteria[k] === 'YES')
     )
