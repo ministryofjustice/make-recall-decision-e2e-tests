@@ -300,7 +300,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
       ? partADetails.RecallType.toString().toUpperCase()
       : faker.helpers.arrayElement(Object.keys(NonIndeterminateRecallType))
     cy.logPageTitle('What do you recommend?')
-    cy.selectRadioByValue('What do you recommend', testData.recallType)
+    cy.selectRadioByValue('Select your recommendation', testData.recallType)
     cy.clickButton('Continue')
     if (testData.recallType !== 'NO_RECALL') {
       cy.title().then($title => {
@@ -792,7 +792,7 @@ const recordPoDecision = function (poDecision?: string) {
     cy.clickButton('Continue')
     cy.selectRadioByValue('Select your recommendation', this.testData.poDecision)
   } else {
-    cy.selectRadioByValue('What do you recommend?', this.testData.poDecision)
+    cy.selectRadioByValue('Select your recommendation', this.testData.poDecision)
   }
   cy.clickButton('Continue')
 }
