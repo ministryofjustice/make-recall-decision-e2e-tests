@@ -638,7 +638,6 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
   cy.logPageTitle('Local police contact details')
   testData.localPoliceDetails = {}
   cy.fillInput('Police contact name', (testData.localPoliceDetails.contact = faker.name.fullName()))
-  cy.fillInput('Telephone number', (testData.localPoliceDetails.phoneNumber = '01277 960 001'))
   cy.fillInput('Email address', (testData.localPoliceDetails.email = faker.internet.email()))
   cy.clickButton('Continue')
   if (!['YES_POLICE', 'YES_PRISON'].includes(testData.inCustody)) {
