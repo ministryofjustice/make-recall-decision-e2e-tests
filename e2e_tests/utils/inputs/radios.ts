@@ -1,8 +1,10 @@
 import { faker } from "@faker-js/faker"
 
-export const selectRandomRadio = (locator: string) => {
-    cy.get(locator).find('input[type="radio"]').then(radios => {
-            faker.helpers.arrayElement(radios.toArray()).click()
+export const selectRandomRadio = (locator: string, valueToExclude?: string) => {
+  cy.get(locator)
+    .find(`input[type="radio"]${valueToExclude ? `[value!="${valueToExclude}"]` : ''}`)
+    .then(radios => {
+      faker.helpers.arrayElement(radios.toArray()).click()
     })
 }
 
