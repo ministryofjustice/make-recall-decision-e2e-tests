@@ -544,42 +544,6 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
   cy.clickButton('Continue')
   cy.clickLink(`Previous releases`)
   cy.logPageTitle('Previous releases')
-  // ECSL change
-  testData.releasedUnderECSL = faker.helpers.arrayElement(Object.keys(YesNoType))
-  if (testData.releasedUnderECSL === 'NO') {
-    cy.get('[type="radio"]').check('NO')
-  } else {
-    cy.get('[type="radio"]').check('YES')
-    testData.ecslDateOfRelease = faker.date.past(1)
-    cy.enterDateTime({
-      day: testData.ecslDateOfRelease.getDate().toString(),
-      month: (testData.ecslDateOfRelease.getMonth() + 1).toString(),
-      year: testData.ecslDateOfRelease.getFullYear().toString(),
-    })
-    testData.conditionalReleaseDate = faker.date.past(3)
-    cy.enterDateForCRD({
-      day: testData.conditionalReleaseDate.getDate().toString(),
-      month: (testData.conditionalReleaseDate.getMonth() + 1).toString(),
-      year: testData.conditionalReleaseDate.getFullYear().toString(),
-    })
-  }
-  if (partADetails?.PreviousReleases) {
-    const previousReleases = partADetails?.PreviousReleases.split(',').map(s => s.trim())
-    previousReleases.forEach(previousRelease => {
-      const dateParts = previousRelease.split('-').map(s => s.trim())
-      const releaseDay = {
-        day: dateParts[0],
-        month: dateParts[1],
-        year: dateParts[2],
-      }
-      cy.clickLink(`Add a previous release`)
-      cy.enterDateTime(releaseDay)
-      cy.clickButton('Continue')
-    })
-  }
-  cy.getPreviousReleases().then(previousReleases => {
-    Object.assign(testData.offenderDetails, previousReleases)
-  })
   cy.clickButton('Continue')
   cy.clickLink(`Previous recalls`)
   cy.logPageTitle('Previous recalls')
