@@ -116,9 +116,7 @@ export const postPORecallRecommendationRequest: () => UpdateRecommendationReques
             allOptions: OPTIONS.YESNONAOptions
         },
         localPoliceContact: {
-            faxNumber: "",
             contactName: faker.name.fullName(),
-            phoneNumber: faker.phone.number(),
             emailAddress: faker.internet.email()
         },
         isUnderIntegratedOffenderManagement : {
