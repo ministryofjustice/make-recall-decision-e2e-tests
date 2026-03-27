@@ -5,7 +5,7 @@ Feature: E2E scenarios - Recall
   countersigning task list accessed using the link sent by PO
 
   #NOTE:
-  #TypeOfSentence: supports LIFE, IPP & DPP only
+  #TypeOfSentence: supports LIFE, IPP, DPP & DHMP only
   #RecallType: supports STANDARD, FIXED_TERM & NO_RECALL for non-indeterminate/non-extended only else its EMERGENCY & NO_RECALL
   #VictimContactScheme: supports 'Yes', 'No' & 'Not applicable'
   #InCustody: supports 'Yes, prison custody', 'Yes, police custody' & 'No'

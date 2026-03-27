@@ -3,7 +3,7 @@ Feature: Rationale for a Recall decision
   Non E2E Tests involving rationale flow
 
   #NOTE:
-  #TypeOfSentence: supports LIFE, IPP & DPP only
+  #TypeOfSentence: supports LIFE, IPP, DPP & DHMP only
   #RecallType: supports STANDARD, FIXED_TERM & NO_RECALL for non-indeterminate/non-extended only else its EMERGENCY & NO_RECALL
   #VictimContactScheme: supports 'Yes', 'No' & 'Not applicable'
   #InCustody: supports 'Yes, prison custody', 'Yes, police custody' & 'No'

@@ -40,7 +40,8 @@ export const alternativesToRecallTried: OptionValue[] = [
 export const indeterminateSentenceTypes: OptionValue[] = [
     { text: "Life sentence", value: "LIFE" },
     { text: "Imprisonment for Public Protection (IPP) sentence", value: "IPP" },
-    { text: "Detention for Public Protection (DPP) sentence", value: "DPP" }
+    { text: "Detention for Public Protection (DPP) sentence", value: "DPP" },
+    { text: "Detention at His Majesty’s pleasure", value: "DHMP" },
 ]
 
 export const recallTypes: OptionValue[] = [

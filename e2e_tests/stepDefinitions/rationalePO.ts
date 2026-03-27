@@ -140,7 +140,7 @@ function completeSentenceInformation(recommendationDetails: Record<string, strin
 function completeIndeterminateSentenceType(recommendationDetails: Record<string, string>, offenderName: string) {
   testData.TypeOfSentence = recommendationDetails?.TypeOfSentence
     ? recommendationDetails.TypeOfSentence.toString().toUpperCase()
-    : faker.helpers.arrayElement(['LIFE', 'IPP', 'DPP'])
+    : faker.helpers.arrayElement(['LIFE', 'IPP', 'DPP', 'DHMP'])
   cy.selectRadioByValue(`What type of sentence is ${offenderName} on`, testData.TypeOfSentence)
   cy.clickButton('Continue')
 }
