@@ -74,7 +74,10 @@ export const q3ExtendedSentence = (contents: string, answer: string) => {
 
 export const q4OffendersSentencedAsYouth = (contents: string, context: Record<string, string>) => {
   const sectionContents = contents.substring(contents.indexOf(partASections[4]), contents.indexOf(partASections[5]))
-  const isYouthSentence = context.isYouthSentence ? YesNoType.YES : YesNoType.NO
+  const isYouthSentence = context.isYouthSentence ? YesNoType.YES : ''
+  expectSoftly(sectionContents, 'Is under 18').to.contain(
+    `Is the offender over 18 years old at the point of recall? ${isYouthSentence}`
+  )
   expectSoftly(sectionContents, 'Is serving youth sentence').to.contain(
     `Is the offender only serving sentence(s) under s91 of the PCC(S)A 2000 or s.250 of the Sentencing Code? ${isYouthSentence}`
   )
