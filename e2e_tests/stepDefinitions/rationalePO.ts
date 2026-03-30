@@ -303,16 +303,6 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
     cy.selectRadioByValue('Select your recommendation', testData.recallType)
     cy.clickButton('Continue')
     if (testData.recallType !== 'NO_RECALL') {
-      cy.title().then($title => {
-        if ($title.match('Is this an emergency recall?')) {
-          cy.logPageTitle('Is this an emergency recall?')
-          testData.emergencyRecall = partADetails?.EmergencyRecall
-            ? partADetails.EmergencyRecall.toString().toUpperCase()
-            : faker.helpers.arrayElement(Object.keys(YesNoType))
-          cy.selectRadioByValue('Is this an emergency recall', testData.emergencyRecall)
-          cy.clickButton('Continue')
-        }
-      })
       cy.logPageTitle('Indeterminate and extended sentences')
       testData.indeterminateAndExtendedSentencesCriteria = 'BEHAVIOUR_LEADING_TO_SEXUAL_OR_VIOLENT_OFFENCE'
       cy.get('input[type="checkbox"]').check(testData.indeterminateAndExtendedSentencesCriteria)
@@ -321,6 +311,12 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
         `#indeterminateOrExtendedSentenceDetailsDetail-${testData.indeterminateAndExtendedSentencesCriteria}`
       ).type(testData.indeterminateANDExtendedSentences)
     }
+    cy.clickButton('Continue')
+    cy.logPageTitle('Is this an emergency recall?')
+    testData.emergencyRecall = partADetails?.EmergencyRecall
+      ? partADetails.EmergencyRecall.toString().toUpperCase()
+      : faker.helpers.arrayElement(Object.keys(YesNoType))
+    cy.selectRadioByValue('Is this an emergency recall', testData.emergencyRecall)
     cy.clickButton('Continue')
     cy.logPageTitle('Sensitive Information')
     cy.clickLink('Continue')
