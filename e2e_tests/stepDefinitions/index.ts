@@ -161,7 +161,6 @@ Then('Part A details are correct', function () {
 
 When('PO returns to Recommendations page of CRN', function () {
   cy.clickLink(`Back`)
-  cy.clickLink('Back')
   cy.clickLink('Recommendations')
 })
 
