@@ -5,7 +5,7 @@ Feature: E2E scenarios - Recall
   countersigning task list accessed using the link sent by PO
 
   #NOTE:
-  #TypeOfSentence: supports LIFE, IPP & DPP only
+  #TypeOfSentence: supports LIFE, IPP, DPP & DHMP only
   #RecallType: supports STANDARD, FIXED_TERM & NO_RECALL for non-indeterminate/non-extended only else its EMERGENCY & NO_RECALL
   #VictimContactScheme: supports 'Yes', 'No' & 'Not applicable'
   #InCustody: supports 'Yes, prison custody', 'Yes, police custody' & 'No'
@@ -13,8 +13,7 @@ Feature: E2E scenarios - Recall
   @MRD-1446 @MRD-1389
   Scenario Outline: E2E - SPO records rationale during review and countersigns Part A later
     Given a PO has created a recommendation to recall with:
-      | Indeterminate  | <Indeterminate>  |
-      | Extended       | <Extended>       |
+      | SentenceGroup  | <SentenceGroup>  |
       | TypeOfSentence | <TypeOfSentence> |
     And PO has requested an SPO to review recommendation
     And SPO has visited the review link
@@ -36,6 +35,6 @@ Feature: E2E scenarios - Recall
     And Part A details are correct
 
     Examples:
-      | Indeterminate | Extended | TypeOfSentence | RecallType | InCustody  | SPODecision |
-      | Yes           | No       | LIFE           | EMERGENCY  | Yes Police | RECALL      |
-#      | No            | Yes      |                | STANDARD   | No         | RECALL      |
+      | SentenceGroup | TypeOfSentence | RecallType | InCustody  | SPODecision |
+      | INDETERMINATE | LIFE           | EMERGENCY  | Yes Police | RECALL      |
+#      | EXTENDED      |                | STANDARD   | No         | RECALL      |
