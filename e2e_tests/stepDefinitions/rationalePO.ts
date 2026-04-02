@@ -30,7 +30,7 @@ import {
   YesNoNAType,
   YesNoType,
 } from '../support/enums'
-import { formatDateToCompletedDocumentFormat } from '../utils'
+import { formatCurrentDateToCompletedDocumentFormat } from '../utils'
 import { randomiseCriteria } from '../utils/test_data/utils'
 import { signOut } from './user/user'
 
@@ -376,7 +376,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
           },
         ],
         testData.recallType !== 'STANDARD'
-          ? () => true
+          ? criteria => Object.keys(criteria).every(k => criteria[k] === 'NO')
           : criteria => Object.keys(criteria).some(k => criteria[k] === 'YES')
       )
       cy.selectRadioByValue(`Is ${this.offenderName} being recalled because of being charged with an offence?`, testData.suitabilityForfixedTermRecall.isChargedWithOffence)
@@ -420,7 +420,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
           },
         ],
         testData.recallType !== 'STANDARD'
-          ? () => true
+          ? criteria => Object.keys(criteria).every(k => criteria[k] === 'NO')
           : criteria => Object.keys(criteria).some(k => criteria[k] === 'YES')
       )
 
@@ -470,7 +470,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
       ? partADetails.RecallType.toString().toUpperCase()
       : faker.helpers.arrayElement(Object.keys(IndeterminateRecallType))
     cy.logPageTitle('What do you recommend?')
-    cy.selectRadioByValue('What do you recommend', testData.recallType)
+    cy.selectRadioByValue('Select your recommendation', testData.recallType)
     cy.clickButton('Continue')
     if (testData.recallType === 'EMERGENCY') {
       testData.emergencyRecall = YesNoType.YES.toUpperCase()
@@ -715,7 +715,9 @@ const createDNTRLetter = function () {
 
 const recordPoDecision = function (poDecision?: string) {
   this.testData.poDecision = poDecision || faker.helpers.arrayElement(Object.keys(NonIndeterminateRecallType))
-  if (testData.sentenceGroup !== SentenceGroup.INDETERMINATE && testData.sentenceGroup !== SentenceGroup.EXTENDED) {
+  if (testData.sentenceGroup === SentenceGroup.ADULT_SDS) {
+    cy.logPageTitle('Check MAPPA Information')
+    cy.clickButton('Continue')
     cy.logPageTitle('Suitability for fixed term recall')
     testData.suitabilityForfixedTermRecall = randomiseCriteria<{
       isChargedWithOffence: string
@@ -757,10 +759,13 @@ const recordPoDecision = function (poDecision?: string) {
         },
       ],
       testData.recallType !== 'STANDARD'
-        ? () => true
+        ? criteria => Object.keys(criteria).every(k => criteria[k] === 'NO')
         : criteria => Object.keys(criteria).some(k => criteria[k] === 'YES')
     )
-    cy.selectRadioByValue(`Is ${this.offenderName} being recalled because of being charged with an offence?`, testData.suitabilityForfixedTermRecall.isChargedWithOffence)
+    cy.selectRadioByValue(
+      `Is ${this.offenderName} being recalled because of being charged with an offence?`,
+      testData.suitabilityForfixedTermRecall.isChargedWithOffence
+    )
     cy.selectRadioByValue(
       `Is ${this.offenderName} serving a sentence for a terrorist or national security offence?`,
       testData.suitabilityForfixedTermRecall.isServingTerroristOrNationalSecurityOffence
@@ -802,7 +807,7 @@ const validateLastCompletedDocumentTabDetails = function (letterType: string) {
     tableCaption: 'Recommendations',
     rowSelector: `[data-qa]`,
   }).then(rowData => {
-    expect(rowData.join('|')).to.contain(formatDateToCompletedDocumentFormat())
+    expect(rowData.join('|')).to.contain(formatCurrentDateToCompletedDocumentFormat())
     expect(rowData.join('|')).to.contain(letterType)
     expect(rowData.join('|')).to.contain('This is the most recent completed document. It is not a draft.')
   })
@@ -980,7 +985,7 @@ Given('PO has started creating the Part A form without requesting SPO review', f
     cy.logPageTitle('What do you recommend?')
     cy.selectRadio('Select your recommendation', NonIndeterminateRecallType.STANDARD)
   } else {
-    cy.selectRadio('What do you recommend', NonIndeterminateRecallType.STANDARD)
+    cy.selectRadio('Select your recommendation', NonIndeterminateRecallType.STANDARD)
   }
   if (testData.sentenceGroup === SentenceGroup.YOUTH_SDS) {
     testData.partARecallReason = faker.hacker.phrase()
