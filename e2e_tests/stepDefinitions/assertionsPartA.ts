@@ -4,8 +4,8 @@ import {
   changeDateFromLongFormatToShort,
   formatObjectDateToLongFormat,
   getTestDataPerEnvironment,
-  formatDateFromUTCLongToShortFormat,
-  extractTimeFromUTCDateFormat,
+  formatDateToCompletedDocumentFormat,
+  formattedTimeFromDateIn24HrFormat,
 } from '../utils'
 import {
   Alternatives,
@@ -442,7 +442,7 @@ export const q20RecallType = (contents: string, details: Record<string, any>) =>
       }
       if (details.recallType === 'FIXED_TERM') {
         // eslint-disable-next-line no-param-reassign
-        details.reason = `${details.offenderDetails.fullName} must get a fixed term recall as they meet the exclusion criteria.`
+        details.reason = `${details.offenderDetails.fullName} must get a fixed term recall as they do not meet the exclusion criteria.`
       }
     }
   } else if (details.sentenceGroup === SentenceGroup.EXTENDED) {
@@ -529,14 +529,14 @@ export const q23ProbationDetailsWithCaseAdmin = (
   expectSoftly(contents, 'Probation-Officer-Region').to.contain(`Region: ${whoCompletedPartADetails.region}`)
   expectSoftly(contents, 'Probation-Officer-LDU').to.contain(`LDU: ${whoCompletedPartADetails.LDU}`)
   expectSoftly(contents, 'Probation-Date of Decision').to.contain(
-    `Date of decision to request revocation: ${formatDateFromUTCLongToShortFormat(date.recallDateBySPO)}`
+    `Date of decision to request revocation: ${formatDateToCompletedDocumentFormat(date.recallDateBySPO as unknown as Date)}`
   )
   // TODO check PPCS responses e-mail address once task-list-consider-recall changes merged
-  expectSoftly(contents, 'Probation-Date of Decision').to.contain(
-    `Date of decision to request revocation: ${formatDateFromUTCLongToShortFormat(date.recallDateBySPO)}`
-  )
+
   expectSoftly(contents, 'Probation-Time of Decision').to.contain(
-    `Time (24 hour) of decision to request information: ${extractTimeFromUTCDateFormat(date.recallDateBySPO)}`
+    `Time (24 hour) of decision to request information: ${formattedTimeFromDateIn24HrFormat(
+      date.recallDateBySPO as unknown as Date
+    )}`
   )
 }
 
