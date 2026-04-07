@@ -4,8 +4,6 @@ import {
   changeDateFromLongFormatToShort,
   formatObjectDateToLongFormat,
   getTestDataPerEnvironment,
-  formatDateToCompletedDocumentFormat,
-  formattedTimeFromDateIn24HrFormat,
 } from '../utils'
 import {
   Alternatives,
@@ -529,14 +527,16 @@ export const q23ProbationDetailsWithCaseAdmin = (
   expectSoftly(contents, 'Probation-Officer-Region').to.contain(`Region: ${whoCompletedPartADetails.region}`)
   expectSoftly(contents, 'Probation-Officer-LDU').to.contain(`LDU: ${whoCompletedPartADetails.LDU}`)
   expectSoftly(contents, 'Probation-Date of Decision').to.contain(
-    `Date of decision to request revocation: ${formatDateToCompletedDocumentFormat(date.recallDateBySPO as unknown as Date)}`
+    `Date of decision to request revocation: ${DateTime.fromJSDate(date.recallDateBySPO as unknown as Date).toFormat(
+      'dd/MM/yyyy'
+    )}`
   )
   // TODO check PPCS responses e-mail address once task-list-consider-recall changes merged
 
   expectSoftly(contents, 'Probation-Time of Decision').to.contain(
-    `Time (24 hour) of decision to request information: ${formattedTimeFromDateIn24HrFormat(
+    `Time (24 hour) of decision to request information: ${DateTime.fromJSDate(
       date.recallDateBySPO as unknown as Date
-    )}`
+    ).toFormat('HH:mm')}`
   )
 }
 
