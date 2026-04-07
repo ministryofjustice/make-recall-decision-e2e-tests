@@ -74,6 +74,77 @@ jobs:
       - store_artifacts:
           path: build/reports/jacoco/test/html
 
+  e2e_environment_test:
+    circleci_ip_ranges: true # opt-in to jobs running on a restricted set of IPs
+    docker:
+      - image: cypress/browsers:node-20.9.0-chrome-118.0.5993.88-1-ff-118.0.2-edge-118.0.2088.46-1
+
+    parallelism: 1
+    resource_class: large
+    parameters:
+      environment:
+        type: string
+        default: dev
+      e2e-tags:
+        type: string
+        default: "@FailingInDev"
+    steps:
+      - run:
+          name: Checkout/clone make-recall-decision-e2e-tests
+          command: |
+            git clone https://github.com/ministryofjustice/make-recall-decision-e2e-tests.git
+            cd make-recall-decision-e2e-tests 
+            git checkout test-branch-to-investigate-failing-e2e-dev-tests
+      # the credentials need to be updated before running apt-get update
+      - run:
+          name: Update credentials
+          command: wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | tee /etc/apt/trusted.gpg.d/google.asc >/dev/null
+      # curl is needed by the node/install command with the node-version parameter, but isn't in the cypress image
+      - run:
+          name: Install curl
+          command: 'apt-get update && apt-get install curl -y'
+      - node/install:
+          node-version: '20' # node/install doesn't have a working_directory parameter, but the .nvmrc file is in a
+          # sub-directory (make-recall-decision-e2e-tests), so we need to set the node version here
+      - run:
+          working_directory: make-recall-decision-e2e-tests
+          name: Install packages
+          command: 'npm run setup'
+      - run:
+          working_directory: make-recall-decision-e2e-tests
+          environment:
+            FEATURE_FLAG_QUERY_PARAMETERS_ENABLED: 'true'
+          name: E2E Check - dev
+          command: |
+            echo $(pwd)
+            shopt -s globstar
+
+            SPECS=$(circleci tests glob "e2e_tests/features/e2eTests/*.feature" | circleci tests split --show-counts)
+            echo $SPECS
+
+            npx cypress run \
+              --env TAGS='<< parameters.e2e-tags >>',USERNAME_PO=${dev_CYPRESS_USERNAME_PO},PASSWORD_PO=${dev_CYPRESS_PASSWORD_PO},USERNAME_SPO=${dev_CYPRESS_USERNAME_SPO},PASSWORD_SPO=${dev_CYPRESS_PASSWORD_SPO},USERNAME_ACO=${dev_CYPRESS_USERNAME_ACO},PASSWORD_ACO=${dev_CYPRESS_PASSWORD_ACO},CRN=${CRN_dev},CRN2=${CRN2_dev},CRN3=${CRN3_dev},CRN4=${CRN4_dev},CRN5=${CRN5_dev},ENV=dev \
+              --config-file e2e_tests/cypress.config.ts \
+              --config baseUrl=https://make-recall-decision-dev.hmpps.service.justice.gov.uk \
+              --spec $SPECS \
+              --browser chrome \
+              --record false
+            node scripts/fix-junit-reports.js
+      - store_artifacts:
+          path: make-recall-decision-e2e-tests/e2e_tests/screenshots
+          destination: screenshots
+      - store_artifacts:
+          path: make-recall-decision-e2e-tests/e2e_tests/videos
+          destination: videos
+      - store_artifacts:
+          path: make-recall-decision-e2e-tests/e2e_tests/logs
+          destination: test-logs
+      - store_artifacts:
+          path: make-recall-decision-e2e-tests/e2e_tests/junit
+          destination: junit
+      - store_test_results:
+          path: make-recall-decision-e2e-tests/e2e_tests/junit
+
   e2e_test:
     executor:
       name: hmpps/default
@@ -264,10 +335,11 @@ workflows:
 #            - hmpps-common-vars
 #          <<: *slack-fail-post-step
 
-      - integration_tests:
+      - e2e_environment_test:
+          name: e2e_test_dev
+          environment: dev
           context:
             - hmpps-common-vars
-          <<: *slack-fail-post-step
 
 #      - hmpps/build_docker:
 #          name: build_docker

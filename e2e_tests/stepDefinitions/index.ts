@@ -32,8 +32,8 @@ import { CUSTODY_GROUP, CustodyType, SentenceGroup, YesNoType } from '../support
 import { loginAndSearchCrn } from './user/user'
 
 export const crns = {
-  1: Cypress.env('CRN') || 'X514364',
-  2: Cypress.env('CRN2') || 'X514364',
+  // 1: Cypress.env('CRN') || 'X514364', // Removed temporarily. This CRN has MAPPA data such that FTR is never possible, which causes issues with FTR tests
+  // 2: Cypress.env('CRN2') || 'X514364',
   3: Cypress.env('CRN3') || 'X487027',
   4: Cypress.env('CRN4') || 'X487027',
   // 5: Cypress.env('CRN5') || 'D002399', // Removed temporarily. This CRN doesn't have an address, and causes an error on the addressDetails page
@@ -91,11 +91,15 @@ Then('the page heading contains {string}', heading => {
 })
 
 Then('PO/SPO/ACO can create Part A', function () {
+  // cy.logPageTitle('PO/SPO/ACO to create Part A')
   cy.clickLink('Create Part A')
+  // cy.logPageTitle("'Create Part A' link clicked")
 })
 
 Then('PO/SPO/ACO can download Part A', function () {
+  // cy.logPageTitle('PO/SPO/ACO to download Part A')
   cy.downloadDocX('Download the Part A').as('partAContent')
+  // cy.logPageTitle("'Download the Part A' link clicked")
 })
 
 Then('PO/SPO/ACO can download preview of Part A', function () {

@@ -4,8 +4,6 @@ import {
   changeDateFromLongFormatToShort,
   formatObjectDateToLongFormat,
   getTestDataPerEnvironment,
-  formatDateToCompletedDocumentFormat,
-  formattedTimeFromDateIn24HrFormat,
 } from '../utils'
 import {
   Alternatives,
@@ -139,7 +137,7 @@ export const q6OffenderDetails = function (
       : (apiDataForCrn.ethnicity as RegExp)
   )
   expectSoftly(contents, 'Offender-Written language').to.contain(`Written: ${context.writtenLanguage}`)
-  expectSoftly(contents, 'Offender-Written language').to.contain(`Spoken: ${context.spokenLanguage}`)
+  expectSoftly(contents, 'Offender-Spoken language').to.contain(`Spoken: ${context.spokenLanguage}`)
   expectSoftly(contents, 'Offender-Gender').to.contain(`Gender: ${context.gender}`)
   expectSoftly(contents, 'Offender-CRN').to.contain(`CRN: ${crn}`)
   expectSoftly(contents, 'Offender-CRO').to.match(
@@ -173,12 +171,12 @@ export const q6OffenderDetails = function (
 export const q7SentenceDetails = function (contents: string, context: Record<string, string>) {
   // eslint-disable-next-line no-param-reassign
   contents = contents.substring(contents.indexOf(partASections[7]), contents.indexOf(partASections[8]))
-  cy.log(`q5: ${JSON.stringify(context)} ${contents}`)
+  cy.log(`q7: ${JSON.stringify(context)} ${contents}`)
   expectSoftly(contents, 'Sentence Details-Index offence').to.contain(
     `Index offence of current sentence which has led to the offender’s recall: ${context.indexOffenceDescription}`
   )
-  cy.log(`q5 from api-- ${apiDataForCrn.dateOfOriginalOffence}`)
-  cy.log(`q5 from context---- ${context.dateOfOriginalOffence}`)
+  cy.log(`q7 from api-- ${apiDataForCrn.dateOfOriginalOffence}`)
+  cy.log(`q7 from context---- ${context.dateOfOriginalOffence}`)
 
   expectSoftly(contents, 'Sentence Details-Dates of Original Offence').to.match(
     context.dateOfOriginalOffence
@@ -529,14 +527,16 @@ export const q23ProbationDetailsWithCaseAdmin = (
   expectSoftly(contents, 'Probation-Officer-Region').to.contain(`Region: ${whoCompletedPartADetails.region}`)
   expectSoftly(contents, 'Probation-Officer-LDU').to.contain(`LDU: ${whoCompletedPartADetails.LDU}`)
   expectSoftly(contents, 'Probation-Date of Decision').to.contain(
-    `Date of decision to request revocation: ${formatDateToCompletedDocumentFormat(date.recallDateBySPO as unknown as Date)}`
+    `Date of decision to request revocation: ${DateTime.fromJSDate(date.recallDateBySPO as unknown as Date).toFormat(
+      'dd/MM/yyyy'
+    )}`
   )
   // TODO check PPCS responses e-mail address once task-list-consider-recall changes merged
 
   expectSoftly(contents, 'Probation-Time of Decision').to.contain(
-    `Time (24 hour) of decision to request information: ${formattedTimeFromDateIn24HrFormat(
+    `Time (24 hour) of decision to request information: ${DateTime.fromJSDate(
       date.recallDateBySPO as unknown as Date
-    )}`
+    ).toFormat('HH:mm')}`
   )
 }
 

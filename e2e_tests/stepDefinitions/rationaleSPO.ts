@@ -39,36 +39,45 @@ const recordSpoDecision = function (spoDecision?: string) {
 
 const recordSpoDecisionAfterCountersigning = function () {
   cy.clickLink(`Review practitioner's concerns`)
+  // cy.logPageTitle("Review practitioner's concerns")
   cy.clickButton('Continue')
   cy.clickLink(`Review profile of ${this.offenderName}`)
+  // cy.logPageTitle(`Review profile of ${this.offenderName}`)
   cy.clickButton('Continue')
   cy.clickLink(`Explain the decision`)
+  // cy.logPageTitle(`Explain the decision`)
   this.testData.spoDecision = 'RECALL'
   this.testData.spoDecisionExplanation = faker.hacker.phrase()
   cy.get('textarea').type(this.testData.spoDecisionExplanation)
   cy.clickButton('Continue')
   cy.clickLink('Record the decision')
+  // cy.logPageTitle(`Record the decision`)
   cy.clickButton('Send to NDelius')
+  // cy.logPageTitle(`Send to NDelius`)
 }
 
 const doManagerCountersign = function (userType: UserType, data?: Record<string, string>) {
   if (userType === UserType.SPO) {
+    // cy.logPageTitle('SPO Telephone number')
     this.testData.spoCounterSignature = {}
     if (faker.datatype.boolean() || (data?.Telephone && data.Telephone.toString().toUpperCase().includes('VALID'))) {
       this.testData.spoCounterSignature.telephone = faker.phone.number()
       cy.fillInput('Telephone number', this.testData.spoCounterSignature.telephone)
     }
     cy.clickButton('Continue')
+    // cy.logPageTitle('SPO Countersign')
     this.testData.spoCounterSignature.reason = faker.hacker.phrase()
     cy.get('#managerCountersignatureExposition').type(this.testData.spoCounterSignature.reason)
     cy.clickButton('Countersign')
   } else {
+    // cy.logPageTitle('ACO Telephone number')
     this.testData.acoCounterSignature = {}
     if (faker.datatype.boolean() || (data?.Telephone && data.Telephone.toString().toUpperCase().includes('VALID'))) {
       this.testData.acoCounterSignature.telephone = faker.phone.number()
       cy.fillInput('Telephone number', this.testData.acoCounterSignature.telephone)
     }
     cy.clickButton('Continue')
+    // cy.logPageTitle('ACO Countersign')
     this.testData.acoCounterSignature.reason = faker.hacker.phrase()
     cy.get('#managerCountersignatureExposition').type(this.testData.acoCounterSignature.reason)
     cy.clickButton('Countersign')
@@ -88,6 +97,9 @@ When('{userType}( has) visits/visited the countersigning/review link', function 
     userType,
     userType === UserType.SPO ? this.spoCounterSignatureLink : this.acoCounterSignatureLink
   )
+  // cy.logPageTitle(
+  //   `${userType} visting ${userType === UserType.SPO ? this.spoCounterSignatureLink : this.acoCounterSignatureLink}`
+  // )
 })
 
 Then('user is unable to access the page after decision is recorded', function () {
@@ -104,7 +116,9 @@ When('SPO( has) records/recorded rationale with {managersDecision} decision', fu
 
 When('SPO( has) records/recorded rationale', function () {
   cy.clickLink('Line manager countersignature')
+  // cy.logPageTitle('First page after selecting line manager countersignature link - Record SPO rationale?')
   cy.selectRadioByValue('You must record your rationale', YesNoType.YES.toUpperCase())
+  // cy.logPageTitle('SPO rationale selected!')
   cy.clickButton('Continue')
   recordSpoDecisionAfterCountersigning.call(this)
 })
@@ -113,23 +127,29 @@ Then('a confirmation of the {word} is shown to SPO/ACO', function (confirmationP
   cy.get('#main-content')
     .invoke('text')
     .then(innerText => {
-      expectSoftly(innerText).to.contain(
+      const expectedToContains =
         // eslint-disable-next-line no-nested-ternary
         confirmationPage === 'countersigning'
           ? 'Part A countersigned'
           : this.testData.spoDecision === 'RECALL'
           ? 'Decision to recall'
           : 'Decision not to recall'
-      )
+      expectSoftly(innerText).to.contain(expectedToContains)
       expectSoftly(innerText).to.contain(this.offenderName)
       expectSoftly(innerText).to.contain(this.crn)
+      // cy.logPageTitle(
+      //   `SPO decision confirmation: ${innerText} contained ${expectedToContains}, ${this.offenderName} and ${this.crn}`
+      // )
     })
 })
 
 Then('SPO( has) countersigns/countersigned after recording rationale', function () {
   cy.clickLink('Return to overview')
+  // cy.logPageTitle('SPO Returned to overview')
   cy.clickLink('Countersign')
+  // cy.logPageTitle('SPO Countersign')
   cy.clickLink('Line manager countersignature')
+  // cy.logPageTitle('SPO Line manager countersignature')
   doManagerCountersign.call(this, UserType.SPO, true)
 })
 
@@ -190,7 +210,10 @@ Then('Countersign button is visible on the Overview page', function () {
 
 When('{userType}( has) countersigns/countersigned', function (userType: UserType) {
   expect(userType, 'Checking only SPO/ACO user is passed!!').to.not.equal(UserType.PO)
-  if (userType === UserType.ACO) cy.clickLink('Senior manager countersignature')
+  if (userType === UserType.ACO) {
+    cy.clickLink('Senior manager countersignature')
+    // cy.logPageTitle('Senior manager countersignature')
+  }
   doManagerCountersign.call(this, userType, false)
 })
 

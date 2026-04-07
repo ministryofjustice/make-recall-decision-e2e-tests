@@ -4,6 +4,7 @@ import { loginAndSearchCrn } from "./user"
 
 When('{userType} logs( back) in to update/view Recommendation', function (userType: UserType) {
   loginAndSearchCrn.call(this, userType)
+  // cy.logPageTitle(`Logged in again as ${userType}, clicking on 'Update recommendation'...`)
   cy.clickLink('Update recommendation')
 })
 

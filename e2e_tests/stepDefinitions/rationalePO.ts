@@ -800,13 +800,16 @@ const recordPoDecision = function (poDecision?: string) {
 
 const navigateToLastCompletedDocumentFromDownloadLetterPage = function () {
   cy.clickLink('to overview')
+  // cy.log('Clicked "to overview" link')
   cy.clickLink('Last completed document')
+  // cy.log('Clicked "Last completed document" link')
 }
 const validateLastCompletedDocumentTabDetails = function (letterType: string) {
   cy.getRowValuesFromTable({
     tableCaption: 'Recommendations',
     rowSelector: `[data-qa]`,
   }).then(rowData => {
+    // cy.log(`Row data from last completed table: ${rowData}`)
     expect(rowData.join('|')).to.contain(formatCurrentDateToCompletedDocumentFormat())
     expect(rowData.join('|')).to.contain(letterType)
     expect(rowData.join('|')).to.contain('This is the most recent completed document. It is not a draft.')
