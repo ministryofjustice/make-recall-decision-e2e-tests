@@ -389,10 +389,10 @@ Cypress.Commands.add('getOffenderDetails', () => {
     offenderDetails.ethnicity = replaceMissingNDeliusInfoWithNotSpecified(text)
   })
   cy.getDefinitionListValue('Spoken').then(text => {
-    offenderDetails.spokenLanguage = text
+    offenderDetails.spokenLanguage = replaceMissingNDeliusInfoWithBlank(text)
   })
   cy.getDefinitionListValue('Written').then(text => {
-    offenderDetails.writtenLanguage = text
+    offenderDetails.writtenLanguage = replaceMissingNDeliusInfoWithBlank(text)
   })
   cy.getDefinitionListValue('CRO number').then(text => {
     offenderDetails.cro = replaceMissingNDeliusInfoWithBlank(text)

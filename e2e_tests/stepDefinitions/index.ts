@@ -32,8 +32,8 @@ import { CUSTODY_GROUP, CustodyType, SentenceGroup, YesNoType } from '../support
 import { loginAndSearchCrn } from './user/user'
 
 export const crns = {
-  1: Cypress.env('CRN') || 'X514364',
-  2: Cypress.env('CRN2') || 'X514364',
+  // 1: Cypress.env('CRN') || 'X514364', // Removed temporarily. This CRN has MAPPA data such that FTR is never possible, which causes issues with FTR tests
+  // 2: Cypress.env('CRN2') || 'X514364',
   3: Cypress.env('CRN3') || 'X487027',
   4: Cypress.env('CRN4') || 'X487027',
   // 5: Cypress.env('CRN5') || 'D002399', // Removed temporarily. This CRN doesn't have an address, and causes an error on the addressDetails page
