@@ -3,7 +3,7 @@ Feature: Case closure scenarios
   Tests covering different variations on how and when a recommendation case can be closed
 
   #NOTE:
-  #TypeOfSentence: supports LIFE, IPP & DPP only
+  #TypeOfSentence: supports LIFE, IPP, DPP & DHMP only
   #RecallType: supports STANDARD, FIXED_TERM & NO_RECALL for non-indeterminate/non-extended only else its EMERGENCY & NO_RECALL
   #VictimContactScheme: supports 'Yes', 'No' & 'Not applicable'
   #InCustody: supports 'Yes, prison custody', 'Yes, police custody' & 'No'
@@ -11,8 +11,7 @@ Feature: Case closure scenarios
   @MRD-1466
   Scenario: E2E - SPO is able to record rationale and close the case even after PO has downloaded Part A
     Given a PO has created a recommendation to recall with:
-      | Indeterminate | No |
-      | Extended      | No |
+      | SentenceGroup | ADULT_SDS |
     And PO has created a Part A form without requesting SPO review with:
       | RecallType          | STANDARD   |
       | InCustody           | Yes Police |
@@ -33,8 +32,7 @@ Feature: Case closure scenarios
   @MRD-1466
   Scenario: E2E - Recommendation is closed when a new recommendation is created before SPO records a rationale
     Given a PO has created a recommendation to recall with:
-      | Indeterminate | No |
-      | Extended      | No |
+      | SentenceGroup | ADULT_SDS |
     And PO has created a Part A form without requesting SPO review with:
       | RecallType          | STANDARD   |
       | InCustody           | Yes Police |
@@ -55,8 +53,7 @@ Feature: Case closure scenarios
   @MRD-1940
   Scenario: E2E - When Extended sentence is Yes but Indeterminate is No
     Given a PO has created a recommendation to recall with:
-      | Indeterminate | No |
-      | Extended      | Yes |
+      | SentenceGroup | EXTENDED |
     And PO has created a Part A form without requesting SPO review with:
       | RecallType          | STANDARD   |
       | InCustody           | Yes Police |

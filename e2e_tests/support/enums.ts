@@ -1,3 +1,10 @@
+export enum SentenceGroup {
+  ADULT_SDS = 'ADULT_SDS',
+  INDETERMINATE = 'INDETERMINATE',
+  EXTENDED = 'EXTENDED',
+  YOUTH_SDS = 'YOUTH_SDS',
+}
+
 export enum YesNoType {
   'YES' = 'Yes',
   'NO' = 'No',
@@ -26,9 +33,10 @@ export enum IndeterminateRecallType {
 }
 
 export enum IndeterminateOrExtendedSentenceDetailType {
-  'BEHAVIOUR_SIMILAR_TO_INDEX_OFFENCE' = 'Has the offender exhibited behaviour similar to the circumstances surrounding the index offence; is there a causal link?',
-  'BEHAVIOUR_LEADING_TO_SEXUAL_OR_VIOLENT_OFFENCE' = 'Has the offender exhibited behaviour likely to give rise, or does give rise to the commission of a sexual or violent offence?',
-  'OUT_OF_TOUCH' = 'Is the offender out of touch with probation/YOT and the assumption can be made that any of (i) to (ii) may arise?',
+  'BEHAVIOUR_SIMILAR_TO_INDEX_OFFENCE' = 'Has the offender exhibited behaviour similar to the circumstances surrounding the index offence?',
+  'BEHAVIOUR_LEADING_TO_SEXUAL_OR_VIOLENT_OFFENCE' = 'Has the offender exhibited behaviour associated with the commission of a sexual or violent offence?',
+  'BEHAVIOUR_LIKELY_TO_RESULT_SEXUAL_OR_VIOLENT_OFFENCE' = 'Has the offender exhibited behaviour likely to give rise, or does give rise to  a sexual or violent offence?',
+  'OUT_OF_TOUCH' = 'Is the offender out of touch with probation or is their whereabouts unknown?',
 }
 
 export enum Vulnerabilities {
@@ -60,16 +68,15 @@ export enum ROSHLevels {
 }
 
 export enum LicenceConditions {
-  GOOD_BEHAVIOUR = 'be of good behaviour and not behave in a way which undermines the purpose of the licence period;',
-  NO_OFFENCE = 'not to commit any offence;',
-  KEEP_IN_TOUCH = 'keep in touch with the supervising officer in accordance with instructions given by the supervising officer;',
-  SUPERVISING_OFFICER_VISIT = 'receive visits from the supervising officer in accordance with instructions given by the supervising officer;',
-  ADDRESS_APPROVED = 'reside permanently at an address approved by the supervising officer and obtain prior permission of the supervising officer for any stay of one or more nights at a different address;',
-  NO_WORK_UNDERTAKEN = 'not undertake work, or a particular type of work, unless it is approved by the supervising officer and notify the supervising officer in advance of any proposal to undertake work or a particular type of work;',
-  NO_TRAVEL_OUTSIDE_UK = 'not to travel outside the United Kingdom, the Channel Islands or the Isle of Man except with the prior permission of your supervising officer or for the purpose of immigration deportation or removal.',
-  NAME_CHANGE = 'Tell your supervising officer if you use a name which is different to the name or names which appear on your licence.',
-  CONTACT_DETAILS = 'Tell your supervising officer if you change or add any contact details, including phone number or email.',
-  'NLC8|NSTT8' = 'To only attend places of worship which have been previously agreed with your supervising officer.',
+  GOOD_BEHAVIOUR = 'Be of good behaviour and not behave in a way which undermines the purpose of the licence period;',
+  NO_OFFENCE = 'Not to commit any offence;',
+  KEEP_IN_TOUCH = 'Keep in touch with the supervising officer in accordance with instructions given by the supervising officer;',
+  SUPERVISING_OFFICER_VISIT = 'Receive visits from the supervising officer in accordance with instructions given by the supervising officer;',
+  ADDRESS_APPROVED = 'Reside permanently at an address approved by the supervising officer and obtain prior permission of the supervising officer for any stay of one or more nights at a different address;',
+  NO_WORK_UNDERTAKEN = 'Not undertake work, or a particular type of work, unless it is approved by the supervising officer and notify the supervising officer in advance of any proposal to undertake work or a particular type of work;',
+  NO_TRAVEL_OUTSIDE_UK = 'Not to travel outside the United Kingdom, the Channel Islands or the Isle of Man except with the prior permission of your supervising officer or for the purpose of immigration deportation or removal.',
+  NAME_CHANGE = 'Tell your supervising officer if you use a name which is different to the name or names which appear on your licence',
+  CONTACT_DETAILS = 'Tell your supervising officer if you change or add any contact details, including phone number or email',
 }
 
 export enum WhyConsiderRecall {

@@ -3,6 +3,7 @@ import { CreateRecommendationRequest, UpdateRecommendationRequest, UpdateRecomme
 import * as OPTIONS from "./ppcs";
 import { RECOMMENDATION_STATUSES } from "../../utils/recommendations/recommendationStatuses";
 import { YESNONA } from "../../utils/standardTypes";
+import { SentenceGroup } from '../../support/enums'
 
 export const createRecommendationRequest: (crn: string) => CreateRecommendationRequest = (crn) => ({
         crn: crn, //TODO V2: toggle and crns for Dev/Pre prod that works for other services
@@ -32,8 +33,7 @@ export const initialRecomendationRequest: () => UpdateRecommendationRequest = ()
         })),
         allOptions: OPTIONS.alternativesToRecallTried
     },
-    isIndeterminateSentence: true,
-    isExtendedSentence: false,
+    sentenceGroup: SentenceGroup.INDETERMINATE,
     indeterminateSentenceType: {
         selected: faker.helpers.arrayElement(OPTIONS.indeterminateSentenceTypes).value,
         allOptions: OPTIONS.indeterminateSentenceTypes
@@ -48,7 +48,8 @@ export const startRecallRecommendationStatusRequest: () => UpdateRecommendationS
 
 export const postPORecallRecommendationRequest: () => UpdateRecommendationRequest = () => {
     const decisionDateTime = faker.date.recent(7) // Some time within the last week
-    const decisionDateTimeReduced = [
+  const govUkEmail = `${faker.internet.userName().toLowerCase()}@justice.gov.uk`
+  const decisionDateTimeReduced = [
         decisionDateTime.getFullYear(),
         decisionDateTime.getMonth() + 1,
         decisionDateTime.getDate(),
@@ -115,9 +116,7 @@ export const postPORecallRecommendationRequest: () => UpdateRecommendationReques
             allOptions: OPTIONS.YESNONAOptions
         },
         localPoliceContact: {
-            faxNumber: "",
             contactName: faker.name.fullName(),
-            phoneNumber: faker.phone.number(),
             emailAddress: faker.internet.email()
         },
         isUnderIntegratedOffenderManagement : {
@@ -136,7 +135,7 @@ export const postPORecallRecommendationRequest: () => UpdateRecommendationReques
         },
         whoCompletedPartA: {
             name: faker.name.fullName(),
-            email: faker.internet.email(),
+            email: govUkEmail,
             region: 'N54',
             telephone: faker.phone.number(),
             localDeliveryUnit: faker.lorem.word(),

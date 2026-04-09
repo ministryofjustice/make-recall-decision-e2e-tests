@@ -55,6 +55,12 @@ export default defineConfig({
       on('task', {
         readDocX,
       })
+
+      config.env = {
+        ...process.env,
+        ...config.env,
+      } 
+
       return config
     },
     baseUrl: 'http://localhost:3000',

@@ -1,4 +1,4 @@
-import { Given, Then, DataTable, When } from '@badeball/cypress-cucumber-preprocessor'
+import { DataTable, Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import { faker } from '@faker-js/faker/locale/en_GB'
 import { proxy } from '@alfonso-presa/soft-assert'
 import {
@@ -17,20 +17,22 @@ import {
 import { crns, deleteOpenRecommendation } from './index'
 
 import {
+  ApptOptions,
+  CustodyType,
   IndeterminateOrExtendedSentenceDetailType,
   IndeterminateRecallType,
   NonIndeterminateRecallType,
-  YesNoType,
-  CustodyType,
-  YesNoNAType,
-  Vulnerabilities,
-  ROSHLevels,
-  WhyConsiderRecall,
-  ApptOptions,
   Regions,
+  ROSHLevels,
+  SentenceGroup,
+  Vulnerabilities,
+  WhyConsiderRecall,
+  YesNoNAType,
+  YesNoType,
 } from '../support/enums'
-import { formatDateToCompletedDocumentFormat } from '../utils'
+import { formatCurrentDateToCompletedDocumentFormat } from '../utils'
 import { randomiseCriteria } from '../utils/test_data/utils'
+import { signOut } from './user/user'
 
 const expectSoftly = proxy(expect)
 
@@ -38,99 +40,57 @@ const expectSoftly = proxy(expect)
 let testData: Record<string, any> = {}
 let currentPage
 
-export const makeRecommendation = function (crn, recommendationDetails?: Record<string, string>) {
-  testData = {
-    licenceConditions: { standard: [], advanced: [] },
-    alternativesTried: [],
-    vulnerabilities: [],
-  }
+function completeTriggerLeadingToRecallConsideration(offenderName: string) {
+  testData.recallReason = faker.hacker.phrase()
+  cy.fillInput(`What has made you consider recalling ${offenderName}`, testData.recallReason)
+  cy.clickButton('Continue')
+}
 
-  cy.clickLink('Start now')
-  cy.clickLink('Search by case reference number (CRN)')
-  cy.fillInputByName('crn', crn)
-  cy.clickButton('Search')
-  // get offender name for use in subsequent pages
-  cy.get(`[data-qa="row-${crn}"] [data-qa="name"]`)
-    .first()
-    .click()
-    .invoke('text')
-    .as('offenderName')
-    .then(offenderName => {
-      deleteOpenRecommendation()
-      // Create a new recommendation - START
-      cy.clickLink('Make a recommendation')
-      cy.clickButton('Continue')
-      cy.clickLink(`What has made you consider recalling ${offenderName}`)
-      testData.recallReason = faker.hacker.phrase()
-      cy.fillInput(`What has made you consider recalling ${offenderName}`, testData.recallReason)
-      cy.clickButton('Continue')
-      cy.clickLink(`How has ${offenderName} responded to probation so far`)
-      testData.probationResponse = faker.hacker.phrase()
-      cy.fillInput(`How has ${offenderName} responded to probation so far`, testData.probationResponse)
-      cy.clickButton('Continue')
-      cy.clickLink(`What licence conditions has ${offenderName} breached`)
-      // select all standard recommendation if recommendationDetails.LicenceConditions === 'all' passed else choose a few randomly
-      cy.get('input[id^=standard-]').then(standardLicenceConditions => {
-        const stdConditions =
-          recommendationDetails?.LicenceConditions?.toLowerCase() === 'all'
-            ? standardLicenceConditions.toArray()
-            : faker.helpers.arrayElements(standardLicenceConditions.toArray())
-        stdConditions.forEach(htmlElement => {
-          htmlElement.click()
-          testData.licenceConditions.standard.push(htmlElement.getAttribute('value').replace('standard|', ''))
-        })
-      })
-      // select additional licence randomly or if recommendationDetails.LicenceConditions === 'all' is passed
-      if (faker.datatype.boolean() || (recommendationDetails?.LicenceConditions?.length ?? 0 !== 0)) {
-        cy.get('body').then($body => {
-          if ($body.find('input[id^=additional-]').length !== 0) {
-            cy.get('input[id^=additional-]').then(advancedLicenceConditions => {
-              const addConditions =
-                recommendationDetails?.LicenceConditions?.toLowerCase() === 'all'
-                  ? advancedLicenceConditions.toArray()
-                  : faker.helpers.arrayElements(advancedLicenceConditions.toArray())
-              addConditions.forEach(htmlElement => {
-                htmlElement.click()
-                cy.wrap(htmlElement)
-                  .next('label')
-                  .next('div')
-                  .invoke('text')
-                  .then(text => {
-                    testData.licenceConditions.advanced.push(
-                      text
-                        .replace(/\n/g, '')
-                        .replace(/\s{2,}/g, '')
-                        .replace('Notes', 'Note: ')
-                        .trim()
-                    )
-                  })
+function completeLicenceConditions(recommendationDetails: Record<string, string>) {
+  // select all standard recommendation if recommendationDetails.LicenceConditions === 'all' passed else choose a few randomly
+  cy.get('input[id^=standard-]').then(standardLicenceConditions => {
+    const stdConditions =
+      recommendationDetails?.LicenceConditions?.toLowerCase() === 'all'
+        ? standardLicenceConditions.toArray()
+        : faker.helpers.arrayElements(standardLicenceConditions.toArray())
+    stdConditions.forEach(htmlElement => {
+      htmlElement.click()
+      testData.licenceConditions.standard.push(htmlElement.getAttribute('value').replace('standard|', ''))
+    })
+  })
+  // select additional licence randomly or if recommendationDetails.LicenceConditions === 'all' is passed
+  if (faker.datatype.boolean() || (recommendationDetails?.LicenceConditions?.length ?? 0) !== 0) {
+    cy.get('body').then($body => {
+      if ($body.find('input[id^=additional-]').length !== 0) {
+        cy.get('input[id^=additional-]').then(advancedLicenceConditions => {
+          const addConditions =
+            recommendationDetails?.LicenceConditions?.toLowerCase() === 'all'
+              ? advancedLicenceConditions.toArray()
+              : faker.helpers.arrayElements(advancedLicenceConditions.toArray())
+          addConditions.forEach(htmlElement => {
+            htmlElement.click()
+            cy.wrap(htmlElement)
+              .next('label')
+              .next('div')
+              .invoke('text')
+              .then(text => {
+                testData.licenceConditions.advanced.push(
+                  text
+                    .replace(/\n/g, '')
+                    .replace(/\s{2,}/g, '')
+                    .replace('Notes', 'Note: ')
+                    .trim()
+                )
               })
-            })
-          }
+          })
         })
-      }
-      cy.clickButton('Continue')
-      // Select if offender is on indeterminate sentence
-      cy.clickLink(`Is ${offenderName} on an indeterminate sentence`)
-      testData.indeterminate = recommendationDetails?.Indeterminate
-        ? recommendationDetails.Indeterminate.toString().toUpperCase()
-        : faker.helpers.arrayElement(Object.keys(YesNoType))
-      cy.selectRadioByValue(`Is ${offenderName} on an indeterminate sentence`, testData.indeterminate)
-      cy.clickButton('Continue')
-      testData.extended = recommendationDetails?.Extended
-        ? recommendationDetails.Extended.toString().toUpperCase()
-        : faker.helpers.arrayElement(Object.keys(YesNoType))
-      cy.selectRadioByValue(`Is ${offenderName} on an extended sentence`, testData.extended)
-      cy.clickButton('Continue')
-      if (recommendationDetails?.Indeterminate.toString().toUpperCase() === 'YES') {
-        testData.TypeOfSentence = recommendationDetails?.TypeOfSentence
-          ? recommendationDetails.TypeOfSentence.toString().toUpperCase()
-          : faker.helpers.arrayElement(['LIFE', 'IPP', 'DPP'])
-        cy.selectRadioByValue(`What type of sentence is ${offenderName} on`, testData.TypeOfSentence)
-        cy.clickButton('Continue')
       }
     })
-  cy.clickLink(`What alternatives to recall have been tried already`)
+  }
+  cy.clickButton('Continue')
+}
+
+function completeAlternativesTried(recommendationDetails: Record<string, string>) {
   const alternativesTried = recommendationDetails?.AlternativesTried
   if (['All', 'Some'].includes(alternativesTried)) {
     cy.get('.govuk-checkboxes input:not([data-behaviour="exclusive"])').then(alternatives => {
@@ -139,8 +99,8 @@ export const makeRecommendation = function (crn, recommendationDetails?: Record<
       selectAlternativesTried(htmlElements)
     })
   } else if (alternativesTried === 'None') {
-    cy.get(`.govuk-checkboxes input[value="${alternativesTried.toUpperCase()}"]`).then(vulnerabilities => {
-      cy.wrap(vulnerabilities).click()
+    cy.get(`.govuk-checkboxes input[value="${alternativesTried.toUpperCase()}"]`).then(alternatives => {
+      cy.wrap(alternatives).click()
       testData.alternativesTried.push(alternativesTried)
     })
   } else {
@@ -167,26 +127,159 @@ export const makeRecommendation = function (crn, recommendationDetails?: Record<
     })
   }
   cy.clickButton('Continue')
+}
+
+function completeSentenceInformation(recommendationDetails: Record<string, string>, offenderName: string) {
+  testData.sentenceGroup = recommendationDetails?.SentenceGroup
+    ? recommendationDetails.SentenceGroup
+    : faker.helpers.arrayElement(Object.values(SentenceGroup))
+  cy.selectRadioByValue(`Which sentence group does ${offenderName}'s sentence type fall into?`, testData.sentenceGroup)
+  cy.clickButton('Continue')
+}
+
+function completeIndeterminateSentenceType(recommendationDetails: Record<string, string>, offenderName: string) {
+  testData.TypeOfSentence = recommendationDetails?.TypeOfSentence
+    ? recommendationDetails.TypeOfSentence.toString().toUpperCase()
+    : faker.helpers.arrayElement(['LIFE', 'IPP', 'DPP', 'DHMP'])
+  cy.selectRadioByValue(`What type of sentence is ${offenderName} on`, testData.TypeOfSentence)
+  cy.clickButton('Continue')
+}
+
+export const makeRecommendation = function (crn, recommendationDetails?: Record<string, string>) {
+  testData = {
+    licenceConditions: { standard: [], advanced: [] },
+    alternativesTried: [],
+    vulnerabilities: [],
+  }
+
+  cy.clickLink('Start now')
+  cy.clickLink('Search by case reference number (CRN)')
+  testData.crn = crn
+  cy.fillInputByName('crn', crn)
+  cy.clickButton('Search')
+  // get offender name for use in subsequent pages
+  cy.get(`[data-qa="row-${crn}"] [data-qa="name"]`)
+    .first()
+    .click()
+    .invoke('text')
+    .as('offenderName')
+    .then(offenderName => {
+      deleteOpenRecommendation()
+      // Create a new recommendation - START
+      cy.clickLink('Make a recommendation')
+      cy.clickButton('Continue')
+
+      cy.clickLink(`What has made you consider recalling ${offenderName}`)
+      completeTriggerLeadingToRecallConsideration(offenderName)
+
+      completeLicenceConditions(recommendationDetails)
+
+      completeAlternativesTried(recommendationDetails)
+
+      completeSentenceInformation(recommendationDetails, offenderName)
+      if (testData.sentenceGroup === SentenceGroup.INDETERMINATE) {
+        completeIndeterminateSentenceType(recommendationDetails, offenderName)
+      }
+    })
+
   cy.wrap(testData).as('testData')
   cy.clickButton('Continue')
   cy.logPageTitle('Record the consideration in NDelius')
   cy.clickButton('Send to NDelius')
 }
 
-const selectVulnerabilities = function (htmlElements: HTMLElement[]) {
-  htmlElements.forEach(htmlElement => {
-    htmlElement.click()
-    const vulnerabilityName = htmlElement.getAttribute('value')
-    const vulnerabilityNotes = faker.hacker.phrase()
-    cy.get(`textarea#vulnerabilitiesDetail-${vulnerabilityName}`).type(vulnerabilityNotes)
-    cy.wrap(htmlElement)
-      .next('label')
-      .invoke('text')
-      .then(text => {
-        testData.vulnerabilities.push({ vulnerabilityName: text.trim(), vulnerabilityNotes })
-      })
-  })
+function selectVulnerabilities(selectedVulnerabilities: Vulnerabilities[], offenderName: string) {
+  cy.pageHeading().should(
+    'equal',
+    `Consider if this recall could affect any vulnerabilities or needs ${offenderName} may have`
+  )
+  cy.logPageTitle(`Consider if this recall could affect any vulnerabilities or needs ${offenderName} may have`)
+  Object.entries(Vulnerabilities)
+    .filter(vu => selectedVulnerabilities.includes(vu[1]))
+    .forEach(selectedVulnerabilityEntry => {
+      const selectedVulnerabilityId = selectedVulnerabilityEntry[0]
+      const selectedVulnerabilityDescription = selectedVulnerabilityEntry[1]
+      if (['NONE', 'NOT_KNOWN'].includes(selectedVulnerabilityId)) {
+        cy.get('.govuk-checkboxes input[value="NONE_OR_NOT_KNOWN"]').then(vulnerabilities => {
+          cy.wrap(vulnerabilities).click()
+        })
+        cy.get(`.govuk-radios input[value="${selectedVulnerabilityId}"]`).then(vulnerabilities => {
+          cy.wrap(vulnerabilities).click()
+        })
+      } else {
+        cy.get(`.govuk-checkboxes input[value="${selectedVulnerabilityId}"]`).then(vulnerabilities => {
+          cy.wrap(vulnerabilities).click()
+        })
+      }
+      testData.vulnerabilities.push(Vulnerabilities[selectedVulnerabilityDescription])
+    })
+  cy.clickButton('Continue')
 }
+
+function enterVulnerabilityDetails(selectedVulnerabilities: Vulnerabilities[]) {
+  cy.pageHeading().should('equal', 'Give details about the vulnerabilities or needs you have identified')
+  cy.logPageTitle('Give details about the vulnerabilities or needs you have identified')
+
+  cy.get('.govuk-textarea').should('have.length', selectedVulnerabilities.length)
+
+  Object.entries(Vulnerabilities)
+    .filter(vu => selectedVulnerabilities.includes(vu[1]))
+    .forEach(selectedVulnerabilityEntry => {
+      const selectedVulnerabilityId = selectedVulnerabilityEntry[0]
+      const selectedVulnerabilityDescription = selectedVulnerabilityEntry[1]
+      const vulnerabilityDetails = faker.hacker.phrase()
+      cy.get(`#vulnerabilitiesDetails-${selectedVulnerabilityId}`).type(vulnerabilityDetails)
+
+      const indexOfRecordedVulnerability = (
+        testData.vulnerabilities as {
+          vulnerabilityName: string
+        }[]
+      ).indexOf({ vulnerabilityName: selectedVulnerabilityDescription })
+      testData.vulnerabilities[indexOfRecordedVulnerability] = {
+        vulnerabilityName: selectedVulnerabilityDescription,
+        vulnerabilityNotes: vulnerabilityDetails,
+      }
+    })
+
+  cy.clickButton('Save and continue')
+}
+
+function completeVulnerabilitiesSection(partADetails: Record<string, string>, offenderName: string) {
+  const vulnerability = partADetails?.Vulnerabilities
+  const exclusiveVulnerabilities = [Vulnerabilities.NONE, Vulnerabilities.NOT_KNOWN]
+  const inclusiveVulnerabilities = Object.values(Vulnerabilities).filter(vu => !exclusiveVulnerabilities.includes(vu))
+
+  let requestedVulnerabilityOption = vulnerability
+  if (!requestedVulnerabilityOption) {
+    const selectExclusiveVulnerability = faker.datatype.boolean()
+    requestedVulnerabilityOption = selectExclusiveVulnerability
+      ? faker.helpers.arrayElement(['None', 'Not known'])
+      : 'Some'
+  }
+
+  const selectedVulnerabilities: Vulnerabilities[] = (function () {
+    switch (requestedVulnerabilityOption) {
+      case 'All':
+        return inclusiveVulnerabilities
+      case 'Some':
+        return faker.helpers.arrayElements(inclusiveVulnerabilities)
+      case 'None':
+        return [Vulnerabilities.NONE]
+      case 'Not known':
+        return [Vulnerabilities.NOT_KNOWN]
+      default:
+        throw new Error(`Unhandled case: ${requestedVulnerabilityOption}`)
+    }
+  })()
+
+  cy.clickLink('Consider if recall could affect vulnerabilities or needs')
+  selectVulnerabilities(selectedVulnerabilities, offenderName)
+
+  if (selectedVulnerabilities.some(selectedVulnerability => inclusiveVulnerabilities.includes(selectedVulnerability))) {
+    enterVulnerabilityDetails(selectedVulnerabilities)
+  }
+}
+
 function selectAlternativesTried(htmlElements: HTMLElement[]) {
   htmlElements.forEach(htmlElement => {
     htmlElement.click()
@@ -199,97 +292,152 @@ function selectAlternativesTried(htmlElements: HTMLElement[]) {
 
 const createPartAOrNoRecallLetter = function (partADetails?: Record<string, string>) {
   cy.log(`testData before Part A creation--> ${JSON.stringify(testData)}`)
-  if (testData.indeterminate === 'NO' && testData.extended === 'YES') {
+  if (testData.sentenceGroup === SentenceGroup.EXTENDED) {
     testData.recallType = partADetails?.RecallType
       ? partADetails.RecallType.toString().toUpperCase()
       : faker.helpers.arrayElement(Object.keys(NonIndeterminateRecallType))
     cy.logPageTitle('What do you recommend?')
-    cy.selectRadioByValue('What do you recommend', testData.recallType)
+    cy.selectRadioByValue('Select your recommendation', testData.recallType)
     cy.clickButton('Continue')
     if (testData.recallType !== 'NO_RECALL') {
-      cy.title().then($title => {
-        if ($title.match('Is this an emergency recall?')) {
-          cy.logPageTitle('Is this an emergency recall?')
-          testData.emergencyRecall = partADetails?.EmergencyRecall
-            ? partADetails.EmergencyRecall.toString().toUpperCase()
-            : faker.helpers.arrayElement(Object.keys(YesNoType))
-          cy.selectRadioByValue('Is this an emergency recall', testData.emergencyRecall)
-          cy.clickButton('Continue')
-        }
-      })
       cy.logPageTitle('Indeterminate and extended sentences')
       testData.indeterminateAndExtendedSentencesCriteria = 'BEHAVIOUR_LEADING_TO_SEXUAL_OR_VIOLENT_OFFENCE'
       cy.get('input[type="checkbox"]').check(testData.indeterminateAndExtendedSentencesCriteria)
-      testData.indeterminatANDExtendedSentences = faker.hacker.phrase()
+      testData.indeterminateANDExtendedSentences = faker.hacker.phrase()
       cy.get(
         `#indeterminateOrExtendedSentenceDetailsDetail-${testData.indeterminateAndExtendedSentencesCriteria}`
-      ).type(testData.indeterminatANDExtendedSentences)
+      ).type(testData.indeterminateANDExtendedSentences)
     }
+    cy.clickButton('Continue')
+    cy.logPageTitle('Is this an emergency recall?')
+    testData.emergencyRecall = partADetails?.EmergencyRecall
+      ? partADetails.EmergencyRecall.toString().toUpperCase()
+      : faker.helpers.arrayElement(Object.keys(YesNoType))
+    cy.selectRadioByValue('Is this an emergency recall', testData.emergencyRecall)
     cy.clickButton('Continue')
     cy.logPageTitle('Sensitive Information')
     cy.clickLink('Continue')
-  } else if (testData.indeterminate === 'NO' && testData.extended === 'NO') {
+  } else if (
+    testData.sentenceGroup !== SentenceGroup.INDETERMINATE &&
+    testData.sentenceGroup !== SentenceGroup.EXTENDED
+  ) {
     testData.recallType = partADetails?.RecallType
       ? partADetails.RecallType.toString().toUpperCase()
       : faker.helpers.arrayElement(Object.keys(NonIndeterminateRecallType))
+
+    if (testData.sentenceGroup === SentenceGroup.ADULT_SDS) {
+      cy.logPageTitle('Check MAPPA Information')
+      cy.clickButton('Continue')
+    }
+
     cy.logPageTitle('Suitability for fixed term recall')
-    testData.suitabilityForfixedTermRecall = randomiseCriteria<{
-      isSentence48MonthsOrOver: string
-      isUnder18: string
-      isMappaCategory4: string
-      isMappaLevel2Or3: string
-      isRecalledOnNewChargedOffence: string
-      isServingFTSentenceForTerroristOffence: string
-      hasBeenChargedWithTerroristOrStateThreatOffence: string
-    }>(
-      [
-        { key: 'isSentence48MonthsOrOver', generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)) },
-        { key: 'isUnder18', generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)) },
-        { key: 'isMappaCategory4', generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)) },
-        { key: 'isMappaLevel2Or3', generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)) },
-        { key: 'isRecalledOnNewChargedOffence', generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)) },
-        {
-          key: 'isServingFTSentenceForTerroristOffence',
-          generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
-        },
-        {
-          key: 'hasBeenChargedWithTerroristOrStateThreatOffence',
-          generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
-        },
-      ],
-      testData.recallType !== 'STANDARD'
-        ? () => true
-        : criteria => Object.keys(criteria).some(k => criteria[k] === 'YES' ?? false)
-    )
-    cy.selectRadioByValue(
-      `Is ${this.offenderName}'s sentence 48 months or over?`,
-      testData.suitabilityForfixedTermRecall.isSentence48MonthsOrOver
-    )
-    cy.selectRadioByValue(`Is ${this.offenderName} under 18?`, testData.suitabilityForfixedTermRecall.isUnder18)
-    cy.selectRadioByValue(
-      `Is ${this.offenderName} in MAPPA category 4?`,
-      testData.suitabilityForfixedTermRecall.isMappaCategory4
-    )
-    cy.selectRadioByValue(
-      `Is ${this.offenderName}'s MAPPA level 2 or 3?`,
-      testData.suitabilityForfixedTermRecall.isMappaLevel2Or3
-    )
-    cy.selectRadioByValue(
-      `Is ${this.offenderName} being recalled on a new charged offence?`,
-      testData.suitabilityForfixedTermRecall.isRecalledOnNewChargedOffence
-    )
-    cy.selectRadioByValue(
-      `Is ${this.offenderName} serving a fixed term sentence for a terrorist offence?`,
-      testData.suitabilityForfixedTermRecall.isServingFTSentenceForTerroristOffence
-    )
-    cy.selectRadioByValue(
-      `Has ${this.offenderName} been charged with a terrorist or state threat offence?`,
-      testData.suitabilityForfixedTermRecall.hasBeenChargedWithTerroristOrStateThreatOffence
-    )
+
+    if (testData.sentenceGroup === SentenceGroup.ADULT_SDS) {
+      testData.suitabilityForfixedTermRecall = randomiseCriteria<{
+        isChargedWithOffence: string
+        isServingTerroristOrNationalSecurityOffence: string
+        isAtRiskOfInvolvedInForeignPowerThreat: string
+        wasReferredToParoleBoard244ZB: string
+        wasRepatriatedForMurder: string
+        isServingSOPCSentence: string
+        isServingDCRSentence: string
+      }>(
+        [
+          {
+            key: 'isChargedWithOffence',
+            generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+          },
+          {
+            key: 'isServingTerroristOrNationalSecurityOffence',
+            generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+          },
+          {
+            key: 'isAtRiskOfInvolvedInForeignPowerThreat',
+            generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+          },
+          {
+            key: 'wasReferredToParoleBoard244ZB',
+            generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+          },
+          {
+            key: 'wasRepatriatedForMurder',
+            generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+          },
+          {
+            key: 'isServingSOPCSentence',
+            generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+          },
+          {
+            key: 'isServingDCRSentence',
+            generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+          },
+        ],
+        testData.recallType !== 'STANDARD'
+          ? criteria => Object.keys(criteria).every(k => criteria[k] === 'NO')
+          : criteria => Object.keys(criteria).some(k => criteria[k] === 'YES')
+      )
+      cy.selectRadioByValue(
+        `Is ${this.offenderName} being recalled because of being charged with an offence?`,
+        testData.suitabilityForfixedTermRecall.isChargedWithOffence
+      )
+      cy.selectRadioByValue(
+        `Is ${this.offenderName} serving a sentence for a terrorist or national security offence?`,
+        testData.suitabilityForfixedTermRecall.isServingTerroristOrNationalSecurityOffence
+      )
+      cy.selectRadioByValue(
+        `Is ${this.offenderName} considered to be a person at risk of being involved in foreign power threat activity?`,
+        testData.suitabilityForfixedTermRecall.isAtRiskOfInvolvedInForeignPowerThreat
+      )
+      cy.selectRadioByValue(
+        `Was ${this.offenderName} referred to the Parole Board under section 244ZB (power to detain) on this sentence?`,
+        testData.suitabilityForfixedTermRecall.wasReferredToParoleBoard244ZB
+      )
+      cy.selectRadioByValue(
+        `Has ${this.offenderName} been repatriated to the UK following a sentence for murder?`,
+        testData.suitabilityForfixedTermRecall.wasRepatriatedForMurder
+      )
+      cy.selectRadioByValue(
+        `Is ${this.offenderName} serving a Sentence for offenders of particular concern (SOPC)?`,
+        testData.suitabilityForfixedTermRecall.isServingSOPCSentence
+      )
+      cy.selectRadioByValue(
+        `Is ${this.offenderName} serving a Discretionary conditional release (DCR) sentence?`,
+        testData.suitabilityForfixedTermRecall.isServingDCRSentence
+      )
+    } else if (testData.sentenceGroup === SentenceGroup.YOUTH_SDS) {
+      testData.suitabilityForfixedTermRecall = randomiseCriteria<{
+        isYouthSentenceOver12Months: string
+        isYouthChargedWithSeriousOffence: string
+      }>(
+        [
+          {
+            key: 'isYouthSentenceOver12Months',
+            generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+          },
+          {
+            key: 'isYouthChargedWithSeriousOffence',
+            generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+          },
+        ],
+        testData.recallType !== 'STANDARD'
+          ? criteria => Object.keys(criteria).every(k => criteria[k] === 'NO')
+          : criteria => Object.keys(criteria).some(k => criteria[k] === 'YES')
+      )
+
+      cy.selectRadioByValue(
+        `Is ${this.offenderName}'s sentence 12 months or over?`,
+        testData.suitabilityForfixedTermRecall.isYouthSentenceOver12Months
+      )
+      cy.selectRadioByValue(
+        `Is ${this.offenderName} being recalled because of being charged with a serious offence?`,
+        testData.suitabilityForfixedTermRecall.isYouthChargedWithSeriousOffence
+      )
+    }
+
     cy.clickButton('Continue')
     cy.logPageTitle('What do you recommend?')
     cy.selectRadioByValue('Select your recommendation', testData.recallType)
-    if (testData.recallType !== 'NO_RECALL') {
+    if (testData.recallType === 'STANDARD' && testData.sentenceGroup === SentenceGroup.YOUTH_SDS) {
       testData.partARecallReason = faker.hacker.phrase()
       cy.get(
         `#recallTypeDetails${testData.recallType
@@ -322,7 +470,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
       ? partADetails.RecallType.toString().toUpperCase()
       : faker.helpers.arrayElement(Object.keys(IndeterminateRecallType))
     cy.logPageTitle('What do you recommend?')
-    cy.selectRadioByValue('What do you recommend', testData.recallType)
+    cy.selectRadioByValue('Select your recommendation', testData.recallType)
     cy.clickButton('Continue')
     if (testData.recallType === 'EMERGENCY') {
       testData.emergencyRecall = YesNoType.YES.toUpperCase()
@@ -355,12 +503,10 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
   currentPage = `Is ${this.offenderName} in custody now`
   cy.logPageTitle(`${currentPage}?`)
   cy.selectRadioByValue(currentPage, testData.inCustody)
-  if (testData.inCustody === 'YES_POLICE') {
-    testData.custodyAddress = faker.address.streetAddress(true)
-    cy.get('#custodyStatusDetailsYesPolice').type(testData.custodyAddress)
-  }
   cy.clickButton('Continue')
   cy.clickLink('Continue') // Share with a case admin
+
+  // Task list
   cy.clickLink(`When did the SPO agree this recall?`)
   cy.logPageTitle('When did the SPO agree this recall?')
   testData.recallDateBySPO = faker.date.recent(7)
@@ -383,6 +529,9 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
     testData.offenderDetails = offenderDetails
   })
   cy.clickLink('Continue')
+  cy.clickLink(`Release details`)
+  cy.logPageTitle('Previous releases')
+  cy.clickButton('Continue')
   cy.clickLink(`Offence details`)
   cy.logPageTitle('Offence details')
   cy.getOffenceDetails().then(det => {
@@ -393,57 +542,6 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
   cy.logPageTitle('Offence analysis')
   testData.offenceAnalysis = faker.hacker.phrase()
   cy.get(`#offenceAnalysis`).type(testData.offenceAnalysis)
-  cy.clickButton('Continue')
-  cy.clickLink(`Previous releases`)
-  cy.logPageTitle('Previous releases')
-  // ECSL change
-  testData.releasedUnderECSL = faker.helpers.arrayElement(Object.keys(YesNoType))
-  if (testData.releasedUnderECSL === 'NO') {
-    cy.get('[type="radio"]').check('NO')
-  } else {
-    cy.get('[type="radio"]').check('YES')
-    testData.ecslDateOfRelease = faker.date.past(1)
-    cy.enterDateTime({
-      day: testData.ecslDateOfRelease.getDate().toString(),
-      month: (testData.ecslDateOfRelease.getMonth() + 1).toString(),
-      year: testData.ecslDateOfRelease.getFullYear().toString(),
-    })
-    testData.conditionalReleaseDate = faker.date.past(3)
-    cy.enterDateForCRD({
-      day: testData.conditionalReleaseDate.getDate().toString(),
-      month: (testData.conditionalReleaseDate.getMonth() + 1).toString(),
-      year: testData.conditionalReleaseDate.getFullYear().toString(),
-    })
-  }
-  if (partADetails?.PreviousReleases) {
-    const previousReleases = partADetails?.PreviousReleases.split(',').map(s => s.trim())
-    previousReleases.forEach(previousRelease => {
-      const dateParts = previousRelease.split('-').map(s => s.trim())
-      const releaseDay = { day: dateParts[0], month: dateParts[1], year: dateParts[2] }
-      cy.clickLink(`Add a previous release`)
-      cy.enterDateTime(releaseDay)
-      cy.clickButton('Continue')
-    })
-  }
-  cy.getPreviousReleases().then(previousReleases => {
-    Object.assign(testData.offenderDetails, previousReleases)
-  })
-  cy.clickButton('Continue')
-  cy.clickLink(`Previous recalls`)
-  cy.logPageTitle('Previous recalls')
-  if (partADetails?.PreviousRecalls) {
-    const previousRecalls = partADetails?.PreviousRecalls.split(',').map(s => s.trim())
-    previousRecalls.forEach(previousRelease => {
-      const dateParts = previousRelease.split('-').map(s => s.trim())
-      const recallDay = { day: dateParts[0], month: dateParts[1], year: dateParts[2] }
-      cy.clickLink(`Add a previous recall`)
-      cy.enterDateTime(recallDay)
-      cy.clickButton('Continue')
-    })
-  }
-  cy.getPreviousRecalls().then(previousRecallDates => {
-    testData.offenderDetails.previousRecallDates = previousRecallDates.join()
-  })
   cy.clickButton('Continue')
   if (!['YES_POLICE', 'YES_PRISON'].includes(testData.inCustody)) {
     cy.clickLink(`Address`)
@@ -457,45 +555,9 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
     }
     cy.clickButton('Continue')
   }
-  cy.clickLink(`Would recall affect vulnerability or additional needs`)
-  cy.logPageTitle('Would recall affect vulnerability or additional needs?')
-  const vulnerability = partADetails?.Vulnerabilities
-  if (['All', 'Some'].includes(vulnerability)) {
-    cy.get('.govuk-checkboxes input:not([data-behaviour="exclusive"])').then(vulnerabilities => {
-      const htmlElements =
-        vulnerability === 'All' ? vulnerabilities.toArray() : faker.helpers.arrayElements(vulnerabilities.toArray())
-      selectVulnerabilities(htmlElements)
-    })
-  } else if (['None', 'Not known'].includes(vulnerability)) {
-    const vulnerabilityName = Object.entries(Vulnerabilities).find(vu => vu.includes(vulnerability))[0]
-    cy.get(`.govuk-checkboxes input[value="${vulnerabilityName}"]`).then(vulnerabilities => {
-      cy.wrap(vulnerabilities).click()
-      testData.vulnerabilities.push(Vulnerabilities[vulnerabilityName])
-    })
-  } else {
-    cy.get(
-      `.govuk-checkboxes ${faker.helpers.arrayElement([
-        'input:not([data-behaviour="exclusive"])',
-        'input[data-behaviour="exclusive"]',
-      ])}`
-    ).then(vulnerabilities => {
-      if (vulnerabilities.length === 2) {
-        const htmlElement = faker.helpers.arrayElement(vulnerabilities.toArray())
-        htmlElement.click()
-        testData.vulnerabilities.length = 0
-        cy.wrap(htmlElement)
-          .next('label')
-          .invoke('text')
-          .then(text => {
-            testData.vulnerabilities.push(text.trim())
-          })
-      } else {
-        const htmlElements = faker.helpers.arrayElements(vulnerabilities.toArray())
-        selectVulnerabilities(htmlElements)
-      }
-    })
-  }
-  cy.clickButton('Continue')
+
+  completeVulnerabilitiesSection(partADetails, this.offenderName)
+
   currentPage = 'Are there any victims in the victim contact scheme'
   cy.clickLink(currentPage)
   cy.logPageTitle(`${currentPage}?`)
@@ -518,7 +580,6 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
   cy.logPageTitle('Local police contact details')
   testData.localPoliceDetails = {}
   cy.fillInput('Police contact name', (testData.localPoliceDetails.contact = faker.name.fullName()))
-  cy.fillInput('Telephone number', (testData.localPoliceDetails.phoneNumber = '01277 960 001'))
   cy.fillInput('Email address', (testData.localPoliceDetails.email = faker.internet.email()))
   cy.clickButton('Continue')
   if (!['YES_POLICE', 'YES_PRISON'].includes(testData.inCustody)) {
@@ -533,14 +594,6 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
       cy.get('#hasArrestIssuesDetailsYes').type((testData.arrestIssueDetails = faker.hacker.phrase()))
     cy.clickButton('Continue')
   }
-  currentPage = `Is ${this.offenderName} under Integrated Offender Management (IOM)`
-  cy.clickLink(currentPage)
-  cy.logPageTitle(`${currentPage}?`)
-  testData.iom = partADetails?.IOM
-    ? partADetails.IOM.toString().replace(' ', '_').toUpperCase()
-    : faker.helpers.arrayElement(Object.keys(YesNoNAType))
-  cy.selectRadioByValue(currentPage, testData.iom)
-  cy.clickButton('Continue')
   currentPage = `Do you think ${this.offenderName} is using recall to bring contraband into prison`
   cy.clickLink(currentPage)
   cy.logPageTitle(`${currentPage}?`)
@@ -596,16 +649,24 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
     }
   })
   cy.clickLink('Continue')
-  currentPage = 'Who completed this Part A?'
-  updateContactInformation(currentPage)
-  currentPage = 'Where should the revocation order be sent?'
-  updateContactInformation(currentPage)
-  currentPage = 'Where should PPCS respond with questions?'
-  updateContactInformation(currentPage)
+  completeContactInformationForPartA()
 }
 
 const createDNTRLetter = function () {
-  cy.clickLink('Why you considered recall')
+  cy.clickLink(`MAPPA information to assess recall type`)
+  cy.clickButton('Continue')
+  cy.clickLink(`When did the SPO agree this recall?`)
+  cy.logPageTitle('When did the SPO agree this recall?')
+  testData.recallDateBySPO = faker.date.recent(7)
+  cy.enterDateTime({
+    day: testData.recallDateBySPO.getDate().toString(),
+    month: (testData.recallDateBySPO.getMonth() + 1).toString(),
+    year: testData.recallDateBySPO.getFullYear().toString(),
+    hour: testData.recallDateBySPO.getHours().toString(),
+    minute: testData.recallDateBySPO.getMinutes().toString(),
+  })
+  cy.clickButton('Continue')
+  cy.clickLink('Explain why you considered recall')
   cy.selectRadio(
     'Why you considered recall',
     (testData.whyRecall = faker.helpers.arrayElement(Object.values(WhyConsiderRecall)))
@@ -654,65 +715,85 @@ const createDNTRLetter = function () {
 
 const recordPoDecision = function (poDecision?: string) {
   this.testData.poDecision = poDecision || faker.helpers.arrayElement(Object.keys(NonIndeterminateRecallType))
-  if (testData.indeterminate === 'NO' && testData.extended === 'NO') {
+  if (testData.sentenceGroup === SentenceGroup.ADULT_SDS) {
+    cy.logPageTitle('Check MAPPA Information')
+    cy.clickButton('Continue')
     cy.logPageTitle('Suitability for fixed term recall')
     testData.suitabilityForfixedTermRecall = randomiseCriteria<{
-      isSentence48MonthsOrOver: string
-      isUnder18: string
-      isMappaCategory4: string
-      isMappaLevel2Or3: string
-      isRecalledOnNewChargedOffence: string
-      isServingFTSentenceForTerroristOffence: string
-      hasBeenChargedWithTerroristOrStateThreatOffence: string
+      isChargedWithOffence: string
+      isServingTerroristOrNationalSecurityOffence: string
+      isAtRiskOfInvolvedInForeignPowerThreat: string
+      wasReferredToParoleBoard244ZB: string
+      wasRepatriatedForMurder: string
+      isServingSOPCSentence: string
+      isServingDCRSentence: string
     }>(
       [
-        { key: 'isSentence48MonthsOrOver', generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)) },
-        { key: 'isUnder18', generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)) },
-        { key: 'isMappaCategory4', generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)) },
-        { key: 'isMappaLevel2Or3', generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)) },
-        { key: 'isRecalledOnNewChargedOffence', generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)) },
         {
-          key: 'isServingFTSentenceForTerroristOffence',
+          key: 'isChargedWithOffence',
           generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
         },
         {
-          key: 'hasBeenChargedWithTerroristOrStateThreatOffence',
+          key: 'isServingTerroristOrNationalSecurityOffence',
+          generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+        },
+        {
+          key: 'isAtRiskOfInvolvedInForeignPowerThreat',
+          generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+        },
+        {
+          key: 'wasReferredToParoleBoard244ZB',
+          generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+        },
+        {
+          key: 'wasRepatriatedForMurder',
+          generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+        },
+        {
+          key: 'isServingSOPCSentence',
+          generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+        },
+        {
+          key: 'isServingDCRSentence',
           generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
         },
       ],
-      testData.poDecision !== 'STANDARD'
-        ? () => true
-        : criteria => Object.keys(criteria).some(k => criteria[k] === 'YES' ?? false)
-    )
-    cy.selectRadioByValue(`Is ${this.offenderName} under 18?`, testData.suitabilityForfixedTermRecall.isUnder18)
-    cy.selectRadioByValue(
-      `Is ${this.offenderName}'s sentence 48 months or over?`,
-      testData.suitabilityForfixedTermRecall.isSentence48MonthsOrOver
+      testData.recallType !== 'STANDARD'
+        ? criteria => Object.keys(criteria).every(k => criteria[k] === 'NO')
+        : criteria => Object.keys(criteria).some(k => criteria[k] === 'YES')
     )
     cy.selectRadioByValue(
-      `Is ${this.offenderName} in MAPPA category 4?`,
-      testData.suitabilityForfixedTermRecall.isMappaCategory4
+      `Is ${this.offenderName} being recalled because of being charged with an offence?`,
+      testData.suitabilityForfixedTermRecall.isChargedWithOffence
     )
     cy.selectRadioByValue(
-      `Is ${this.offenderName}'s MAPPA level 2 or 3?`,
-      testData.suitabilityForfixedTermRecall.isMappaLevel2Or3
+      `Is ${this.offenderName} serving a sentence for a terrorist or national security offence?`,
+      testData.suitabilityForfixedTermRecall.isServingTerroristOrNationalSecurityOffence
     )
     cy.selectRadioByValue(
-      `Is ${this.offenderName} being recalled on a new charged offence?`,
-      testData.suitabilityForfixedTermRecall.isRecalledOnNewChargedOffence
+      `Is ${this.offenderName} considered to be a person at risk of being involved in foreign power threat activity?`,
+      testData.suitabilityForfixedTermRecall.isAtRiskOfInvolvedInForeignPowerThreat
     )
     cy.selectRadioByValue(
-      `Is ${this.offenderName} serving a fixed term sentence for a terrorist offence?`,
-      testData.suitabilityForfixedTermRecall.isServingFTSentenceForTerroristOffence
+      `Was ${this.offenderName} referred to the Parole Board under section 244ZB (power to detain) on this sentence?`,
+      testData.suitabilityForfixedTermRecall.wasReferredToParoleBoard244ZB
     )
     cy.selectRadioByValue(
-      `Has ${this.offenderName} been charged with a terrorist or state threat offence?`,
-      testData.suitabilityForfixedTermRecall.hasBeenChargedWithTerroristOrStateThreatOffence
+      `Has ${this.offenderName} been repatriated to the UK following a sentence for murder?`,
+      testData.suitabilityForfixedTermRecall.wasRepatriatedForMurder
+    )
+    cy.selectRadioByValue(
+      `Is ${this.offenderName} serving a Sentence for offenders of particular concern (SOPC)?`,
+      testData.suitabilityForfixedTermRecall.isServingSOPCSentence
+    )
+    cy.selectRadioByValue(
+      `Is ${this.offenderName} serving a Discretionary conditional release (DCR) sentence?`,
+      testData.suitabilityForfixedTermRecall.isServingDCRSentence
     )
     cy.clickButton('Continue')
     cy.selectRadioByValue('Select your recommendation', this.testData.poDecision)
   } else {
-    cy.selectRadioByValue('What do you recommend?', this.testData.poDecision)
+    cy.selectRadioByValue('Select your recommendation', this.testData.poDecision)
   }
   cy.clickButton('Continue')
 }
@@ -726,43 +807,71 @@ const validateLastCompletedDocumentTabDetails = function (letterType: string) {
     tableCaption: 'Recommendations',
     rowSelector: `[data-qa]`,
   }).then(rowData => {
-    expect(rowData.join('|')).to.contain(formatDateToCompletedDocumentFormat())
+    expect(rowData.join('|')).to.contain(formatCurrentDateToCompletedDocumentFormat())
     expect(rowData.join('|')).to.contain(letterType)
     expect(rowData.join('|')).to.contain('This is the most recent completed document. It is not a draft.')
   })
 }
 
+function completeWhoCompletedThisPartAInformation() {
+  cy.clickLink('Who completed this Part A?')
+  cy.logPageTitle('Who completed this Part A?')
+  testData.thePersonCompletingTheForm = {} // Populates Q25 of Part A document when Probation Admin flag is set
+  cy.get(`#name`).type((testData.thePersonCompletingTheForm.name = faker.name.fullName()))
+  cy.get('#email').type(
+    (testData.thePersonCompletingTheForm.email = `${faker.internet.userName().toLowerCase()}@justice.gov.uk`)
+  )
+  cy.get(`#telephone`).type((testData.thePersonCompletingTheForm.telephone = faker.phone.number('01277 ### ###')))
+  cy.get(`#region`).select(
+    (testData.thePersonCompletingTheForm.region = faker.helpers.arrayElement(Object.values(Regions)))
+  )
+  cy.get(`#localDeliveryUnit`).type((testData.thePersonCompletingTheForm.LDU = faker.address.cityName()))
+
+  cy.selectRadio('Is this person the probation practitioner', 'No')
+  cy.clickButton('Continue')
+  completePractitionerForPartAInformation()
+}
+
+function completePractitionerForPartAInformation() {
+  cy.logPageTitle(`Practitioner for ${this.offenderName}`)
+  testData.offenderManager = {} // Populates Q26 of Part A document when Probation Admin flag is set
+  cy.get(`#name`).type((testData.offenderManager.name = faker.name.fullName()))
+  cy.get(`#email`).type((testData.offenderManager.email = `${faker.internet.userName().toLowerCase()}@justice.gov.uk`))
+  cy.get(`#telephone`).type((testData.offenderManager.telephone = faker.phone.number('012## ### ###')))
+  cy.clickButton('Continue')
+}
+
+function completeRevocationOrderContactInformation() {
+  cy.clickLink('Where should the revocation order be sent?')
+  cy.logPageTitle('Where should the revocation order be sent?')
+  cy.get(`#email_0`).type(`${faker.internet.userName().toLowerCase()}@justice.gov.uk`)
+  cy.clickButton('Add another email')
+  cy.get(`#email_1`).type(`${faker.internet.userName().toLowerCase()}@justice.gov.uk`)
+  cy.clickButton('Continue')
+}
+
+function completePPCSResponsesContactInformation() {
+  cy.clickLink('Where should PPCS respond with questions?')
+  cy.logPageTitle('Where should PPCS respond with questions?')
+  cy.get(`#email_0`).type(`${faker.internet.userName().toLowerCase()}@justice.gov.uk`)
+  cy.clickButton('Add another email')
+  cy.get(`#email_1`).type(`${faker.internet.userName().toLowerCase()}@justice.gov.uk`)
+  cy.clickButton('Continue')
+}
+
+function completeContactInformationForPartA() {
+  completeWhoCompletedThisPartAInformation()
+  completeRevocationOrderContactInformation()
+  completePPCSResponsesContactInformation()
+}
+
 const updateContactInformation = function (question: string) {
   if (question === 'Who completed this Part A?') {
-    cy.clickLink(currentPage)
-    cy.logPageTitle(currentPage)
-    testData.thePersonCompletingTheForm = {} // Populates Q25 of Part A document when Probation Admin flag is set
-    cy.get(`#name`).type((testData.thePersonCompletingTheForm.name = faker.name.fullName()))
-    cy.get(`#email`).type((testData.thePersonCompletingTheForm.email = faker.internet.email()))
-    cy.get(`#telephone`).type((testData.thePersonCompletingTheForm.telephone = faker.phone.number('01277 ### ###')))
-    cy.get(`#region`).select(
-      (testData.thePersonCompletingTheForm.region = faker.helpers.arrayElement(Object.values(Regions)))
-    )
-    cy.get(`#localDeliveryUnit`).type((testData.thePersonCompletingTheForm.LDU = faker.address.cityName()))
-
-    cy.selectRadio('Is this person the probation practitioner', 'No')
-    cy.clickButton('Continue')
-    currentPage = `Practitioner for ${this.offenderName}`
-    cy.logPageTitle(`${currentPage}?`)
-    testData.offenderManager = {} // Populates Q26 of Part A document when Probation Admin flag is set
-    cy.get(`#name`).type((testData.offenderManager.name = faker.name.fullName()))
-    cy.get(`#email`).type((testData.offenderManager.email = faker.internet.email()))
-    cy.get(`#telephone`).type((testData.offenderManager.telephone = faker.phone.number('012## ### ###')))
-    cy.get(`#region`).select((testData.offenderManager.region = faker.helpers.arrayElement(Object.values(Regions))))
-    cy.get(`#localDeliveryUnit`).type((testData.offenderManager.LDU = faker.address.cityName()))
-    cy.clickButton('Continue')
-  } else {
-    cy.clickLink(currentPage)
-    cy.logPageTitle(currentPage)
-    cy.get(`#email_0`).type(faker.internet.email())
-    cy.clickButton('Add another email')
-    cy.get(`#email_1`).type(faker.internet.email())
-    cy.clickButton('Continue')
+    completeWhoCompletedThisPartAInformation()
+  } else if (question === 'Where should the revocation order be sent?') {
+    completeRevocationOrderContactInformation()
+  } else if (question === 'Where should PPCS respond with questions?') {
+    completePPCSResponsesContactInformation()
   }
 }
 
@@ -794,73 +903,102 @@ Given('PO( has) creates/created a Part A form with:', function (dataTable: DataT
 })
 
 Given('PO has started creating the Part A form without requesting SPO review', function () {
+  cy.logPageTitle('Share this case with your manager')
   cy.clickLink('Continue')
+  cy.logPageTitle('Discuss with your manager')
   cy.clickLink('Continue')
-  cy.logPageTitle('What do you recommend?')
-  if (testData.indeterminate === 'NO' && testData.extended === 'NO') {
+  cy.logPageTitle('Check MAPPA Information')
+  cy.clickButton('Continue')
+
+  if (testData.sentenceGroup !== SentenceGroup.INDETERMINATE && testData.sentenceGroup !== SentenceGroup.EXTENDED) {
     cy.logPageTitle('Suitability for fixed term recall')
     testData.suitabilityForfixedTermRecall = randomiseCriteria<{
-      isSentence48MonthsOrOver: string
-      isUnder18: string
-      isMappaCategory4: string
-      isMappaLevel2Or3: string
-      isRecalledOnNewChargedOffence: string
-      isServingFTSentenceForTerroristOffence: string
-      hasBeenChargedWithTerroristOrStateThreatOffence: string
+      isChargedWithOffence: string
+      isServingTerroristOrNationalSecurityOffence: string
+      isAtRiskOfInvolvedInForeignPowerThreat: string
+      wasReferredToParoleBoard244ZB: string
+      wasRepatriatedForMurder: string
+      isServingSOPCSentence: string
+      isServingDCRSentence: string
     }>(
       [
-        { key: 'isSentence48MonthsOrOver', generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)) },
-        { key: 'isUnder18', generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)) },
-        { key: 'isMappaCategory4', generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)) },
-        { key: 'isMappaLevel2Or3', generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)) },
-        { key: 'isRecalledOnNewChargedOffence', generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)) },
         {
-          key: 'isServingFTSentenceForTerroristOffence',
+          key: 'isChargedWithOffence',
           generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
         },
         {
-          key: 'hasBeenChargedWithTerroristOrStateThreatOffence',
+          key: 'isServingTerroristOrNationalSecurityOffence',
+          generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+        },
+        {
+          key: 'isAtRiskOfInvolvedInForeignPowerThreat',
+          generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+        },
+        {
+          key: 'wasReferredToParoleBoard244ZB',
+          generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+        },
+        {
+          key: 'wasRepatriatedForMurder',
+          generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+        },
+        {
+          key: 'isServingSOPCSentence',
+          generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
+        },
+        {
+          key: 'isServingDCRSentence',
           generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
         },
       ],
-      criteria => Object.keys(criteria).some(k => criteria[k] === 'YES' ?? false)
+      testData.recallType !== 'STANDARD'
+        ? () => true
+        : criteria => Object.keys(criteria).some(k => criteria[k] === 'YES')
     )
     cy.selectRadioByValue(
-      `Is ${this.offenderName}'s sentence 48 months or over?`,
-      testData.suitabilityForfixedTermRecall.isSentence48MonthsOrOver
-    )
-    cy.selectRadioByValue(`Is ${this.offenderName} under 18?`, testData.suitabilityForfixedTermRecall.isUnder18)
-    cy.selectRadioByValue(
-      `Is ${this.offenderName} in MAPPA category 4?`,
-      testData.suitabilityForfixedTermRecall.isMappaCategory4
+      `Is ${this.offenderName} being recalled because of being charged with an offence?`,
+      testData.suitabilityForfixedTermRecall.isChargedWithOffence
     )
     cy.selectRadioByValue(
-      `Is ${this.offenderName}'s MAPPA level 2 or 3?`,
-      testData.suitabilityForfixedTermRecall.isMappaLevel2Or3
+      `Is ${this.offenderName} serving a sentence for a terrorist or national security offence?`,
+      testData.suitabilityForfixedTermRecall.isServingTerroristOrNationalSecurityOffence
     )
     cy.selectRadioByValue(
-      `Is ${this.offenderName} being recalled on a new charged offence?`,
-      testData.suitabilityForfixedTermRecall.isRecalledOnNewChargedOffence
+      `Is ${this.offenderName} considered to be a person at risk of being involved in foreign power threat activity?`,
+      testData.suitabilityForfixedTermRecall.isAtRiskOfInvolvedInForeignPowerThreat
     )
     cy.selectRadioByValue(
-      `Is ${this.offenderName} serving a fixed term sentence for a terrorist offence?`,
-      testData.suitabilityForfixedTermRecall.isServingFTSentenceForTerroristOffence
+      `Was ${this.offenderName} referred to the Parole Board under section 244ZB (power to detain) on this sentence?`,
+      testData.suitabilityForfixedTermRecall.wasReferredToParoleBoard244ZB
     )
     cy.selectRadioByValue(
-      `Has ${this.offenderName} been charged with a terrorist or state threat offence?`,
-      testData.suitabilityForfixedTermRecall.hasBeenChargedWithTerroristOrStateThreatOffence
+      `Has ${this.offenderName} been repatriated to the UK following a sentence for murder?`,
+      testData.suitabilityForfixedTermRecall.wasRepatriatedForMurder
+    )
+    cy.selectRadioByValue(
+      `Is ${this.offenderName} serving a Sentence for offenders of particular concern (SOPC)?`,
+      testData.suitabilityForfixedTermRecall.isServingSOPCSentence
+    )
+    cy.selectRadioByValue(
+      `Is ${this.offenderName} serving a Discretionary conditional release (DCR) sentence?`,
+      testData.suitabilityForfixedTermRecall.isServingDCRSentence
     )
     cy.clickButton('Continue')
+
+    cy.logPageTitle('What do you recommend?')
     cy.selectRadio('Select your recommendation', NonIndeterminateRecallType.STANDARD)
   } else {
-    cy.selectRadio('What do you recommend', NonIndeterminateRecallType.STANDARD)
+    cy.selectRadio('Select your recommendation', NonIndeterminateRecallType.STANDARD)
   }
-  cy.get(
-    `#recallTypeDetails${NonIndeterminateRecallType.STANDARD.toString()
-      .split('_')
-      .map(i => Cypress._.capitalize(i))
-      .join('')}`
-  ).type(faker.hacker.phrase())
+  if (testData.sentenceGroup === SentenceGroup.YOUTH_SDS) {
+    testData.partARecallReason = faker.hacker.phrase()
+    cy.get(
+      `#recallTypeDetails${NonIndeterminateRecallType.STANDARD.toString()
+        .split('_')
+        .map(i => Cypress._.capitalize(i))
+        .join('')}`
+    ).type(testData.partARecallReason)
+  }
   cy.clickButton('Continue')
   cy.selectRadio('Is this an emergency recall', 'No')
   cy.clickButton('Continue')
@@ -939,7 +1077,7 @@ Given('PO( has) requests/requested an SPO to review recommendation', function ()
   cy.clickLink('Continue')
   cy.clickLink('Continue')
   cy.log('Logging out as PO!')
-  cy.clickLink('Sign out')
+  signOut()
 })
 
 Then('the previous Recommendation should be marked a complete', function () {
@@ -988,17 +1126,11 @@ Then('Decision Not To Recall letter details are correct', function () {
 })
 
 When('PO has updated {string} under Contact Information section', function (question: string) {
-  currentPage = question
-  updateContactInformation(currentPage)
+  updateContactInformation(question)
 })
 
 When('PO has updated the Contact Information section', function () {
-  currentPage = 'Who completed this Part A?'
-  updateContactInformation(currentPage)
-  currentPage = 'Where should the revocation order be sent?'
-  updateContactInformation(currentPage)
-  currentPage = 'Where should PPCS respond with questions?'
-  updateContactInformation(currentPage)
+  completeContactInformationForPartA()
 })
 
 When('PO selects Preview Part A option', function () {

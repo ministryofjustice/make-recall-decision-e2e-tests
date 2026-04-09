@@ -5,7 +5,7 @@ Feature: E2E scenarios - Recall
   countersigning task list accessed using the link sent by PO
 
   #NOTE:
-  #TypeOfSentence: supports LIFE, IPP & DPP only
+  #TypeOfSentence: supports LIFE, IPP, DPP & DHMP only
   #RecallType: supports STANDARD, FIXED_TERM & NO_RECALL for non-indeterminate/non-extended only else its EMERGENCY & NO_RECALL
   #VictimContactScheme: supports 'Yes', 'No' & 'Not applicable'
   #InCustody: supports 'Yes, prison custody', 'Yes, police custody' & 'No'
@@ -14,8 +14,7 @@ Feature: E2E scenarios - Recall
     @MRD-1276 @MRD-1391 @MRD-1391 @MRD-1327 @MRD-1449 @MRD-1465
   Scenario Outline: E2E - PO records a recall while countersigning and SPO & ACO countersigns - deeplink
     Given a PO has created a recommendation to recall with:
-      | Indeterminate     | <Indeterminate> |
-      | Extended          | <Extended>      |
+      | SentenceGroup     | <SentenceGroup> |
       | LicenceConditions | All             |
       | AlternativesTried | Some            |
     And PO has created a Part A form without requesting SPO review with:
@@ -51,6 +50,8 @@ Feature: E2E scenarios - Recall
 
 
     Examples:
-      | Indeterminate | Extended | RecallType | InCustody  | Vulnerabilities | EmergencyRecall |
-      | No            | No       | STANDARD   | No         | None            |                 |
-      | No            | No       | FIXED_TERM | Yes Prison | Some            | Yes             |
+      | SentenceGroup | RecallType | InCustody  | Vulnerabilities | EmergencyRecall |
+      | ADULT_SDS     | STANDARD   | No         | None            |                 |
+      | ADULT_SDS     | FIXED_TERM | Yes Prison | Some            | Yes             |
+      | YOUTH_SDS     | STANDARD   | No         | None            |                 |
+      | YOUTH_SDS     | FIXED_TERM | Yes Prison | Some            | Yes             |

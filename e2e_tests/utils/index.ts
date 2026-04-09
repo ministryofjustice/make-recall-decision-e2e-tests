@@ -18,58 +18,18 @@ export const getTestDataPerEnvironment = () => {
   }
 }
 
-export const isoDateToObject = (isoDate: string) => {
-  const d = DateTime.fromISO(isoDate)
-  const { day, month, year } = d.toObject()
-  return { day, month, year }
-}
-
 export const formatObjectDateToLongFormat = (objectDate: Record<string, number | string>) => {
   const d = DateTime.fromObject(objectDate)
   return d.toFormat('d MMMM yyyy')
 }
 
-export const formatDateFromUTCLongToShortFormat = (inputDate: string) => {
-  const date = new Date(inputDate)
-  const day = date.getUTCDate()
-  const month = (date.getUTCMonth() + 1)
-  const year = date.getFullYear()
-
-  const formattedDay = day < 10 ? `0${day}` : `${day}`
-  const formattedMonth = month < 10 ? `0${month}` : `${month}`
-
-  return `${formattedDay}/${formattedMonth}/${year}`
-}
-
-export const extractTimeFromUTCDateFormat = (inputDate: string) => {
-  const date = new Date(inputDate)
-  const hours = date.getUTCHours()
-  const minutes = date.getUTCMinutes()
-
-  const formattedHours = hours < 10 ? `0${hours}` : `${hours}`
-  const formattedMin = minutes < 10 ? `0${minutes}` : `${minutes}`
-
-  return `${formattedHours}:${formattedMin}`
-}
-
-export const formatDateToCompletedDocumentFormat = () => {
+export const formatCurrentDateToCompletedDocumentFormat = () => {
   const d = DateTime.now()
   return d.toFormat('d MMM yyyy')
 }
 
 export const changeDateFromLongFormatToShort = (dateToConvert: string) => {
   return DateTime.fromFormat(dateToConvert, 'd MMMM yyyy').toFormat('dd/MM/yyyy')
-}
-
-export const formattedTimeIn24HrFormat = () => {
-  const options: Intl.DateTimeFormatOptions = {
-    timeZone: 'Europe/London',
-    hour12: false,
-    hour: '2-digit',
-    minute: '2-digit',
-  }
-  const currentTime: string = new Date().toLocaleTimeString('en-GB', options)
-  return currentTime
 }
 
 export const formatDateToDNTRLetterFormat = (objectDate: Date) => {
