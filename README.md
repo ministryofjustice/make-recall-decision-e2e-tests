@@ -4,7 +4,7 @@
 
 This repo is for the e2e tests for Make Recall Decision Project. They run using Cypress.
 
-There's a HMPPS dev 'community of practice' talk on [how the E2E tests are set up](https://drive.google.com/file/d/1OeekvkViazrYNJXGMZrlM8UZU-Z71x6X/view).
+There's a HMPPS dev 'community of practice' talk on [how the E2E tests are set up](https://justiceuk.sharepoint.com/:v:/r/sites/HMPPSDeveloperCommunityofPractice/Shared%20Documents/COP%20Recordings/HMPPS%20Dev%20CoP_%20lightning%20talks%20(2022-09-07%2015_03%20GMT+3)%20(1).mp4?csf=1&web=1&e=XtIcxp&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D).
 
 ## Run E2E tests against local containers
 
