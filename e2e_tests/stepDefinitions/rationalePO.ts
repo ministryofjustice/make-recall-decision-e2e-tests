@@ -188,10 +188,7 @@ export const makeRecommendation = function (crn, recommendationDetails?: Record<
   cy.clickButton('Send to NDelius')
 }
 
-function selectVulnerabilitiesWhenRiskToSelfFlagEnabled(
-  selectedVulnerabilities: Vulnerabilities[],
-  offenderName: string
-) {
+function selectVulnerabilities(selectedVulnerabilities: Vulnerabilities[], offenderName: string) {
   cy.pageHeading().should(
     'equal',
     `Consider if this recall could affect any vulnerabilities or needs ${offenderName} may have`
@@ -276,7 +273,7 @@ function completeVulnerabilitiesSection(partADetails: Record<string, string>, of
   })()
 
   cy.clickLink('Consider if recall could affect vulnerabilities or needs')
-  selectVulnerabilitiesWhenRiskToSelfFlagEnabled(selectedVulnerabilities, offenderName)
+  selectVulnerabilities(selectedVulnerabilities, offenderName)
 
   if (selectedVulnerabilities.some(selectedVulnerability => inclusiveVulnerabilities.includes(selectedVulnerability))) {
     enterVulnerabilityDetails(selectedVulnerabilities)
@@ -336,7 +333,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
     cy.logPageTitle('Suitability for fixed term recall')
 
     if (testData.sentenceGroup === SentenceGroup.ADULT_SDS) {
-       testData.suitabilityForfixedTermRecall = randomiseCriteria<{
+      testData.suitabilityForfixedTermRecall = randomiseCriteria<{
         isChargedWithOffence: string
         isServingTerroristOrNationalSecurityOffence: string
         isAtRiskOfInvolvedInForeignPowerThreat: string
@@ -379,7 +376,10 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
           ? criteria => Object.keys(criteria).every(k => criteria[k] === 'NO')
           : criteria => Object.keys(criteria).some(k => criteria[k] === 'YES')
       )
-      cy.selectRadioByValue(`Is ${this.offenderName} being recalled because of being charged with an offence?`, testData.suitabilityForfixedTermRecall.isChargedWithOffence)
+      cy.selectRadioByValue(
+        `Is ${this.offenderName} being recalled because of being charged with an offence?`,
+        testData.suitabilityForfixedTermRecall.isChargedWithOffence
+      )
       cy.selectRadioByValue(
         `Is ${this.offenderName} serving a sentence for a terrorist or national security offence?`,
         testData.suitabilityForfixedTermRecall.isServingTerroristOrNationalSecurityOffence
@@ -430,7 +430,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
       )
       cy.selectRadioByValue(
         `Is ${this.offenderName} being recalled because of being charged with a serious offence?`,
-        testData.suitabilityForfixedTermRecall.isYouthChargedWithSeriousOffence,
+        testData.suitabilityForfixedTermRecall.isYouthChargedWithSeriousOffence
       )
     }
 
@@ -955,7 +955,10 @@ Given('PO has started creating the Part A form without requesting SPO review', f
         ? () => true
         : criteria => Object.keys(criteria).some(k => criteria[k] === 'YES')
     )
-    cy.selectRadioByValue(`Is ${this.offenderName} being recalled because of being charged with an offence?`, testData.suitabilityForfixedTermRecall.isChargedWithOffence)
+    cy.selectRadioByValue(
+      `Is ${this.offenderName} being recalled because of being charged with an offence?`,
+      testData.suitabilityForfixedTermRecall.isChargedWithOffence
+    )
     cy.selectRadioByValue(
       `Is ${this.offenderName} serving a sentence for a terrorist or national security offence?`,
       testData.suitabilityForfixedTermRecall.isServingTerroristOrNationalSecurityOffence
