@@ -28,7 +28,7 @@ import {
   q4OffendersSentencedAsYouth,
   q5FTR56AdultSuitabilityCriteria,
 } from './assertionsPartA'
-import { CUSTODY_GROUP, CustodyType, SentenceGroup, YesNoType } from '../support/enums'
+import { CustodyGroup, CustodyType, PPUDRecordState, SentenceGroup, YesNoType } from '../support/enums'
 import { loginAndSearchCrn } from './user/user'
 
 export const crns = {
@@ -76,7 +76,18 @@ defineParameterType({
   transformer: s => s,
 })
 
-defineParameterType({ name: 'custodyGroup', regexp: /DETERMINATE|INDETERMINATE/, transformer: s => CUSTODY_GROUP[s] })
+defineParameterType({
+  name: 'ppudRecordState',
+  regexp: /new|existing/,
+  transformer: s => PPUDRecordState[s.toUpperCase()],
+})
+
+defineParameterType({
+  name: 'custodyGroup',
+  regexp: /determinate|indeterminate/,
+  transformer: s => CustodyGroup[s.toUpperCase()],
+})
+
 Before(() => {
   openApp({ flagRecommendationsPage: 1, flagDeleteRecommendation: 1 })
 })
