@@ -73,6 +73,7 @@ export const q3ExtendedSentence = (contents: string, answer: string) => {
 export const q4OffendersSentencedAsYouth = (contents: string, context: Record<string, string>) => {
   const sectionContents = contents.substring(contents.indexOf(partASections[4]), contents.indexOf(partASections[5]))
   const isYouthSentence = context.isYouthSentence ? YesNoType.YES : ''
+
   expectSoftly(sectionContents, 'Is under 18').to.contain(
     `Is the offender over 18 years old at the point of recall? ${isYouthSentence}`
   )
@@ -80,43 +81,114 @@ export const q4OffendersSentencedAsYouth = (contents: string, context: Record<st
     `Is the offender only serving sentence(s) under s91 of the PCC(S)A 2000 or s.250 of the Sentencing Code? ${isYouthSentence}`
   )
 
-  // TODO MRD-3097 fill in section 4b parts
-  // expectSoftly(sectionContents, 'MAPPA level 2 or 3').to.contain(`Are they MAPPA level 2 or 3? ${}`)
-  // expectSoftly(sectionContents, 'Recalled due to charge of serious offence').to.contain(
-  //   `Are they being recalled on account of being charged with a serious offence? ${}`)
+  if (context.suitabilityForfixedTermRecall?.isYouthSentenceOver12Months == "NO") {
+    expectSoftly(sectionContents, 'MAPPA level 2 or 3').to.contain(`Are they MAPPA level 2 or 3? ${context.mappa.mappaLevel === 'Level 2' || context.mappa.mappaLevel === 'Level 3' ? 'Yes' : 'No'}`)
+    expectSoftly(sectionContents, 'Recalled due to charge of serious offence').to.contain(
+    `Are they being recalled on account of being charged with a serious offence?  ${context.suitabilityForfixedTermRecall?.isYouthChargedWithSeriousOffence === "YES" ? 'Yes' : 'No'}`)
+  } else {
+    if (context.sentenceGroup === 'INDETERMINATE' || context.sentenceGroup === 'EXTENDED') {
+      expectSoftly(sectionContents, 'MAPPA level 2 or 3').to.contain(`Are they MAPPA level 2 or 3? N/A - indeterminate or extended sentence`)
+      expectSoftly(sectionContents, 'Recalled due to charge of serious offence').to.contain(
+        `Are they being recalled on account of being charged with a serious offence?  N/A - indeterminate or extended sentence`)
+    } else {
+      expectSoftly(sectionContents, 'MAPPA level 2 or 3').to.contain(`Are they MAPPA level 2 or 3? Are they being recalled on account`)
+      expectSoftly(sectionContents, 'Recalled due to charge of serious offence').to.contain(
+      `Are they being recalled on account of being charged with a serious offence?  `)
+    }
+  }
 }
 
 export const q5FTR56AdultSuitabilityCriteria = (contents: string, context: Record<string, string>) => {
-  // TODO MRD-3097 fill in section 5 parts
   const sectionContents = contents.substring(contents.indexOf(partASections[5]), contents.indexOf(partASections[6]))
+  const { mappa, suitabilityForfixedTermRecall }: {
+    mappa?: {
+      mappaLevel: string;
+      mappaCategory: string;
+    }
+    suitabilityForfixedTermRecall?: {
+      isChargedWithOffence: keyof typeof YesNoType;
+      isServingSOPCSentence: keyof typeof YesNoType;
+      isServingDCRSentence: keyof typeof YesNoType;
+      wasReferredToParoleBoard244ZB: keyof typeof YesNoType;
+      wasRepatriatedForMurder: keyof typeof YesNoType;
+      isAtRiskOfInvolvedInForeignPowerThreat: keyof typeof YesNoType;
+      isServingTerroristOrNationalSecurityOffence: keyof typeof YesNoType;
+    }
+  } = context
 
-  // expectSoftly(sectionContents, 'FTR56 suitability- MAPPA level 2 or 3').to.contain(
-  //   `Is their MAPPA level 2 or 3? ${}`
-  // )
-  // expectSoftly(sectionContents, 'FTR56 suitability- Charged with offence').to.contain(
-  //   `Are they being recalled on account of being charged with an offence? ${}`
-  // )
-  // expectSoftly(sectionContents, 'FTR56 suitability- SOPC').to.contain(
-  //   `Are they serving a sentence for offenders of particular concern (SOPC)? ${}`
-  // )
-  // expectSoftly(sectionContents, 'FTR56 suitability- DCR').to.contain(
-  //   `Are they serving a Discretionary Conditional Release (DCR) sentence? ${}`
-  // )
-  // expectSoftly(sectionContents, 'FTR56 suitability- Parole Board').to.contain(
-  //   `Were they referred to the Parole Board under section 244ZB (power to detain) on this sentence? ${}`
-  // )
-  // expectSoftly(sectionContents, 'FTR56 suitability- Repatriated for murder').to.contain(
-  //   `Have they been repatriated to the UK following a sentence for murder? ${}`
-  // )
-  // expectSoftly(sectionContents, 'FTR56 suitability- MAPPA category 4').to.contain(
-  //   `Are they MAPPA category 4? ${}`
-  // )
-  // expectSoftly(sectionContents, 'FTR56 suitability- Foreign power threat activity').to.contain(
-  //   `Are they considered to be a person who may be at risk of involvement in foreign power threat activity? ${}`
-  // )
-  // expectSoftly(sectionContents, 'FTR56 suitability- MAPPA level 2 or 3').to.contain(
-  //   `Are they serving a sentence for a terrorist or national security offence? ${}`
-  // )
+  // These are undefined when it's a YOUTH_SDS flow, so assert that differently
+  if (context.sentenceGroup === "ADULT_SDS") {
+    expectSoftly(sectionContents, 'FTR56 suitability- MAPPA level 2 or 3').to.contain(
+      `Is their MAPPA level 2 or 3? ${mappa?.mappaLevel === 'Level 2' || mappa?.mappaLevel === 'Level 3' ? YesNoType.YES : YesNoType.NO}`
+    )
+    expectSoftly(sectionContents, 'FTR56 suitability- Charged with offence').to.contain(
+      `Are they being recalled on account of being charged with an offence?  ${suitabilityForfixedTermRecall ? YesNoType[suitabilityForfixedTermRecall.isChargedWithOffence] : ''}`
+    )
+    expectSoftly(sectionContents, 'FTR56 suitability- SOPC').to.contain(
+      `Are they serving a sentence for offenders of particular concern (SOPC)? ${suitabilityForfixedTermRecall ? YesNoType[suitabilityForfixedTermRecall.isServingSOPCSentence] : ''}`
+    )
+    expectSoftly(sectionContents, 'FTR56 suitability- DCR').to.contain(
+      `Are they serving a Discretionary Conditional Release (DCR) sentence? ${suitabilityForfixedTermRecall ? YesNoType[suitabilityForfixedTermRecall.isServingDCRSentence] : ''}`
+    )
+    expectSoftly(sectionContents, 'FTR56 suitability- Parole Board').to.contain(
+      `Were they referred to the Parole Board under section 244ZB (power to detain) on this sentence? ${suitabilityForfixedTermRecall ? YesNoType[suitabilityForfixedTermRecall.wasReferredToParoleBoard244ZB] : ''}`
+    )
+    expectSoftly(sectionContents, 'FTR56 suitability- Repatriated for murder').to.contain(
+      `Have they been repatriated to the UK following a sentence for murder? ${suitabilityForfixedTermRecall ? YesNoType[suitabilityForfixedTermRecall.wasRepatriatedForMurder] : ''}`
+    )
+    expectSoftly(sectionContents, 'FTR56 suitability- MAPPA category 4').to.contain(
+      `Are they MAPPA category 4? ${mappa?.mappaCategory === "Category 4" ? 'Yes' : 'No'}`
+    )
+    expectSoftly(sectionContents, 'FTR56 suitability- Foreign power threat activity').to.contain(
+      `Are they considered to be a person who may be at risk of involvement in foreign power threat activity? ${suitabilityForfixedTermRecall ? YesNoType[suitabilityForfixedTermRecall.isAtRiskOfInvolvedInForeignPowerThreat] : ''}`
+    )
+    expectSoftly(sectionContents, 'FTR56 suitability- Are they serving sentence for terrorist or national security offence?').to.contain(
+      `Are they serving a sentence for a terrorist or national security offence? ${suitabilityForfixedTermRecall ? YesNoType[suitabilityForfixedTermRecall.isServingTerroristOrNationalSecurityOffence] : ''}`
+    )
+  } else if (context.sentenceGroup === 'INDETERMINATE' || context.sentenceGroup === 'EXTENDED') {
+    const exclusionString = 'N/A - indeterminate or extended sentence'
+    expectSoftly(sectionContents, 'FTR56 suitability- MAPPA level 2 or 3').to.contain(
+      `Is their MAPPA level 2 or 3? ${exclusionString}`
+    )
+    expectSoftly(sectionContents, 'FTR56 suitability- Charged with offence').to.contain(
+      `Are they being recalled on account of being charged with an offence?  ${exclusionString}`
+    )
+    expectSoftly(sectionContents, 'FTR56 suitability- SOPC').to.contain(
+      `Are they serving a sentence for offenders of particular concern (SOPC)? ${exclusionString}`
+    )
+    expectSoftly(sectionContents, 'FTR56 suitability- DCR').to.contain(
+      `Are they serving a Discretionary Conditional Release (DCR) sentence? ${exclusionString}`
+    )
+    expectSoftly(sectionContents, 'FTR56 suitability- Parole Board').to.contain(
+      `Were they referred to the Parole Board under section 244ZB (power to detain) on this sentence? ${exclusionString}`
+    )
+    expectSoftly(sectionContents, 'FTR56 suitability- Repatriated for murder').to.contain(
+      `Have they been repatriated to the UK following a sentence for murder? ${exclusionString}`
+    )
+    expectSoftly(sectionContents, 'FTR56 suitability- MAPPA category 4').to.contain(
+      `Are they MAPPA category 4? ${exclusionString}`
+    )
+    expectSoftly(sectionContents, 'FTR56 suitability- Foreign power threat activity').to.contain(
+      `Are they considered to be a person who may be at risk of involvement in foreign power threat activity? ${exclusionString}`
+    )
+    expectSoftly(sectionContents, 'FTR56 suitability- Are they serving sentence for terrorist or national security offence?').to.contain(
+      `Are they serving a sentence for a terrorist or national security offence? ${exclusionString}`
+    )
+  } else {
+    expectSoftly(sectionContents, 'FTR56 (Youth Flow) - suitability questions').to.contain(
+      // This has been split up for readability's sake, template literals will cause unwanted spacing
+      [
+        'Is their MAPPA level 2 or 3? ',
+        'Are they being recalled on account of being charged with an offence?  ',
+        'Are they serving a sentence for offenders of particular concern (SOPC)? ',
+        'Are they serving a Discretionary Conditional Release (DCR) sentence? ',
+        'Were they referred to the Parole Board under section 244ZB (power to detain) on this sentence? ',
+        'Have they been repatriated to the UK following a sentence for murder? ',
+        'Are they MAPPA category 4? ',
+        'Are they considered to be a person who may be at risk of involvement in foreign power threat activity? ',
+        'Are they serving a sentence for a terrorist or national security offence?'
+      ].join(''))
+  }
 }
 
 export const q6OffenderDetails = function (
