@@ -14,7 +14,7 @@ parameters:
     default: make-recall-decisions-pipeline
   e2e-parallelism:
     type: integer
-    default: 2
+    default: 6
 
 slack-fail-post-step: &slack-fail-post-step
   post-steps:
