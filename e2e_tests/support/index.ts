@@ -17,7 +17,7 @@
 import './commands'
 import installLogsCollector from 'cypress-terminal-report/src/installLogsCollector'
 
-installLogsCollector({ collectTypes: ['cy:log', 'cons:info', 'cons:warn', 'cons:error', 'cons:debug'], enableContinuousLogging: false })
+installLogsCollector({ collectTypes: ['cy:log', 'cons:info', 'cons:warn', 'cons:error', 'cons:debug'], enableContinuousLogging: true })
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
