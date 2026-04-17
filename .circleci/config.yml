@@ -14,7 +14,7 @@ parameters:
     default: make-recall-decisions-pipeline
   e2e-parallelism:
     type: integer
-    default: 8
+    default: 2
 
 slack-fail-post-step: &slack-fail-post-step
   post-steps:
@@ -50,7 +50,6 @@ jobs:
   validate:
     machine:
       image: ubuntu-2204:current
-      docker_layer_caching: true
     resource_class: xlarge
     steps:
       - checkout
@@ -164,6 +163,7 @@ jobs:
   integration_tests:
     machine:
       image: ubuntu-2204:current
+      docker_layer_caching: true
     resource_class: xlarge
     parallelism: << pipeline.parameters.e2e-parallelism >>
     steps:
@@ -211,7 +211,7 @@ jobs:
               --config-file e2e_tests/cypress.config.ts \
               --browser chrome \
               --record false \
-              --spec $SPECS \
+              --spec "$SPECS" \
 
             export E2E_RESULT=$?
             node scripts/fix-junit-reports.js
