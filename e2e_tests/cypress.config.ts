@@ -15,21 +15,21 @@ export default defineConfig({
   fixturesFolder: 'e2e_tests/fixtures',
   screenshotsFolder: 'e2e_tests/screenshots',
   videosFolder: 'e2e_tests/videos',
-  video: process.env.ENVIRONMENT !== 'local',
-  videoCompression: process.env.ENVIRONMENT !== 'local',
+  video: false, // process.env.ENVIRONMENT !== 'local',
+  videoCompression: false, //process.env.ENVIRONMENT !== 'local',
   reporter: 'cypress-multi-reporters',
   reporterOptions: {
     reportDir: 'e2e_tests/reports',
-    charts: true,
+    charts: false,
     reportPageTitle: 'Make recall decisions E2E tests',
-    embeddedScreenshots: true,
+    embeddedScreenshots: false,
     reporterEnabled: 'spec, mocha-junit-reporter',
     reporterOptions: {
       mochaFile: 'e2e_tests/junit/results-[hash].xml',
     },
   },
   retries: {
-    runMode: 1,
+    runMode: 0,
     openMode: 0,
   },
   e2e: {
@@ -67,6 +67,5 @@ export default defineConfig({
     excludeSpecPattern: '**/!(*.cy).ts',
     specPattern: '**/*.feature',
     supportFile: 'e2e_tests/support/index.ts',
-    experimentalRunAllSpecs: true,
   },
 })
