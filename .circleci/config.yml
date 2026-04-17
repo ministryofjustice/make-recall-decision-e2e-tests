@@ -14,7 +14,7 @@ parameters:
     default: make-recall-decisions-pipeline
   e2e-parallelism:
     type: integer
-    default: 8
+    default: 6
 
 slack-fail-post-step: &slack-fail-post-step
   post-steps:
@@ -164,6 +164,7 @@ jobs:
   integration_tests:
     machine:
       image: ubuntu-2204:current
+    resource_class: xlarge
     parallelism: << pipeline.parameters.e2e-parallelism >>
     steps:
       - run:
