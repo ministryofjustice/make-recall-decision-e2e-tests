@@ -63,6 +63,7 @@ export default defineConfig({
 
       return config
     },
+    testIsolation: false,
     baseUrl: 'http://localhost:3000',
     excludeSpecPattern: '**/!(*.cy).ts',
     specPattern: '**/*.feature',
