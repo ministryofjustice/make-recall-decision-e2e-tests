@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  hmpps: ministryofjustice/hmpps@11
+  hmpps: ministryofjustice/hmpps@6
   node: circleci/node@6.1.0
   slack: circleci/slack@4.10.1
 
@@ -50,6 +50,7 @@ jobs:
   validate:
     machine:
       image: ubuntu-2204:current
+      docker_layer_caching: true
     resource_class: xlarge
     steps:
       - checkout
@@ -162,8 +163,7 @@ jobs:
 
   integration_tests:
     machine:
-      image: ubuntu-2404:current
-    resource_class: xlarge
+      image: ubuntu-2204:current
     parallelism: << pipeline.parameters.e2e-parallelism >>
     steps:
       - run:
@@ -200,7 +200,7 @@ jobs:
             shopt -s globstar
 
             echo Generating specs
-            SPECS=$(circleci tests glob "e2e_tests/features/**/*.feature" | circleci tests split --split-by=timings | paste -sd ',')
+            SPECS=$(circleci tests glob "e2e_tests/features/**/*.feature" | circleci tests split --split-by=timings --show-counts | paste -sd ',')
             echo "Running feature file(s): $SPECS"
 
             set +e
@@ -210,7 +210,7 @@ jobs:
               --config-file e2e_tests/cypress.config.ts \
               --browser chrome \
               --record false \
-              --spec "$SPECS" \
+              --spec $SPECS \
 
             export E2E_RESULT=$?
             node scripts/fix-junit-reports.js
