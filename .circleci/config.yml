@@ -218,12 +218,12 @@ jobs:
             set -e
             exit $E2E_RESULT
       - run:
-          when: on_fail
+          # when: on_fail
           name: make-recall-decision-api - docker logs
           working_directory: make-recall-decision-api
           command: docker-compose logs
       - run:
-          when: on_fail
+          # when: on_fail
           name: make-recall-decision-ui - docker logs
           working_directory: make-recall-decision-ui
           command: docker-compose logs
