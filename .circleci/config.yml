@@ -192,6 +192,16 @@ jobs:
           working_directory: make-recall-decision-e2e-tests
           command: ./scripts/start-services-integration.sh
       - run:
+          name: Stream API docker logs (background)
+          background: true
+          working_directory: make-recall-decision-api
+          command: docker-compose logs -f --tail=100 2>&1 | sed -u 's/^/[api] /'
+      - run:
+          name: Stream UI docker logs (background)
+          background: true
+          working_directory: make-recall-decision-ui
+          command: docker-compose logs -f --tail=100 2>&1 | sed -u 's/^/[ui] /'
+      - run:
           name: Run Integration Tests
           working_directory: make-recall-decision-e2e-tests
           command: |
@@ -217,16 +227,16 @@ jobs:
 
             set -e
             exit $E2E_RESULT
-      - run:
-          # when: on_fail
-          name: make-recall-decision-api - docker logs
-          working_directory: make-recall-decision-api
-          command: docker-compose logs
-      - run:
-          # when: on_fail
-          name: make-recall-decision-ui - docker logs
-          working_directory: make-recall-decision-ui
-          command: docker-compose logs
+      # - run:
+      #     when: on_fail
+      #     name: make-recall-decision-api - docker logs
+      #     working_directory: make-recall-decision-api
+      #     command: docker-compose logs
+      # - run:
+      #     when: on_fail
+      #     name: make-recall-decision-ui - docker logs
+      #     working_directory: make-recall-decision-ui
+      #     command: docker-compose logs
       - store_artifacts:
           path: make-recall-decision-e2e-tests/e2e_tests/screenshots
           destination: screenshots
