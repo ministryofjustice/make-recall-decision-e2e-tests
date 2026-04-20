@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  hmpps: ministryofjustice/hmpps@6
+  hmpps: ministryofjustice/hmpps@11
   node: circleci/node@6.1.0
   slack: circleci/slack@4.10.1
 
@@ -108,7 +108,7 @@ jobs:
           name: Checkout/clone make-recall-decision-ui
           command: git clone https://github.com/ministryofjustice/make-recall-decision-ui.git
       - node/install:
-          node-version: '20' # node/install doesn't have a working_directory parameter, but the .nvmrc file is in a
+          node-version: '24' # node/install doesn't have a working_directory parameter, but the .nvmrc file is in a
                              # sub-directory (make-recall-decision-e2e-tests), so we need to set the node version here
       - run:
           name: Start components
@@ -185,7 +185,7 @@ jobs:
             cd make-recall-decision-ui
             git checkout main
       - node/install:
-          node-version: '20' # node/install doesn't have a working_directory parameter, but the .nvmrc file is in a
+          node-version: '24' # node/install doesn't have a working_directory parameter, but the .nvmrc file is in a
                              # sub-directory (make-recall-decision-e2e-tests), so we need to set the node version here
       - run:
           name: Start components for integration tests
@@ -200,7 +200,7 @@ jobs:
             shopt -s globstar
 
             echo Generating specs
-            SPECS=$(circleci tests glob "e2e_tests/features/**/*.feature" | circleci tests split --split-by=timings --show-counts)
+            SPECS=$(circleci tests glob "e2e_tests/features/**/*.feature" | circleci tests split --split-by=timings --show-counts | paste -sd ',')
             echo "Running feature file(s): $SPECS"
 
             set +e
