@@ -5,6 +5,7 @@ import { loginAndSearchForCrn, signOut } from '../user/user'
 import { selectRandomOption } from '../../utils/inputs/select'
 import { selectRadio, selectRandomRadio } from '../../utils/inputs/radios'
 import { selectRandomAutocompleteOption } from '../../utils/inputs/accessibleAutocomplete'
+import {addDateAndTime} from '../../utils/inputs/dateAndTime'
 import { pages } from '../pages/pages'
 import { UserType } from '../../support/commands'
 import { textAreaRandomText } from '../../utils/inputs/textArea'
@@ -189,6 +190,11 @@ Then(
   cy.clickLinkById('edit-currentestablishment', editText)
   cy.pageHeading().should('equal', 'Edit current establishment')
   selectRandomAutocompleteOption('currentEstablishment')
+  cy.clickButton('Continue')
+
+  cy.clickLinkById('edit-receivedDateTime', editText)
+  cy.pageHeading().should('equal', 'Edit when PPCS received the recall')
+  addDateAndTime('dateTime', new Date('2026-02-30T14:35:00'))
   cy.clickButton('Continue')
 
   cy.clickLinkById('edit-probationarea', editText)
