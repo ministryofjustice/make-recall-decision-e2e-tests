@@ -4,6 +4,7 @@ import { addCucumberPreprocessorPlugin } from '@badeball/cypress-cucumber-prepro
 import createEsbuildPlugin from '@badeball/cypress-cucumber-preprocessor/esbuild'
 import { nodeModulesPolyfillPlugin } from 'esbuild-plugins-node-modules-polyfill'
 import installLogsPrinter from 'cypress-terminal-report/src/installLogsPrinter'
+import cypressSplit from 'cypress-split'
 import { readDocX } from '../cypress_shared/plugins'
 
 export default defineConfig({
@@ -37,6 +38,8 @@ export default defineConfig({
       on: Cypress.PluginEvents,
       config: Cypress.PluginConfigOptions
     ): Promise<Cypress.PluginConfigOptions> {
+      // This allows us to parallelise our test runs in the pipelines
+      cypressSplit(on, config)
       // This is required for the preprocessor to be able to generate JSON reports after each run, and more,
       await addCucumberPreprocessorPlugin(on, config)
       installLogsPrinter(on, {
@@ -59,7 +62,7 @@ export default defineConfig({
       config.env = {
         ...process.env,
         ...config.env,
-      } 
+      }
 
       return config
     },
