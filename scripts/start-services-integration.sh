@@ -18,8 +18,7 @@ docker compose -f "${API_DIR}/docker-compose.yml" pull
 
 pushd "${API_DIR}"
 printf "\n\nBuilding/starting API components...\n\n"
-# e2e-test-repo-ftr56 added for FTR56 testing - to be removed once merging into main
-export SPRING_PROFILES_ACTIVE=dev,seed-test-data,e2e-test-repo-ftr56
+export SPRING_PROFILES_ACTIVE=dev,seed-test-data
 export POSTGRES_OPTIONS=sslmode=disable
 docker compose build
 docker compose up -d
@@ -28,7 +27,6 @@ popd
 pushd "${UI_DIR}"
 printf "\n\nBuilding/starting UI components...\n\n"
 export USE_LOCAL_HEADER_FALLBACKS=true
-export FEATURE_FLAGFTR56ENABLED=2026-03-13T00:00Z # remove once FTR56 is released
 docker compose build
 docker compose up -d
 popd

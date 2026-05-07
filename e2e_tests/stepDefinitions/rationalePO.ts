@@ -878,7 +878,6 @@ const updateContactInformation = function (question: string) {
 /* ---- Cucumber glue ---- */
 
 Given('a PO has created a recommendation to/of recall/no-recall with:', (dataTable: DataTable) => {
-  cy.log(`ENV value read: ${Cypress.env('ENV')}`)
   const crn = ['DEV', 'PREPROD'].includes(Cypress.env('ENV')?.toString().toUpperCase())
     ? crns[faker.helpers.arrayElement(Object.keys(crns))]
     : 'X098092'
@@ -905,7 +904,7 @@ Given('PO( has) creates/created a Part A form with:', function (dataTable: DataT
 
 Given('PO has started creating the Part A form without requesting SPO review', function () {
   cy.logPageTitle('Share this case with your manager')
-  cy.clickLink('Continue')
+  cy.clickLink('Continaue')
   cy.logPageTitle('Discuss with your manager')
   cy.clickLink('Continue')
   cy.logPageTitle('Check MAPPA Information')

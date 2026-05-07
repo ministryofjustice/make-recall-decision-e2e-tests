@@ -1,0 +1,44 @@
+name: Pipeline [test -> build -> deploy]
+on:
+  push:
+    branches:
+      - '**'
+  workflow_dispatch:
+    inputs:
+      additional_docker_tag:
+        description: Additional docker tag that can be used to specify stable or testing tags
+        required: false
+        default: ''
+        type: string
+      push:
+        description: Push docker image to registry flag
+        required: true
+        default: false
+        type: boolean
+permissions:
+  contents: read
+  packages: write
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref == 'refs/heads/main' && github.sha || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+jobs:
+  e2e_local_tests:
+    name: Run e2e tests locally
+    permissions:
+      actions: write
+      contents: read
+    secrets: inherit
+    uses: ./.github/workflows/e2e_local_tests.yml
+    with:
+      e2e-branch-name: ${{ github.ref }}
+
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Prepare Slack failure message
+#        run: echo "Validation checks failed in workflow ${{ github.repository }} - ${{ github.workflow }}." > results_slack_message.txt
+#      - name: Notify Slack of failure
+#        uses: ministryofjustice/hmpps-github-shared-actions/.github/actions/slack_failure_results@c9b92b85a2aa7e313fb377a81fec08dd4f6f15b8 # v2
+#        with:
+#          channel_id: ${{ vars.PROD_RELEASES_SLACK_CHANNEL }}
+#          SLACK_BOT_TOKEN: ${{ secrets.HMPPS_SRE_SLACK_BOT_TOKEN }}
+#          input_file: results_slack_message.txt

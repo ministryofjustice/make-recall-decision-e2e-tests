@@ -48,7 +48,7 @@ Then('the PPCS recommendation is submitted by a PO', () => {
   pages.taskListConsiderRecall(ppcsTestData.recommendationId)
 
   cy.pageHeading().should('equal', 'Consider a recall')
-  cy.clickButton('Continue')
+  cy.clickButton('Contianue')
   cy.pageHeading().should('equal', 'Record the consideration in NDelius')
   cy.clickButton('Send to NDelius')
 
