@@ -167,6 +167,7 @@
     "cypress": "^15.13.1",
     "cypress-axe": "^1.7.0",
     "cypress-multi-reporters": "^2.0.5",
+    "cypress-split": "1.24.31",
     "cypress-terminal-report": "^7.3.3",
     "eslint": "^8.31.0",
     "eslint-config-airbnb-base": "^15.0.0",
