@@ -223,7 +223,7 @@ Then(
     cy.clickLink('Continue')
 
     if (ppudRecordState === PPUDRecordState.EXISTING) {
-      cy.pageHeading().should('contain', 'Add your booking to PPUD - ')
+      cy.pageHeading().should('contain', 'Select or add a sentence for your booking - ')
       selectRandomRadio('.govuk-radios', 'ADD_NEW')
       cy.clickButton('Continue')
 
