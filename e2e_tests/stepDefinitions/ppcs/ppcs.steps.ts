@@ -239,7 +239,7 @@ Then(
       // and can access direct data
       cy.clickButton('Continue')
 
-      cy.pageHeading().should('match', /Book \S.+? onto PPUD/)
+      cy.pageHeading().should('match', /Booked on to PPUD/)
       cy.clickButton('Continue')
     } else if (ppudRecordState === PPUDRecordState.NEW) {
       cy.pageHeading().should('equal', 'Select a matching index offence in PPUD')
@@ -255,7 +255,7 @@ Then(
       // and can access direct data
       cy.clickButton('Continue')
 
-      cy.pageHeading().should('contain', 'Create new PPUD record for ')
+      cy.pageHeading().should('contain', 'Record created and booked on to PPUD')
       cy.clickButton('Continue')
     }
   } else if (custodyGroup === CustodyGroup.INDETERMINATE) {
@@ -281,7 +281,7 @@ Then(
     cy.pageHeading().should('contain', 'Your recall booking for ')
     cy.clickButton('Continue')
 
-    cy.pageHeading().should('match', /Book \S.+? onto PPUD/)
+    cy.pageHeading().should('match', /Booked on in PPUD/)
     cy.clickButton('Continue')
   }
 })
