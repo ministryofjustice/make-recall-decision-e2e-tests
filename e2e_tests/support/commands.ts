@@ -24,7 +24,7 @@ const passwordAco = Cypress.env('PASSWORD_ACO')
 const userNamePpcs = Cypress.env('USERNAME_PPCS')
 const passwordPpcs = Cypress.env('PASSWORD_PPCS')
 
-const getUserDetails = function (userType: UserType) {
+const getUserDetails = function (url: string, userType: UserType) {
   let userDetails = {}
   cy.visit('/account-details')
   cy.getText('name').then(text => {
@@ -36,7 +36,7 @@ const getUserDetails = function (userType: UserType) {
   cy.getText('email').then(text => {
     userDetails['email'] = text
   })
-  cy.go('back')
+  cy.visit(url)
   cy.on("uncaught:exception", (e, runnable) => {
     console.log("uncaught:exception error", e)
     console.log("runnable", runnable)
@@ -53,7 +53,7 @@ Cypress.Commands.add('visitPage', (url, isSpoUser = false) => {
   cy.get('#username').type(isSpoUser ? userNameSpo : userNamePo, { log: false })
   cy.get('#password').type(isSpoUser ? passwordSpo : passwordPo, { log: false })
   cy.get('#submit').click()
-  getUserDetails(isSpoUser ? UserType.SPO : UserType.PO)
+  getUserDetails(url, isSpoUser ? UserType.SPO : UserType.PO)
 })
 
 const resolveUserDetails: (userType: UserType) => { username: string, password: string } = (userType) => {
@@ -78,5 +78,15 @@ Cypress.Commands.add('visitPageAndLogin', function (url, userType = UserType.PO)
   cy.get('#username').type(userDetails.username)
   cy.get('#password').type(userDetails.password, { log: false })
   cy.get('#submit').click()
-  getUserDetails(userType)
+  skipEmailVerification()
+  getUserDetails(url, userType)
 })
+
+const skipEmailVerification = () => {
+  cy.get('body').then($body => {
+    const $heading = $body.find('h1.govuk-heading-l')
+    if ($heading.text().trim() === 'Verify your email address') {
+      $body.find('input#cancel').trigger('click')
+    }
+  })
+}
