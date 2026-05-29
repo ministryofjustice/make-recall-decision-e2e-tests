@@ -655,17 +655,6 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
 const createDNTRLetter = function () {
   cy.clickLink(`MAPPA information to assess recall type`)
   cy.clickButton('Continue')
-  cy.clickLink(`When did the SPO agree this recall?`)
-  cy.logPageTitle('When did the SPO agree this recall?')
-  testData.recallDateBySPO = faker.date.recent(7)
-  cy.enterDateTime({
-    day: testData.recallDateBySPO.getDate().toString(),
-    month: (testData.recallDateBySPO.getMonth() + 1).toString(),
-    year: testData.recallDateBySPO.getFullYear().toString(),
-    hour: testData.recallDateBySPO.getHours().toString(),
-    minute: testData.recallDateBySPO.getMinutes().toString(),
-  })
-  cy.clickButton('Continue')
   cy.clickLink('Explain why you considered recall')
   cy.selectRadio(
     'Why you considered recall',
