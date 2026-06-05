@@ -1,3 +1,7 @@
+# The CircleCI to GHA migration script expects there to be deployment jobs and config, so we
+# couldn't use it here. The add-snyk.sh one (which migrates all security jobs, not just snyk)
+# can and was used for the security pipelines.
+
 version: 2.1
 
 orbs:
@@ -96,7 +100,7 @@ jobs:
           name: Checkout/clone make-recall-decision-e2e-tests
           command: |
             git clone https://github.com/ministryofjustice/make-recall-decision-e2e-tests.git
-            cd make-recall-decision-e2e-tests 
+            cd make-recall-decision-e2e-tests
             git checkout $CIRCLE_BRANCH
       - run:
           name: Checkout/clone make-recall-decision-api
@@ -121,7 +125,7 @@ jobs:
             npm run setup:no-audit
             echo PWD:: $PWD
             shopt -s globstar
-            
+
             SPECS=$(circleci tests glob "e2e_tests/features/**/*.feature" | circleci tests split --split-by=timings --show-counts  | paste -sd ',')
             echo "Running feature file(s): $SPECS"
 
@@ -170,7 +174,7 @@ jobs:
           name: Clone and checkout make-recall-decision-e2e-tests
           command: |
             git clone https://github.com/ministryofjustice/make-recall-decision-e2e-tests.git
-            cd make-recall-decision-e2e-tests 
+            cd make-recall-decision-e2e-tests
             git checkout $CIRCLE_BRANCH
       - run:
           name: Clone and checkout make-recall-decision-api
