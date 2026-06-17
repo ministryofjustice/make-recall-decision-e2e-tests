@@ -2,6 +2,8 @@
 
 [![Ministry of Justice Repository Compliance Badge](https://github-community.service.justice.gov.uk/repository-standards/api/make-recall-decision-e2e-tests/badge?style=flat)](https://github-community.service.justice.gov.uk/repository-standards/make-recall-decision-e2e-tests)
 
+[![GitHub Actions](https://github.com/ministryofjustice/make-recall-decision-e2e-tests/actions/workflows/pipeline.yml/badge.svg)](https://github.com/ministryofjustice/make-recall-decision-ui)
+
 This repo is for the e2e tests for Make Recall Decision Project. They run using Cypress.
 
 There's a HMPPS dev 'community of practice' talk on [how the E2E tests are set up](https://justiceuk.sharepoint.com/:v:/r/sites/HMPPSDeveloperCommunityofPractice/Shared%20Documents/COP%20Recordings/HMPPS%20Dev%20CoP_%20lightning%20talks%20(2022-09-07%2015_03%20GMT+3)%20(1).mp4?csf=1&web=1&e=XtIcxp&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D).
@@ -10,9 +12,7 @@ There's a HMPPS dev 'community of practice' talk on [how the E2E tests are set u
 
 All dependencies will be mocked, including upstream APIs used by make-recall-decision-api, and HMPPS Auth.
 
-Set the `CYPRESS_PASSWORD_PO`, `CYPRESS_PASSWORD_SPO` and `CYPRESS_PASSWORD_ACO` env vars in the [.env.local.sample](./.env.local.sample)
-file and copy it as `.env`. The passwords can be obtained from the `local_CYPRESS_PASSWORD_PO`, `local_CYPRESS_PASSWORD_SPO`
-and `local_CYPRESS_PASSWORD_ACO` env vars in [CircleCi](https://app.circleci.com/settings/project/github/ministryofjustice/make-recall-decision-ui/environment-variables)
+Create a copy of the [.env.local.sample](./.env.local.sample) and rename it to `.env`.
 
 Run the following command two in the root of the project from `make-recall-decision-ui` project. It will start `make-recall-decision-api` and other dependencies required for this service:
 
@@ -41,36 +41,33 @@ To pass any parameter to tests, use the `--env` param of cypress, e.g.
 npm run e2e-ui -- --env TAGS='@E2E and not @ignore',ENV=dev
 ```
 
-## E2E Tests on CircleCI
+## E2E Tests on GitHub Actions
 
-E2E tests are not run on a feature branch, only unit, integration and accessibility tests are run. Once a feature branch
-is merged into `main`, the E2E tests are ran against the `dev` environments after deployment. The user credentials they
-use to log into the service are stored as [environment variables (in CircleCI)](https://app.circleci.com/settings/project/github/ministryofjustice/make-recall-decision-ui/environment-variables) called
-`CYPRESS_USERNAME_PO<environment>`, `CYPRESS_PASSWORD_PO<environment>`, `CYPRESS_USERNAME_SPO_<environment>`,
-`CYPRESS_PASSWORD_SPO_<environment>`,`CYPRESS_USERNAME_ACO_<environment>`, `CYPRESS_PASSWORD_ACO_<environment>`,
-`CYPRESS_USERNAME_PPCS_<environment>`, `CYPRESS_PASSWORD_PPCS_<environment>`.
+E2E tests are not run on a feature branch; only unit, integration and accessibility tests are run. Once a feature branch
+is merged into `main`, the E2E tests are run both locally and against the `dev` environment (after deployment). The user
+credentials used to log into the service are stored as [environment variables in GitHub](https://github.com/ministryofjustice/make-recall-decision-ui/settings/secrets/actions) called
+`DEV_USERNAME_PO`, `DEV_PASSWORD_PO`, `DEV_USERNAME_SPO`, `DEV_PASSWORD_SPO`,`DEV_USERNAME_ACO`, `DEV_PASSWORD_ACO`,
+`DEV_USERNAME_PPCS` and `DEV_PASSWORD_PPCS`.
 
-### Running E2E tests on CircleCI on demand
+### Running E2E tests on GitHub Actions on demand
 
-The E2E test can be run manually on `dev` from the [Pipeline](https://app.circleci.com/pipelines/github/ministryofjustice/make-recall-decision-ui?branch=main) page
+The E2E test can be run manually on `dev` from either [the UI Pipeline](https://github.com/ministryofjustice/make-recall-decision-ui/actions/workflows/e2e_dev_tests.yml)
+or [the e2e tests Pipeline](https://github.com/ministryofjustice/make-recall-decision-e2e-tests/actions/workflows/pipeline.yml) pages
 
 To run the tests:
-1. Click on **Trigger Pipeline** button
-2. Click on **Add another parameter** button
-3. Select `boolean` in **Parameter type** dropdown
-4. Enter `e2e-check-dev` in **Name** field
-5. Select `true` in the **Value** field
-6. If you want to override the cucumber tags you can add another string parameter called `e2e-tags` and enter a valid
-   cucumber tag expression, .e.g. `@E2E and not @ignore` without any quotes. This is optional, if not passed it defaults
-   to `@E2E` when running on `dev`.
+1. Click on the **Run workflow** button (in the row above the one listing the latest run of the workflow)
+2. Select the branch you want the tests run for (only branches of the repository you're checking from are available)
+3. Click on the **Run workflow** button.
 
-If a test fails, look under the **ARTIFACTS** tab for the CircleCI job to see a screenshot, video and logs of the failed
-step.
+If a test fails, open the workflow run and scroll down beyond the pipeline graph. You should see a report with the
+results. For more details, you can click on the failed workflow and expand the 'Upload X' steps. Each one should include
+a link to download the relevant artifact. There should be such steps for screenshots, videos, test logs and JUnit
+results of the failed workflow.
 
 ## Running E2E tests locally against the service deployed on dev
 
-You can run the E2E tests in your local repo against dev. Useful in case the CircleCI tests are failing and you want to
-reproduce the issue locally.
+You can run the E2E tests in your local repo against dev. Useful in case the GitHub Actions tests are failing and you
+want to reproduce the issue locally.
 
 You can run your local tests against dev env using:
 
@@ -81,7 +78,7 @@ npx cypress open --env USERNAME=<username>,PASSWORD=<password>,USERNAME_SPO=<use
 With params replaced as follows:
 - USERNAME - your Delius username for `dev`
 - PASSWORD - your Delius password for `dev`
-- USERNAME_SPO - the value of the `dev_CYPRESS_USERNAME_SPO` env var in [CircleCi](https://app.circleci.com/settings/project/github/ministryofjustice/make-recall-decision-ui/environment-variables)
-- PASSWORD_SPO - the value of the `dev_CYPRESS_PASSWORD_SPO` env var in [CircleCi](https://app.circleci.com/settings/project/github/ministryofjustice/make-recall-decision-ui/environment-variables)
-- USERNAME_ACO - the value of the `dev_CYPRESS_USERNAME_ACO` env var in [CircleCi](https://app.circleci.com/settings/project/github/ministryofjustice/make-recall-decision-ui/environment-variables)
-- PASSWORD_ACO - the value of the `dev_CYPRESS_PASSWORD_ACO` env var in [CircleCi](https://app.circleci.com/settings/project/github/ministryofjustice/make-recall-decision-ui/environment-variables)
+- USERNAME_SPO - the SPO username set up for the team, which you can get from a team member or the team's 1Password vault
+- PASSWORD_SPO - the SPO password set up for the team, which you can get from a team member or the team's 1Password vault
+- USERNAME_ACO - the ACO username set up for the team, which you can get from a team member or the team's 1Password vault
+- PASSWORD_ACO - the ACO password set up for the team, which you can get from a team member or the team's 1Password vault
