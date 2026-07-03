@@ -103,7 +103,7 @@
     "cookie-session": "^2.0.0",
     "csurf": "^1.11.0",
     "dotenv": "^16.0.3",
-    "esbuild-plugins-node-modules-polyfill": "^1.7.1",
+    "esbuild-plugins-node-modules-polyfill": "^1.8.2",
     "express": "^4.21.0",
     "express-prom-bundle": "^6.6.0",
     "express-session": "^1.17.3",
