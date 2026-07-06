@@ -31,14 +31,14 @@ npm run e2e-ui
 
 ### Parameter supported
 The following parameters can be passed during a test run
-- `TAGS`: Cucumber tag expression can be passed to restrict the scenarios that get run in a test run
+- `tags`: Cucumber tag expression can be passed to restrict the scenarios that get run in a test run (must be `tags`, in lowercase, not `TAGS`)
 - `ENV`: environment where you want to run the tests, e.g. `dev` or `preprod`. If nothing is passed tests are run on
   local instance.
 
 #### Passing parameters
 To pass any parameter to tests, use the `--env` param of cypress, e.g.
 ```
-npm run e2e-ui -- --env TAGS='@E2E and not @ignore',ENV=dev
+npm run e2e-ui -- --env tags='@E2E and not @ignore',ENV=dev
 ```
 
 ## E2E Tests on GitHub Actions
