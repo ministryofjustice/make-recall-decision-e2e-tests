@@ -171,7 +171,8 @@ export const makeRecommendation = function (crn, recommendationDetails?: Record<
 
       cy.clickLink(`What has made you consider recalling ${offenderName}`)
       completeTriggerLeadingToRecallConsideration(offenderName)
-
+      
+      cy.clickLink(`What licence conditions has ${offenderName} breached?`)
       completeLicenceConditions(recommendationDetails)
 
       completeAlternativesTried(recommendationDetails)
