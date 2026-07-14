@@ -84,7 +84,7 @@ When('{userType}( has) visits/visited the countersigning/review link', function 
   cy.reload(true)
   cy.pageHeading().should('equal', 'Sign in')
   openApp(
-    { flagRecommendationsPage: 1, flagDeleteRecommendation: 1 },
+    { flagRecommendationsPage: 1, flagDeleteRecommendation: 1, ftr56SentenceConviction: 1 }, // remove ftr56SentenceConviction before merging into main
     userType,
     userType === UserType.SPO ? this.spoCounterSignatureLink : this.acoCounterSignatureLink
   )

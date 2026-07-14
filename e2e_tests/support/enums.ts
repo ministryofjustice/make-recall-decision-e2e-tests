@@ -22,6 +22,12 @@ export enum CustodyType {
   'NO' = 'No',
 }
 
+export enum IsRecalledOnNewChargedOrConvictedOffence {
+  ONLY_CHARGED,
+  CHARGED_AND_CONVICTED,
+  NO,
+}
+
 export enum NonIndeterminateRecallType {
   'STANDARD' = 'Standard',
   'FIXED_TERM' = 'Fixed',
