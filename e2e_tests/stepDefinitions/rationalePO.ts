@@ -191,20 +191,23 @@ export const makeRecommendation = function (crn, recommendationDetails?: Record<
 
 function completeIsRecalledOnNewChargedOrConvictedOffence(offenderName: string) {
   cy.logPageTitle('Is recalled due to offence charge/conviction')
+
+  let enumValue: IsRecalledOnNewChargedOrConvictedOffence
   if (testData.recallType === 'STANDARD') {
-    testData.suitabilityForfixedTermRecall = {
-      isRecalledOnNewChargedOrConvictedOffence: IsRecalledOnNewChargedOrConvictedOffence.ONLY_CHARGED,
-    }
+    enumValue = IsRecalledOnNewChargedOrConvictedOffence.ONLY_CHARGED
   } else {
-    testData.suitabilityForfixedTermRecall = {
-      isRecalledOnNewChargedOrConvictedOffence: IsRecalledOnNewChargedOrConvictedOffence.NO,
-    }
+    enumValue = IsRecalledOnNewChargedOrConvictedOffence.NO
+  }
+  const enumKey = Object.keys(IsRecalledOnNewChargedOrConvictedOffence)[
+    Object.values(IsRecalledOnNewChargedOrConvictedOffence).indexOf(enumValue)
+  ]
+
+  testData.suitabilityForfixedTermRecall = {
+    isRecalledOnNewChargedOrConvictedOffence: enumValue,
   }
   cy.selectRadioByValue(
     `Is ${offenderName} being recalled because of being charged or convicted for an offence?`,
-    IsRecalledOnNewChargedOrConvictedOffence[
-      testData.suitabilityForfixedTermRecall.isRecalledOnNewChargedOrConvictedOffence
-    ]
+    enumKey
   )
 
   cy.clickButton('Continue')
