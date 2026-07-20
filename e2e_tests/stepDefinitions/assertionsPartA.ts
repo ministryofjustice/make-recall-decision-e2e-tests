@@ -106,7 +106,6 @@ export const q5FTR56AdultSuitabilityCriteria = (contents: string, context: Recor
       mappaCategory: string;
     }
     suitabilityForfixedTermRecall?: {
-      isChargedWithOffence: keyof typeof YesNoType;
       isServingSOPCSentence: keyof typeof YesNoType;
       isServingDCRSentence: keyof typeof YesNoType;
       wasReferredToParoleBoard244ZB: keyof typeof YesNoType;
@@ -121,9 +120,7 @@ export const q5FTR56AdultSuitabilityCriteria = (contents: string, context: Recor
     expectSoftly(sectionContents, 'FTR56 suitability- MAPPA level 2 or 3').to.contain(
       `Is their MAPPA level 2 or 3? ${mappa?.mappaLevel === 'Level 2' || mappa?.mappaLevel === 'Level 3' ? YesNoType.YES : YesNoType.NO}`
     )
-    expectSoftly(sectionContents, 'FTR56 suitability- Charged with offence').to.contain(
-      `Are they being recalled on account of being charged with an offence?  ${suitabilityForfixedTermRecall ? YesNoType[suitabilityForfixedTermRecall.isChargedWithOffence] : ''}`
-    )
+    // TODO check for new question
     expectSoftly(sectionContents, 'FTR56 suitability- SOPC').to.contain(
       `Are they serving a sentence for offenders of particular concern (SOPC)? ${suitabilityForfixedTermRecall ? YesNoType[suitabilityForfixedTermRecall.isServingSOPCSentence] : ''}`
     )

@@ -9,7 +9,8 @@ export function loginAndSearchCrn(userType: UserType) {
     openApp(
         {
             flagRecommendationsPage: 1,
-            flagDeleteRecommendation: 1
+            flagDeleteRecommendation: 1,
+            ftr56SentenceConviction: 1, // remove before merging into main
         },
         userType
     )
