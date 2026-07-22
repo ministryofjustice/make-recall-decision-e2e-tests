@@ -63,7 +63,7 @@ jobs:
         shell: bash
         run: sudo npm install -g npm@11
       - name: Start components
-        working-directory: make-recall-decision-ui
+        working-directory: make-recall-decision-e2e-tests # should be reverted to using the ui one before merging to main
         run: ./scripts/start-services-for-e2e-tests.sh
       - uses: ministryofjustice/hmpps-assess-risks-and-needs-github-actions/.github/actions/cypress/create_timings_file@bd2ccc17cfc6c285638a4be7bbb280527a30c328 # v1.1.0
         with:
