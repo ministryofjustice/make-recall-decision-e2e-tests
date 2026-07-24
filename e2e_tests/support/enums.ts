@@ -23,9 +23,9 @@ export enum CustodyType {
 }
 
 export enum IsRecalledOnNewChargedOrConvictedOffence {
-  ONLY_CHARGED,
-  CHARGED_AND_CONVICTED,
-  NO,
+  ONLY_CHARGED = 'Yes, charged with a new offence but not convicted',
+  CHARGED_AND_CONVICTED = 'Yes, charged and convicted of a new offence',
+  NO = 'No',
 }
 
 export enum NonIndeterminateRecallType {
@@ -41,7 +41,7 @@ export enum IndeterminateRecallType {
 export enum IndeterminateOrExtendedSentenceDetailType {
   'BEHAVIOUR_SIMILAR_TO_INDEX_OFFENCE' = 'Has the offender exhibited behaviour similar to the circumstances surrounding the index offence?',
   'BEHAVIOUR_LEADING_TO_SEXUAL_OR_VIOLENT_OFFENCE' = 'Has the offender exhibited behaviour associated with the commission of a sexual or violent offence?',
-  'BEHAVIOUR_LIKELY_TO_RESULT_SEXUAL_OR_VIOLENT_OFFENCE' = 'Has the offender exhibited behaviour likely to give rise, or does give rise to  a sexual or violent offence?',
+  'BEHAVIOUR_LIKELY_TO_RESULT_SEXUAL_OR_VIOLENT_OFFENCE' = 'Has the offender exhibited behaviour likely to give rise, or does give rise to a sexual or violent offence?',
   'OUT_OF_TOUCH' = 'Is the offender out of touch with probation or is their whereabouts unknown?',
 }
 
