@@ -89,7 +89,7 @@ defineParameterType({
 })
 
 Before(() => {
-  openApp({ flagRecommendationsPage: 1, flagDeleteRecommendation: 1, ftr56SentenceConviction: 1 }) // remove ftr56SentenceConviction before merging into main
+  openApp({ flagRecommendationsPage: 1, flagDeleteRecommendation: 1 })
 })
 
 After(function () {

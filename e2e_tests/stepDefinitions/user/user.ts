@@ -10,7 +10,6 @@ export function loginAndSearchCrn(userType: UserType) {
         {
             flagRecommendationsPage: 1,
             flagDeleteRecommendation: 1,
-            ftr56SentenceConviction: 1, // remove before merging into main
         },
         userType
     )
