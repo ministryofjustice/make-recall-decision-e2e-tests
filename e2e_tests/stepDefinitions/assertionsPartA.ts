@@ -8,6 +8,7 @@ import {
 import {
   Alternatives,
   IndeterminateOrExtendedSentenceDetailType,
+  IsRecalledOnNewChargedOrConvictedOffence,
   LicenceConditions,
   NonIndeterminateRecallType,
   REGEXP_SPECIAL_CHAR,
@@ -26,7 +27,7 @@ const partASections = {
   2: '2. Is the offender serving a life or IPP/DPP sentence?',
   3: '3. Is the offender serving an extended sentence?',
   4: '4. Offenders sentenced as a youth – Eligibility for a 14/28-day FTR',
-  5: '5. To be eligible for a mandated 56-day FTR all answers must be “NO”',
+  5: '5a. Is the offender being recalled because of being charged or convicted for an offence?',
   6: '6. Offender/Young Offender Details',
   7: '7. Sentence details',
   8: '8. VICTIMS: (Any information presented here should be disclosable to the prisoner)',
@@ -84,74 +85,104 @@ export const q4OffendersSentencedAsYouth = (contents: string, context: Record<st
   if (context.suitabilityForfixedTermRecall?.isYouthSentenceOver12Months == "NO") {
     expectSoftly(sectionContents, 'MAPPA level 2 or 3').to.contain(`Are they MAPPA level 2 or 3? ${context.mappa.mappaLevel === 'Level 2' || context.mappa.mappaLevel === 'Level 3' ? 'Yes' : 'No'}`)
     expectSoftly(sectionContents, 'Recalled due to charge of serious offence').to.contain(
-    `Are they being recalled on account of being charged with a serious offence?  ${context.suitabilityForfixedTermRecall?.isYouthChargedWithSeriousOffence === "YES" ? 'Yes' : 'No'}`)
+    `Are they being recalled on account of being charged with a serious offence? ${context.suitabilityForfixedTermRecall?.isYouthChargedWithSeriousOffence === "YES" ? 'Yes' : 'No'}`)
   } else {
     if (context.sentenceGroup === 'INDETERMINATE' || context.sentenceGroup === 'EXTENDED') {
       expectSoftly(sectionContents, 'MAPPA level 2 or 3').to.contain(`Are they MAPPA level 2 or 3? N/A - indeterminate or extended sentence`)
       expectSoftly(sectionContents, 'Recalled due to charge of serious offence').to.contain(
-        `Are they being recalled on account of being charged with a serious offence?  N/A - indeterminate or extended sentence`)
+        'Are they being recalled on account of being charged with a serious offence? N/A - indeterminate or extended sentence'
+      )
     } else {
-      expectSoftly(sectionContents, 'MAPPA level 2 or 3').to.contain(`Are they MAPPA level 2 or 3? Are they being recalled on account`)
+      expectSoftly(sectionContents, 'MAPPA level 2 or 3').to.contain(
+        'Are they MAPPA level 2 or 3? Are they being recalled on account'
+      )
       expectSoftly(sectionContents, 'Recalled due to charge of serious offence').to.contain(
-      `Are they being recalled on account of being charged with a serious offence?  `)
+        'Are they being recalled on account of being charged with a serious offence? '
+      )
     }
   }
 }
 
 export const q5FTR56AdultSuitabilityCriteria = (contents: string, context: Record<string, string>) => {
   const sectionContents = contents.substring(contents.indexOf(partASections[5]), contents.indexOf(partASections[6]))
-  const { mappa, suitabilityForfixedTermRecall }: {
+  const {
+    mappa,
+    suitabilityForfixedTermRecall,
+  }: {
     mappa?: {
-      mappaLevel: string;
-      mappaCategory: string;
+      mappaLevel: string
+      mappaCategory: string
     }
     suitabilityForfixedTermRecall?: {
-      isChargedWithOffence: keyof typeof YesNoType;
-      isServingSOPCSentence: keyof typeof YesNoType;
-      isServingDCRSentence: keyof typeof YesNoType;
-      wasReferredToParoleBoard244ZB: keyof typeof YesNoType;
-      wasRepatriatedForMurder: keyof typeof YesNoType;
-      isAtRiskOfInvolvedInForeignPowerThreat: keyof typeof YesNoType;
-      isServingTerroristOrNationalSecurityOffence: keyof typeof YesNoType;
+      isRecalledOnNewChargedOrConvictedOffence: IsRecalledOnNewChargedOrConvictedOffence
+      isServingSOPCSentence: keyof typeof YesNoType
+      isServingDCRSentence: keyof typeof YesNoType
+      wasReferredToParoleBoard244ZB: keyof typeof YesNoType
+      wasRepatriatedForMurder: keyof typeof YesNoType
+      isAtRiskOfInvolvedInForeignPowerThreat: keyof typeof YesNoType
+      isServingTerroristOrNationalSecurityOffence: keyof typeof YesNoType
     }
   } = context
 
   // These are undefined when it's a YOUTH_SDS flow, so assert that differently
   if (context.sentenceGroup === "ADULT_SDS") {
-    expectSoftly(sectionContents, 'FTR56 suitability- MAPPA level 2 or 3').to.contain(
-      `Is their MAPPA level 2 or 3? ${mappa?.mappaLevel === 'Level 2' || mappa?.mappaLevel === 'Level 3' ? YesNoType.YES : YesNoType.NO}`
+    expectSoftly(sectionContents, 'FTR56 suitability- Charged or convicted for new offence').to.contain(
+      `Is the offender being recalled because of being charged or convicted for an offence? ${
+        suitabilityForfixedTermRecall ? suitabilityForfixedTermRecall.isRecalledOnNewChargedOrConvictedOffence : ''
+      }`
     )
-    expectSoftly(sectionContents, 'FTR56 suitability- Charged with offence').to.contain(
-      `Are they being recalled on account of being charged with an offence?  ${suitabilityForfixedTermRecall ? YesNoType[suitabilityForfixedTermRecall.isChargedWithOffence] : ''}`
+    expectSoftly(sectionContents, 'FTR56 suitability- MAPPA level 2 or 3').to.contain(
+      `Is their MAPPA level 2 or 3? ${
+        mappa?.mappaLevel === 'Level 2' || mappa?.mappaLevel === 'Level 3' ? YesNoType.YES : YesNoType.NO
+      }`
     )
     expectSoftly(sectionContents, 'FTR56 suitability- SOPC').to.contain(
-      `Are they serving a sentence for offenders of particular concern (SOPC)? ${suitabilityForfixedTermRecall ? YesNoType[suitabilityForfixedTermRecall.isServingSOPCSentence] : ''}`
+      `Are they serving a sentence for offenders of particular concern (SOPC)? ${
+        suitabilityForfixedTermRecall ? YesNoType[suitabilityForfixedTermRecall.isServingSOPCSentence] : ''
+      }`
     )
     expectSoftly(sectionContents, 'FTR56 suitability- DCR').to.contain(
-      `Are they serving a Discretionary Conditional Release (DCR) sentence? ${suitabilityForfixedTermRecall ? YesNoType[suitabilityForfixedTermRecall.isServingDCRSentence] : ''}`
+      `Are they serving a Discretionary Conditional Release (DCR) sentence? ${
+        suitabilityForfixedTermRecall ? YesNoType[suitabilityForfixedTermRecall.isServingDCRSentence] : ''
+      }`
     )
     expectSoftly(sectionContents, 'FTR56 suitability- Parole Board').to.contain(
-      `Were they referred to the Parole Board under section 244ZB (power to detain) on this sentence? ${suitabilityForfixedTermRecall ? YesNoType[suitabilityForfixedTermRecall.wasReferredToParoleBoard244ZB] : ''}`
+      `Were they referred to the Parole Board under section 244ZB (power to detain) on this sentence? ${
+        suitabilityForfixedTermRecall ? YesNoType[suitabilityForfixedTermRecall.wasReferredToParoleBoard244ZB] : ''
+      }`
     )
     expectSoftly(sectionContents, 'FTR56 suitability- Repatriated for murder').to.contain(
-      `Have they been repatriated to the UK following a sentence for murder? ${suitabilityForfixedTermRecall ? YesNoType[suitabilityForfixedTermRecall.wasRepatriatedForMurder] : ''}`
+      `Have they been repatriated to the UK following a sentence for murder? ${
+        suitabilityForfixedTermRecall ? YesNoType[suitabilityForfixedTermRecall.wasRepatriatedForMurder] : ''
+      }`
     )
     expectSoftly(sectionContents, 'FTR56 suitability- MAPPA category 4').to.contain(
       `Are they MAPPA category 4? ${mappa?.mappaCategory === "Category 4" ? 'Yes' : 'No'}`
     )
     expectSoftly(sectionContents, 'FTR56 suitability- Foreign power threat activity').to.contain(
-      `Are they considered to be a person who may be at risk of involvement in foreign power threat activity? ${suitabilityForfixedTermRecall ? YesNoType[suitabilityForfixedTermRecall.isAtRiskOfInvolvedInForeignPowerThreat] : ''}`
+      `Are they considered to be a person who may be at risk of involvement in foreign power threat activity? ${
+        suitabilityForfixedTermRecall
+          ? YesNoType[suitabilityForfixedTermRecall.isAtRiskOfInvolvedInForeignPowerThreat]
+          : ''
+      }`
     )
-    expectSoftly(sectionContents, 'FTR56 suitability- Are they serving sentence for terrorist or national security offence?').to.contain(
-      `Are they serving a sentence for a terrorist or national security offence? ${suitabilityForfixedTermRecall ? YesNoType[suitabilityForfixedTermRecall.isServingTerroristOrNationalSecurityOffence] : ''}`
+    expectSoftly(
+      sectionContents,
+      'FTR56 suitability- Are they serving sentence for terrorist or national security offence?'
+    ).to.contain(
+      `Are they serving a sentence for a terrorist or national security offence? ${
+        suitabilityForfixedTermRecall
+          ? YesNoType[suitabilityForfixedTermRecall.isServingTerroristOrNationalSecurityOffence]
+          : ''
+      }`
     )
   } else if (context.sentenceGroup === 'INDETERMINATE' || context.sentenceGroup === 'EXTENDED') {
     const exclusionString = 'N/A - indeterminate or extended sentence'
+    expectSoftly(sectionContents, 'FTR56 suitability- Charged or convicted for new offence').to.contain(
+      `Is the offender being recalled because of being charged or convicted for an offence? ${exclusionString}`
+    )
     expectSoftly(sectionContents, 'FTR56 suitability- MAPPA level 2 or 3').to.contain(
       `Is their MAPPA level 2 or 3? ${exclusionString}`
-    )
-    expectSoftly(sectionContents, 'FTR56 suitability- Charged with offence').to.contain(
-      `Are they being recalled on account of being charged with an offence?  ${exclusionString}`
     )
     expectSoftly(sectionContents, 'FTR56 suitability- SOPC').to.contain(
       `Are they serving a sentence for offenders of particular concern (SOPC)? ${exclusionString}`
@@ -171,15 +202,15 @@ export const q5FTR56AdultSuitabilityCriteria = (contents: string, context: Recor
     expectSoftly(sectionContents, 'FTR56 suitability- Foreign power threat activity').to.contain(
       `Are they considered to be a person who may be at risk of involvement in foreign power threat activity? ${exclusionString}`
     )
-    expectSoftly(sectionContents, 'FTR56 suitability- Are they serving sentence for terrorist or national security offence?').to.contain(
-      `Are they serving a sentence for a terrorist or national security offence? ${exclusionString}`
-    )
+    expectSoftly(
+      sectionContents,
+      'FTR56 suitability- Are they serving sentence for terrorist or national security offence?'
+    ).to.contain(`Are they serving a sentence for a terrorist or national security offence? ${exclusionString}`)
   } else {
     expectSoftly(sectionContents, 'FTR56 (Youth Flow) - suitability questions').to.contain(
       // This has been split up for readability's sake, template literals will cause unwanted spacing
       [
         'Is their MAPPA level 2 or 3? ',
-        'Are they being recalled on account of being charged with an offence?  ',
         'Are they serving a sentence for offenders of particular concern (SOPC)? ',
         'Are they serving a Discretionary Conditional Release (DCR) sentence? ',
         'Were they referred to the Parole Board under section 244ZB (power to detain) on this sentence? ',
@@ -187,7 +218,8 @@ export const q5FTR56AdultSuitabilityCriteria = (contents: string, context: Recor
         'Are they MAPPA category 4? ',
         'Are they considered to be a person who may be at risk of involvement in foreign power threat activity? ',
         'Are they serving a sentence for a terrorist or national security offence?'
-      ].join(''))
+      ].join('')
+    )
   }
 }
 
@@ -253,7 +285,7 @@ export const q7SentenceDetails = function (contents: string, context: Record<str
   expectSoftly(contents, 'Sentence Details-Dates of Original Offence').to.match(
     context.dateOfOriginalOffence
       ? new RegExp(
-          `Date of original offence: \\t${changeDateFromLongFormatToShort(context.dateOfOriginalOffence).replace(
+          `Date of original offence: ${changeDateFromLongFormatToShort(context.dateOfOriginalOffence).replace(
             REGEXP_SPECIAL_CHAR,
             '\\$&'
           )}`
@@ -263,7 +295,7 @@ export const q7SentenceDetails = function (contents: string, context: Record<str
   expectSoftly(contents, 'Sentence Details-Dates').to.match(
     context.dateOfSentence
       ? new RegExp(
-          `Date of sentence: \\t${changeDateFromLongFormatToShort(context.dateOfSentence).replace(
+          `Date of sentence: ${changeDateFromLongFormatToShort(context.dateOfSentence).replace(
             REGEXP_SPECIAL_CHAR,
             '\\$&'
           )}`
@@ -272,7 +304,7 @@ export const q7SentenceDetails = function (contents: string, context: Record<str
   )
   expectSoftly(contents, 'Sentence Details-Length').to.match(
     context.lengthOfSentence
-      ? new RegExp(`Length of sentence: \\t${context.lengthOfSentence.replace(REGEXP_SPECIAL_CHAR, '\\$&')}`)
+      ? new RegExp(`Length of sentence: ${context.lengthOfSentence.replace(REGEXP_SPECIAL_CHAR, '\\$&')}`)
       : (apiDataForCrn.lengthOfSentence as RegExp)
   )
   expectSoftly(contents, 'Sentence Details-Licence Expiry Date').to.match(
@@ -281,7 +313,7 @@ export const q7SentenceDetails = function (contents: string, context: Record<str
       ? /Licence expiry date:/
       : context.licenceExpiryDate && context.licenceExpiryDate.length > 0
       ? new RegExp(
-          `Licence expiry date: \\t${changeDateFromLongFormatToShort(context.licenceExpiryDate).replace(
+          `Licence expiry date: ${changeDateFromLongFormatToShort(context.licenceExpiryDate).replace(
             REGEXP_SPECIAL_CHAR,
             '\\$&'
           )}`
@@ -294,7 +326,7 @@ export const q7SentenceDetails = function (contents: string, context: Record<str
       ? /Sentence expiry date:/
       : context.sentenceExpiryDate && context.sentenceExpiryDate.length > 0
       ? new RegExp(
-          `Sentence expiry date: \\t${changeDateFromLongFormatToShort(context.sentenceExpiryDate).replace(
+          `Sentence expiry date: ${changeDateFromLongFormatToShort(context.sentenceExpiryDate).replace(
             REGEXP_SPECIAL_CHAR,
             '\\$&'
           )}`
@@ -306,7 +338,7 @@ export const q7SentenceDetails = function (contents: string, context: Record<str
     context.custodialTerm === ''
       ? /Custodial term:/
       : context.custodialTerm && context.custodialTerm.length > 0
-      ? new RegExp(`Custodial term: \\t${context.custodialTerm.replace(REGEXP_SPECIAL_CHAR, '\\$&')}`)
+      ? new RegExp(`Custodial term: ${context.custodialTerm.replace(REGEXP_SPECIAL_CHAR, '\\$&')}`)
       : (apiDataForCrn.custodialTerm as RegExp)
   )
   expectSoftly(contents, 'Sentence Details-Extended Term').to.match(
@@ -314,7 +346,7 @@ export const q7SentenceDetails = function (contents: string, context: Record<str
     context.extendedTerm === ''
       ? /Extended term:/
       : context.extendedTerm && context.extendedTerm.length > 0
-      ? new RegExp(`Extended term: \\t${context.extendedTerm.replace(REGEXP_SPECIAL_CHAR, '\\$&')}`)
+      ? new RegExp(`Extended term: ${context.extendedTerm.replace(REGEXP_SPECIAL_CHAR, '\\$&')}`)
       : (apiDataForCrn.extendedTerm as RegExp)
   )
 }
@@ -354,7 +386,7 @@ export const q9PoliceInformation = (
     `Are there any arrest issues of which police should be aware? ${hasArrestIssues}`
   )
   expectSoftly(contents, 'Additional arrests information').to.contain(
-    `If yes, provide details below, including information about risks to staff, any children or vulnerable adults linked to any of the above addresses: ${arrestIssuesDetails}`
+    `If yes, provide details below, including information about risks to staff, any children or vulnerable adults linked to any of the below addresses: ${arrestIssuesDetails}`
   )
 
   if (localPoliceDetails) {

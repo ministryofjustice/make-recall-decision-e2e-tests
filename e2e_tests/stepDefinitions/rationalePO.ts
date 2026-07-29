@@ -21,6 +21,7 @@ import {
   CustodyType,
   IndeterminateOrExtendedSentenceDetailType,
   IndeterminateRecallType,
+  IsRecalledOnNewChargedOrConvictedOffence,
   NonIndeterminateRecallType,
   Regions,
   ROSHLevels,
@@ -188,6 +189,30 @@ export const makeRecommendation = function (crn, recommendationDetails?: Record<
   cy.clickButton('Send to NDelius')
 }
 
+function completeIsRecalledOnNewChargedOrConvictedOffence(offenderName: string) {
+  cy.logPageTitle('Is recalled due to offence charge/conviction')
+
+  let enumValue: IsRecalledOnNewChargedOrConvictedOffence
+  if (testData.recallType === 'STANDARD') {
+    enumValue = IsRecalledOnNewChargedOrConvictedOffence.ONLY_CHARGED
+  } else {
+    enumValue = IsRecalledOnNewChargedOrConvictedOffence.NO
+  }
+  const enumKey = Object.keys(IsRecalledOnNewChargedOrConvictedOffence)[
+    Object.values(IsRecalledOnNewChargedOrConvictedOffence).indexOf(enumValue)
+  ]
+
+  testData.suitabilityForfixedTermRecall = {
+    isRecalledOnNewChargedOrConvictedOffence: enumValue,
+  }
+  cy.selectRadioByValue(
+    `Is ${offenderName} being recalled because of being charged or convicted for an offence?`,
+    enumKey
+  )
+
+  cy.clickButton('Continue')
+}
+
 function selectVulnerabilities(selectedVulnerabilities: Vulnerabilities[], offenderName: string) {
   cy.pageHeading().should(
     'equal',
@@ -328,13 +353,14 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
     if (testData.sentenceGroup === SentenceGroup.ADULT_SDS) {
       cy.logPageTitle('Check MAPPA Information')
       cy.clickButton('Continue')
+
+      completeIsRecalledOnNewChargedOrConvictedOffence(this.offenderName)
     }
 
     cy.logPageTitle('Suitability for fixed term recall')
 
     if (testData.sentenceGroup === SentenceGroup.ADULT_SDS) {
-      testData.suitabilityForfixedTermRecall = randomiseCriteria<{
-        isChargedWithOffence: string
+      const suitabilityForFixedTermRecallCriteria = randomiseCriteria<{
         isServingTerroristOrNationalSecurityOffence: string
         isAtRiskOfInvolvedInForeignPowerThreat: string
         wasReferredToParoleBoard244ZB: string
@@ -343,10 +369,6 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
         isServingDCRSentence: string
       }>(
         [
-          {
-            key: 'isChargedWithOffence',
-            generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
-          },
           {
             key: 'isServingTerroristOrNationalSecurityOffence',
             generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
@@ -376,10 +398,10 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
           ? criteria => Object.keys(criteria).every(k => criteria[k] === 'NO')
           : criteria => Object.keys(criteria).some(k => criteria[k] === 'YES')
       )
-      cy.selectRadioByValue(
-        `Is ${this.offenderName} being recalled because of being charged with an offence?`,
-        testData.suitabilityForfixedTermRecall.isChargedWithOffence
-      )
+      testData.suitabilityForfixedTermRecall = {
+        ...testData.suitabilityForfixedTermRecall,
+        ...suitabilityForFixedTermRecallCriteria,
+      }
       cy.selectRadioByValue(
         `Is ${this.offenderName} serving a sentence for a terrorist or national security offence?`,
         testData.suitabilityForfixedTermRecall.isServingTerroristOrNationalSecurityOffence
@@ -707,9 +729,11 @@ const recordPoDecision = function (poDecision?: string) {
   if (testData.sentenceGroup === SentenceGroup.ADULT_SDS) {
     cy.logPageTitle('Check MAPPA Information')
     cy.clickButton('Continue')
+
+    completeIsRecalledOnNewChargedOrConvictedOffence(this.offenderName)
+
     cy.logPageTitle('Suitability for fixed term recall')
-    testData.suitabilityForfixedTermRecall = randomiseCriteria<{
-      isChargedWithOffence: string
+    const suitabilityForFixedTermRecallCriteria = randomiseCriteria<{
       isServingTerroristOrNationalSecurityOffence: string
       isAtRiskOfInvolvedInForeignPowerThreat: string
       wasReferredToParoleBoard244ZB: string
@@ -718,10 +742,6 @@ const recordPoDecision = function (poDecision?: string) {
       isServingDCRSentence: string
     }>(
       [
-        {
-          key: 'isChargedWithOffence',
-          generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
-        },
         {
           key: 'isServingTerroristOrNationalSecurityOffence',
           generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
@@ -751,10 +771,10 @@ const recordPoDecision = function (poDecision?: string) {
         ? criteria => Object.keys(criteria).every(k => criteria[k] === 'NO')
         : criteria => Object.keys(criteria).some(k => criteria[k] === 'YES')
     )
-    cy.selectRadioByValue(
-      `Is ${this.offenderName} being recalled because of being charged with an offence?`,
-      testData.suitabilityForfixedTermRecall.isChargedWithOffence
-    )
+    testData.suitabilityForfixedTermRecall = {
+      ...testData.suitabilityForfixedTermRecall,
+      ...suitabilityForFixedTermRecallCriteria,
+    }
     cy.selectRadioByValue(
       `Is ${this.offenderName} serving a sentence for a terrorist or national security offence?`,
       testData.suitabilityForfixedTermRecall.isServingTerroristOrNationalSecurityOffence
@@ -900,9 +920,10 @@ Given('PO has started creating the Part A form without requesting SPO review', f
   cy.clickButton('Continue')
 
   if (testData.sentenceGroup !== SentenceGroup.INDETERMINATE && testData.sentenceGroup !== SentenceGroup.EXTENDED) {
+    completeIsRecalledOnNewChargedOrConvictedOffence(this.offenderName)
+
     cy.logPageTitle('Suitability for fixed term recall')
-    testData.suitabilityForfixedTermRecall = randomiseCriteria<{
-      isChargedWithOffence: string
+    const suitabilityForFixedTermRecallCriteria = randomiseCriteria<{
       isServingTerroristOrNationalSecurityOffence: string
       isAtRiskOfInvolvedInForeignPowerThreat: string
       wasReferredToParoleBoard244ZB: string
@@ -911,10 +932,6 @@ Given('PO has started creating the Part A form without requesting SPO review', f
       isServingDCRSentence: string
     }>(
       [
-        {
-          key: 'isChargedWithOffence',
-          generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
-        },
         {
           key: 'isServingTerroristOrNationalSecurityOffence',
           generate: () => faker.helpers.arrayElement(Object.keys(YesNoType)),
@@ -944,10 +961,10 @@ Given('PO has started creating the Part A form without requesting SPO review', f
         ? () => true
         : criteria => Object.keys(criteria).some(k => criteria[k] === 'YES')
     )
-    cy.selectRadioByValue(
-      `Is ${this.offenderName} being recalled because of being charged with an offence?`,
-      testData.suitabilityForfixedTermRecall.isChargedWithOffence
-    )
+    testData.suitabilityForfixedTermRecall = {
+      ...testData.suitabilityForfixedTermRecall,
+      ...suitabilityForFixedTermRecallCriteria,
+    }
     cy.selectRadioByValue(
       `Is ${this.offenderName} serving a sentence for a terrorist or national security offence?`,
       testData.suitabilityForfixedTermRecall.isServingTerroristOrNationalSecurityOffence

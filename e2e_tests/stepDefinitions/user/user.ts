@@ -9,7 +9,7 @@ export function loginAndSearchCrn(userType: UserType) {
     openApp(
         {
             flagRecommendationsPage: 1,
-            flagDeleteRecommendation: 1
+            flagDeleteRecommendation: 1,
         },
         userType
     )
