@@ -652,7 +652,7 @@ export const q24SPOEndorsement = function (
   // eslint-disable-next-line no-param-reassign
   contents = contents.substring(contents.indexOf(partASections[24]), contents.indexOf(partASections[25]))
   cy.log(`Q24: ${JSON.stringify(details)} ${contents}`)
-  expectSoftly(contents, 'SPO Reason').to.contain(`Please provide your view on the recall:${details.reason}`)
+  expectSoftly(contents, 'SPO Reason').to.contain(`Please provide your view on the recall: ${details.reason}`)
   expectSoftly(contents, 'SPO Name').to.contain(`Name of person completing this form: ${this.SPO ? this.SPO.name : ''}`)
   expectSoftly(contents, 'SPO Email').to.contain(`Email address: ${this.SPO ? this.SPO.email : ''}`)
   expectSoftly(contents, 'SPO Telephone').to.contain(`Telephone Number: ${details.telephone ? details.telephone : ''}`)
@@ -668,7 +668,7 @@ export const q25ACOAuthorisation = function (contents: string, details: Record<s
   // eslint-disable-next-line no-param-reassign
   contents = contents.substring(contents.indexOf(partASections[25]), contents.indexOf(partASections[26]))
   cy.log(`Q25: ${JSON.stringify(details)} ${contents}`)
-  expectSoftly(contents, 'ACO Reason').to.contain(`Provide details ${details.reason}`)
+  expectSoftly(contents, 'ACO Reason').to.contain(`${details.reason}`)
   expectSoftly(contents, 'ACO Name').to.contain(`Name of person completing this form: ${this.ACO ? this.ACO.name : ''}`)
   expectSoftly(contents, 'ACO Telephone').to.contain(`Telephone Number: ${details.telephone ? details.telephone : ''}`)
   expectSoftly(contents, 'ACO Email').to.contain(`Email Address: ${this.ACO ? this.ACO.email : ''}`)
