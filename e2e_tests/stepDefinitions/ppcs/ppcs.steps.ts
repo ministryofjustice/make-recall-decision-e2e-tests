@@ -288,7 +288,7 @@ Then(
 
 Then('the {custodyGroup} booking reports successfully sent to PPUD', function (custodyGroup: CustodyGroup) {
   if ([CustodyGroup.DETERMINATE, CustodyGroup.INDETERMINATE].includes(custodyGroup)) {
-    cy.pageHeading().should('contain', 'Your recall booking')
+    cy.pageHeading().should('contain', 'Booked onto PPUD')
   } else {
     cy.contains(`Unexpected custody group encountered: ${custodyGroup}`).should('exist')
   }
