@@ -16,8 +16,8 @@ export default defineConfig({
   fixturesFolder: 'e2e_tests/fixtures',
   screenshotsFolder: 'e2e_tests/screenshots',
   videosFolder: 'e2e_tests/videos',
-  video: process.env.ENVIRONMENT !== 'local',
-  videoCompression: process.env.ENVIRONMENT !== 'local',
+  video: false,
+  videoCompression: false,
   reporter: 'cypress-multi-reporters',
   reporterOptions: {
     reportDir: 'e2e_tests/reports',
@@ -57,6 +57,13 @@ export default defineConfig({
 
       on('task', {
         readDocX,
+      })
+
+      on('before:browser:launch', (browser, launchOptions) => {
+        if (browser.family === 'chromium') {
+          launchOptions.args.push('--disable-dev-shm-usage')
+        }
+        return launchOptions
       })
 
       config.env = {
