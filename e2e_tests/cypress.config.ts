@@ -5,6 +5,7 @@ import createEsbuildPlugin from '@badeball/cypress-cucumber-preprocessor/esbuild
 import { nodeModulesPolyfillPlugin } from 'esbuild-plugins-node-modules-polyfill'
 import installLogsPrinter from 'cypress-terminal-report/src/installLogsPrinter'
 import cypressSplit from 'cypress-split'
+import * as fs from 'node:fs'
 import { readDocX } from '../cypress_shared/plugins'
 
 export default defineConfig({
@@ -64,6 +65,14 @@ export default defineConfig({
           launchOptions.args.push('--disable-dev-shm-usage')
         }
         return launchOptions
+      })
+
+      on('after:spec', (spec: Cypress.Spec, results: CypressCommandLine.RunResult) => {
+        // Do we have failures?
+        if (results && results.video && results.stats.failures === 0) {
+          // delete the video if the spec passed
+          fs.unlinkSync(results.video)
+        }
       })
 
       config.env = {
