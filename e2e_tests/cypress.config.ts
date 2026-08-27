@@ -83,6 +83,8 @@ export default defineConfig({
       return config
     },
     baseUrl: 'http://localhost:3000',
+    // without this, the memory usage of our e2e dev tests was building up throughout the test run and leading to OOM
+    numTestsKeptInMemory: 0,
     excludeSpecPattern: '**/!(*.cy).ts',
     specPattern: '**/*.feature',
     supportFile: 'e2e_tests/support/index.ts',
