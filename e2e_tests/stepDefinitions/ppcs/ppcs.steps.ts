@@ -212,6 +212,21 @@ Then(
   selectRandomRadio('.govuk-radios') // Forced to select by class at the moment as no id
   cy.clickButton('Continue')
 
+  // Upload supporting documents
+  cy.clickLink('Upload documents')
+  cy.pageHeading().should('contain', 'Add supporting documents for ')
+
+  cy.get('input[type=file]').selectFile('e2e_tests/fixtures/test-upload.txt', { force: true })
+
+  cy.get('.moj-multi-file-upload__list', { timeout: 10000 }).within(() => {
+    cy.get('.moj-multi-file-upload__message').should('contain.text', 'test-upload.txt')
+    cy.get('.govuk-tag--green').should('contain.text', 'Uploaded')
+  })
+
+  cy.go('back')
+
+  // Back on check booking details after supporting documents
+  cy.pageHeading().should('contain', 'Check booking details for ')
   cy.clickButton('Continue')
 
   if (custodyGroup === CustodyGroup.DETERMINATE) {
