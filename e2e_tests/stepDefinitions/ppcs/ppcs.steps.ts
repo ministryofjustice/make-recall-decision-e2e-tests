@@ -223,7 +223,7 @@ Then(
     cy.get('.govuk-tag--green').should('contain.text', 'Uploaded')
   })
 
-  cy.go('back')
+  cy.visit(`/recommendations/${ppcsTestData.recommendationId}/check-booking-details`)
 
   // Back on check booking details after supporting documents
   cy.pageHeading().should('contain', 'Check booking details for ')
@@ -254,8 +254,7 @@ Then(
       // and can access direct data
       cy.clickButton('Continue')
 
-      cy.pageHeading().should('contain', 'Book ')
-      cy.pageHeading().should('contain', 'onto PPUD')
+      cy.pageHeading().should('contain', 'Booked on in PPUD')
       cy.clickButton('Continue')
     } else if (ppudRecordState === PPUDRecordState.NEW) {
       cy.pageHeading().should('equal', 'Select a matching index offence in PPUD')
@@ -297,8 +296,7 @@ Then(
     cy.pageHeading().should('contain', 'Your recall booking for ')
     cy.clickButton('Continue')
 
-    cy.pageHeading().should('contain', 'Book ')
-    cy.pageHeading().should('contain', 'onto PPUD')
+    cy.pageHeading().should('contain', 'Booked on in PPUD')
     cy.clickButton('Continue')
   }
 })
