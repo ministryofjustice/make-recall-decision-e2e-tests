@@ -212,21 +212,6 @@ Then(
   selectRandomRadio('.govuk-radios') // Forced to select by class at the moment as no id
   cy.clickButton('Continue')
 
-  // Upload supporting documents
-  cy.clickLink('Upload documents')
-  cy.pageHeading().should('contain', 'Add supporting documents for ')
-
-  cy.get('input[type=file]').selectFile('e2e_tests/fixtures/test-upload.txt', { force: true })
-
-  cy.get('.moj-multi-file-upload__list', { timeout: 10000 }).within(() => {
-    cy.get('.moj-multi-file-upload__message').should('contain.text', 'test-upload.txt')
-    cy.get('.govuk-tag--green').should('contain.text', 'Uploaded')
-  })
-
-  cy.visit(`/recommendations/${ppcsTestData.recommendationId}/check-booking-details`)
-
-  // Back on check booking details after supporting documents
-  cy.pageHeading().should('contain', 'Check booking details for ')
   cy.clickButton('Continue')
 
   if (custodyGroup === CustodyGroup.DETERMINATE) {
@@ -249,12 +234,22 @@ Then(
       cy.pageHeading().should('equal', 'Change index offence or add a comment')
       cy.clickButton('Continue')
 
+      // Upload supporting documents
+      cy.pageHeading().should('contain', 'Add supporting documents for ')
+      cy.get('input[type=file]').selectFile('e2e_tests/fixtures/test-upload.txt', { force: true })
+      cy.get('.moj-multi-file-upload__list', { timeout: 10000 }).within(() => {
+        cy.get('.moj-multi-file-upload__message').should('contain.text', 'test-upload.txt')
+        cy.get('.govuk-tag--green').should('contain.text', 'Uploaded')
+      })
+      cy.clickButton('Continue')
+
       cy.pageHeading().should('contain', 'Double check your booking')
       // TODO Verify data that was set during the test once we have normalised the summary list
       // and can access direct data
       cy.clickButton('Continue')
 
-      cy.pageHeading().should('contain', 'Booked on in PPUD')
+      cy.pageHeading().should('contain', 'Book ')
+      cy.pageHeading().should('contain', 'onto PPUD')
       cy.clickButton('Continue')
     } else if (ppudRecordState === PPUDRecordState.NEW) {
       cy.pageHeading().should('equal', 'Select a matching index offence in PPUD')
@@ -263,6 +258,15 @@ Then(
 
       cy.pageHeading().should('contain', 'Which custody type is ')
       selectRandomRadio('.govuk-radios')
+      cy.clickButton('Continue')
+
+      // Upload supporting documents
+      cy.pageHeading().should('contain', 'Add supporting documents for ')
+      cy.get('input[type=file]').selectFile('e2e_tests/fixtures/test-upload.txt', { force: true })
+      cy.get('.moj-multi-file-upload__list', { timeout: 10000 }).within(() => {
+        cy.get('.moj-multi-file-upload__message').should('contain.text', 'test-upload.txt')
+        cy.get('.govuk-tag--green').should('contain.text', 'Uploaded')
+      })
       cy.clickButton('Continue')
 
       cy.pageHeading().should('contain', 'Your recall booking - ')
@@ -293,10 +297,20 @@ Then(
     selectRandomRadio('.govuk-radios') // Forced to select by class at the moment as no id
     cy.clickButton('Continue')
 
+    // Upload supporting documents
+    cy.pageHeading().should('contain', 'Add supporting documents for ')
+    cy.get('input[type=file]').selectFile('e2e_tests/fixtures/test-upload.txt', { force: true })
+    cy.get('.moj-multi-file-upload__list', { timeout: 10000 }).within(() => {
+      cy.get('.moj-multi-file-upload__message').should('contain.text', 'test-upload.txt')
+      cy.get('.govuk-tag--green').should('contain.text', 'Uploaded')
+    })
+    cy.clickButton('Continue')
+
     cy.pageHeading().should('contain', 'Your recall booking for ')
     cy.clickButton('Continue')
 
-    cy.pageHeading().should('contain', 'Booked on in PPUD')
+    cy.pageHeading().should('contain', 'Book ')
+    cy.pageHeading().should('contain', 'onto PPUD')
     cy.clickButton('Continue')
   }
 })
