@@ -241,7 +241,7 @@ Then(
         cy.get('.moj-multi-file-upload__message').should('contain.text', 'test-upload.txt')
         cy.get('.govuk-tag--green').should('contain.text', 'Uploaded')
       })
-      cy.clickButton('Continue')
+      cy.clickLink('Continue')
 
       cy.pageHeading().should('contain', 'Double check your booking')
       // TODO Verify data that was set during the test once we have normalised the summary list
@@ -267,7 +267,7 @@ Then(
         cy.get('.moj-multi-file-upload__message').should('contain.text', 'test-upload.txt')
         cy.get('.govuk-tag--green').should('contain.text', 'Uploaded')
       })
-      cy.clickButton('Continue')
+      cy.clickLink('Continue')
 
       cy.pageHeading().should('contain', 'Your recall booking - ')
       // TODO Verify data that was set during the test once we have normalised the summary list
@@ -304,7 +304,7 @@ Then(
       cy.get('.moj-multi-file-upload__message').should('contain.text', 'test-upload.txt')
       cy.get('.govuk-tag--green').should('contain.text', 'Uploaded')
     })
-    cy.clickButton('Continue')
+    cy.clickLink('Continue')
 
     cy.pageHeading().should('contain', 'Your recall booking for ')
     cy.clickButton('Continue')
