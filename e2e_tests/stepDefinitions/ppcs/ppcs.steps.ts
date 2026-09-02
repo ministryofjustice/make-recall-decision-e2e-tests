@@ -246,16 +246,12 @@ Then(
 
       completeFileUpload()
 
-      // TODO: uncomment below assertions once /add-minute page is ready
-      // cy.pageHeading().should('contain', 'Check booking details for ')
-      // cy.clickButton('Continue')
+      cy.pageHeading().should('contain', 'Double check your booking')
+      cy.clickButton('Continue')
 
-      // cy.pageHeading().should('contain', 'Double check your booking')
-      // cy.clickButton('Continue')
-
-      // cy.pageHeading().should('contain', 'Book ')
-      // cy.pageHeading().should('contain', 'onto PPUD')
-      // cy.clickButton('Continue')
+      cy.pageHeading().should('contain', 'Book ')
+        cy.pageHeading().should('contain', 'onto PPUD')
+        cy.clickButton('Continue')
     } else if (ppudRecordState === PPUDRecordState.NEW) {
       cy.pageHeading().should('equal', 'Select a matching index offence in PPUD')
       selectRandomAutocompleteOption('indexOffence')
@@ -267,15 +263,11 @@ Then(
 
       completeFileUpload()
 
-      // TODO: uncomment below assertions once /add-minute page is ready
-      // cy.pageHeading().should('contain', 'Check booking details for ')
-      // cy.clickButton('Continue')
+      cy.pageHeading().should('contain', 'Your recall booking - ')
+      cy.clickButton('Continue')
 
-      // cy.pageHeading().should('contain', 'Your recall booking - ')
-      // cy.clickButton('Continue')
-
-      // cy.pageHeading().should('contain', 'Create new PPUD record for ')
-      // cy.clickButton('Continue')
+      cy.pageHeading().should('contain', 'Create new PPUD record for ')
+      cy.clickButton('Continue')
     }
   } else if (custodyGroup === CustodyGroup.INDETERMINATE) {
     cy.pageHeading().should('contain', 'Select a sentence for your booking')
@@ -297,18 +289,12 @@ Then(
     selectRandomRadio('.govuk-radios') // Forced to select by class at the moment as no id
     cy.clickButton('Continue')
 
-    completeFileUpload()
+    cy.pageHeading().should('contain', 'Your recall booking for ')
+    cy.clickButton('Continue')
 
-    // TODO: uncomment below assertions once /add-minute page is ready
-    // cy.pageHeading().should('contain', 'Check booking details for ')
-    // cy.clickButton('Continue')
-
-    // cy.pageHeading().should('contain', 'Your recall booking for ')
-    // cy.clickButton('Continue')
-
-    // cy.pageHeading().should('contain', 'Book ')
-    // cy.pageHeading().should('contain', 'onto PPUD')
-    // cy.clickButton('Continue')
+    cy.pageHeading().should('contain', 'Book ')
+    cy.pageHeading().should('contain', 'onto PPUD')
+    cy.clickButton('Continue')
   }
 })
 
