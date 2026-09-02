@@ -198,27 +198,15 @@
   },
   "overrides": {
     "@opentelemetry/core": "2.10.0",
-    "brace-expansion": "5.0.9",
     "csurf": {
       "cookie": "0.7.2"
     },
     "micromatch": "4.0.8",
     "mocha": {
-      "serialize-javascript": "7.0.5",
-      "diff": "8.0.3"
+      "diff": "8.0.3",
+      "serialize-javascript": "7.0.5"
     },
-    "yaml": "2.8.3",
-    "@badeball/cypress-cucumber-preprocessor": {
-      "find-cypress-specs": {
-        "tsx": "4.22.4"
-      }
-    },
-    "@bahmutov/cypress-esbuild-preprocessor": {
-      "esbuild": "0.28.1"
-    },
-    "esbuild-plugins-node-modules-polyfill": {
-      "esbuild": "0.28.1"
-    }
+    "yaml": "2.8.3"
   },
   "overridesComments": {
     "glob": "Jest depends on babel-plugin-istanbul, which depends on an older glob version. This should be fixed soon, but overriding this until then - see https://github.com/istanbuljs/babel-plugin-istanbul/issues",
