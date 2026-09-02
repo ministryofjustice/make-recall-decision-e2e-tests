@@ -19,6 +19,16 @@ import {
 } from './ppcs.requests'
 import { CustodyGroup, PPUDRecordState } from '../../support/enums'
 
+const completeFileUpload = () => {
+  cy.pageHeading().should('contain', 'Add supporting documents for ')
+  cy.get('input[type=file]').selectFile('e2e_tests/fixtures/test-upload.txt', { force: true })
+  cy.get('.moj-multi-file-upload__list', { timeout: 10000 }).within(() => {
+    cy.get('.moj-multi-file-upload__message').should('contain.text', 'test-upload.txt')
+    cy.get('.govuk-tag--green').should('contain.text', 'Uploaded')
+  })
+  cy.clickLink('Continue')
+}
+
 const LOCAL_TEST_PPCS_CRN = 'X738925'
 
 let ppcsTestData: {
@@ -234,14 +244,14 @@ Then(
       cy.pageHeading().should('equal', 'Change index offence or add a comment')
       cy.clickButton('Continue')
 
+      completeFileUpload()
+
       cy.pageHeading().should('contain', 'Double check your booking')
-      // TODO Verify data that was set during the test once we have normalised the summary list
-      // and can access direct data
       cy.clickButton('Continue')
 
       cy.pageHeading().should('contain', 'Book ')
-      cy.pageHeading().should('contain', 'onto PPUD')
-      cy.clickButton('Continue')
+        cy.pageHeading().should('contain', 'onto PPUD')
+        cy.clickButton('Continue')
     } else if (ppudRecordState === PPUDRecordState.NEW) {
       cy.pageHeading().should('equal', 'Select a matching index offence in PPUD')
       selectRandomAutocompleteOption('indexOffence')
@@ -251,9 +261,9 @@ Then(
       selectRandomRadio('.govuk-radios')
       cy.clickButton('Continue')
 
+      completeFileUpload()
+
       cy.pageHeading().should('contain', 'Your recall booking - ')
-      // TODO Verify data that was set during the test once we have normalised the summary list
-      // and can access direct data
       cy.clickButton('Continue')
 
       cy.pageHeading().should('contain', 'Create new PPUD record for ')
