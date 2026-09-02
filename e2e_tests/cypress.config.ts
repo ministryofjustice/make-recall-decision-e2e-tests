@@ -5,6 +5,7 @@ import createEsbuildPlugin from '@badeball/cypress-cucumber-preprocessor/esbuild
 import { nodeModulesPolyfillPlugin } from 'esbuild-plugins-node-modules-polyfill'
 import installLogsPrinter from 'cypress-terminal-report/src/installLogsPrinter'
 import cypressSplit from 'cypress-split'
+import * as fs from 'node:fs'
 import { readDocX } from '../cypress_shared/plugins'
 
 export default defineConfig({
@@ -59,6 +60,21 @@ export default defineConfig({
         readDocX,
       })
 
+      on('before:browser:launch', (browser, launchOptions) => {
+        if (browser.family === 'chromium') {
+          launchOptions.args.push('--disable-dev-shm-usage')
+        }
+        return launchOptions
+      })
+
+      on('after:spec', (spec: Cypress.Spec, results: CypressCommandLine.RunResult) => {
+        // Do we have failures?
+        if (results && results.video && results.stats.failures === 0) {
+          // delete the video if the spec passed
+          fs.unlinkSync(results.video)
+        }
+      })
+
       config.env = {
         ...process.env,
         ...config.env,
@@ -67,6 +83,8 @@ export default defineConfig({
       return config
     },
     baseUrl: 'http://localhost:3000',
+    // without this, the memory usage of our e2e dev tests was building up throughout the test run and leading to OOM
+    numTestsKeptInMemory: 0,
     excludeSpecPattern: '**/!(*.cy).ts',
     specPattern: '**/*.feature',
     supportFile: 'e2e_tests/support/index.ts',
