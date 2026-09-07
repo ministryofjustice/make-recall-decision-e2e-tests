@@ -222,6 +222,11 @@ Then(
   selectRandomRadio('.govuk-radios') // Forced to select by class at the moment as no id
   cy.clickButton('Continue')
 
+  cy.clickLinkById('edit-cro', editText)
+  cy.pageHeading().should('equal', 'Edit CRO')
+  cy.get('#cro').clear().type('12345/67A')
+  cy.clickButton('Continue')
+
   cy.clickButton('Continue')
 
   if (custodyGroup === CustodyGroup.DETERMINATE) {
