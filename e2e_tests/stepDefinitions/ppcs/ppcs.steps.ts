@@ -246,7 +246,7 @@ Then(
 
       completeFileUpload()
 
-      cy.pageHeading().should('contain', 'Double check your booking')
+      cy.pageHeading().should('contain', 'Check the sentence and offence details for')
       cy.clickButton('Continue')
 
       cy.pageHeading().should('contain', 'Book ')
