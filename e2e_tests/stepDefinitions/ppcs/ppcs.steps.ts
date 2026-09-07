@@ -246,6 +246,9 @@ Then(
 
       completeFileUpload()
 
+      cy.pageHeading().should('contain', 'Add a minute for')
+      cy.clickButton('Continue')
+
       cy.pageHeading().should('contain', 'Double check your booking')
       cy.clickButton('Continue')
 
@@ -263,6 +266,9 @@ Then(
 
       completeFileUpload()
 
+      cy.pageHeading().should('contain', 'Add a minute for')
+      cy.clickButton('Continue')
+      
       cy.pageHeading().should('contain', 'Your recall booking - ')
       cy.clickButton('Continue')
 
