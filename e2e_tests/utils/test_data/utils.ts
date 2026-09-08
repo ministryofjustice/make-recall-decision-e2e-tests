@@ -23,9 +23,9 @@ function resolveData<P>(generate: SupportedDefaultType | (() => P)) {
     case 'boolean':
       return faker.datatype.boolean()
     case 'number':
-      return faker.random.numeric()
+      return faker.number.int()
     case 'string':
-      return faker.random.alpha()
+      return faker.string.alpha(10)
     default:
       return generate()
   }

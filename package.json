@@ -19,13 +19,16 @@
   "jest": {
     "preset": "ts-jest",
     "transform": {
-      "^.+\\.tsx?$": [
+      "^.+\\.(t|j)sx?$": [
         "ts-jest",
         {
           "isolatedModules": true
         }
       ]
     },
+    "transformIgnorePatterns": [
+      "/node_modules/(?!(@faker-js/faker)/)"
+    ],
     "collectCoverageFrom": [
       "server/**/*.{ts,js,jsx,mjs}"
     ],
@@ -133,7 +136,7 @@
     "@aws-sdk/types": "^3.226.0",
     "@badeball/cypress-cucumber-preprocessor": "^25.0.0",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.5",
-    "@faker-js/faker": "^7.6.0",
+    "@faker-js/faker": "^10.6.0",
     "@ministryofjustice/hmpps-npm-script-allowlist": "^0.0.6",
     "@types/bunyan": "^1.8.8",
     "@types/bunyan-format": "^0.2.5",
