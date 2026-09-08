@@ -29,6 +29,15 @@ const completeFileUpload = () => {
   cy.clickLink('Continue')
 }
 
+const addMinute = () => {
+  cy.pageHeading().should('contain', 'Add a minute for')
+  cy.get('#minute')
+    .should('exist')
+    .clear()
+    .type('Updated minute text for the recall decision')
+  cy.clickButton('Continue')
+}
+
 const LOCAL_TEST_PPCS_CRN = 'X738925'
 
 let ppcsTestData: {
@@ -246,15 +255,14 @@ Then(
 
       completeFileUpload()
 
-      cy.pageHeading().should('contain', 'Add a minute for')
-      cy.clickButton('Continue')
+      addMinute()
 
       cy.pageHeading().should('contain', 'Double check your booking')
       cy.clickButton('Continue')
 
       cy.pageHeading().should('contain', 'Book ')
-        cy.pageHeading().should('contain', 'onto PPUD')
-        cy.clickButton('Continue')
+      cy.pageHeading().should('contain', 'onto PPUD')
+      cy.clickButton('Continue')
     } else if (ppudRecordState === PPUDRecordState.NEW) {
       cy.pageHeading().should('equal', 'Select a matching index offence in PPUD')
       selectRandomAutocompleteOption('indexOffence')
@@ -266,8 +274,7 @@ Then(
 
       completeFileUpload()
 
-      cy.pageHeading().should('contain', 'Add a minute for')
-      cy.clickButton('Continue')
+      addMinute()
       
       cy.pageHeading().should('contain', 'Your recall booking - ')
       cy.clickButton('Continue')
