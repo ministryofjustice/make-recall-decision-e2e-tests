@@ -531,7 +531,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
   // Task list
   cy.clickLink(`When did the SPO agree this recall?`)
   cy.logPageTitle('When did the SPO agree this recall?')
-  testData.recallDateBySPO = faker.date.recent(7)
+  testData.recallDateBySPO = faker.date.recent({ days: 7 })
   cy.enterDateTime({
     day: testData.recallDateBySPO.getDate().toString(),
     month: (testData.recallDateBySPO.getMonth() + 1).toString(),
@@ -573,7 +573,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
       : faker.helpers.arrayElement(Object.keys(YesNoType))
     cy.selectRadioByValue(`Is this where the police can find ${this.offenderName}`, testData.lastKnownAddressCorrect)
     if (testData.lastKnownAddressCorrect === 'NO') {
-      cy.get(`#isMainAddressWherePersonCanBeFoundDetailsNo`).type(faker.address.streetAddress(true))
+      cy.get(`#isMainAddressWherePersonCanBeFoundDetailsNo`).type(faker.location.streetAddress(true))
     }
     cy.clickButton('Continue')
   }
@@ -601,7 +601,7 @@ const createPartAOrNoRecallLetter = function (partADetails?: Record<string, stri
   cy.clickLink(`Local police contact details`)
   cy.logPageTitle('Local police contact details')
   testData.localPoliceDetails = {}
-  cy.fillInput('Police contact name', (testData.localPoliceDetails.contact = faker.name.fullName()))
+  cy.fillInput('Police contact name', (testData.localPoliceDetails.contact = faker.person.fullName()))
   cy.fillInput('Email address', (testData.localPoliceDetails.email = faker.internet.email()))
   cy.clickButton('Continue')
   if (!['YES_POLICE', 'YES_PRISON'].includes(testData.inCustody)) {
@@ -710,7 +710,7 @@ const createDNTRLetter = function () {
     'How will the appointment happen?',
     (testData.appointmentOptions = faker.helpers.arrayElement(Object.values(ApptOptions)))
   )
-  testData.apptDate = faker.date.future(1)
+  testData.apptDate = faker.date.future({ years: 1 })
   cy.enterDateTime({
     day: testData.apptDate.getDate().toString(),
     month: (testData.apptDate.getMonth() + 1).toString(),
@@ -719,7 +719,7 @@ const createDNTRLetter = function () {
     minute: testData.apptDate.getMinutes().toString(),
   })
 
-  cy.fillInput('Probation telephone', (testData.phoneNumber = faker.phone.number('01277 ### ###')))
+  cy.fillInput('Probation telephone', (testData.phoneNumber = faker.phone.number({ style: 'mobile' })))
   cy.clickButton('Continue')
   cy.clickLink('Continue')
 }
@@ -826,15 +826,15 @@ function completeWhoCompletedThisPartAInformation() {
   cy.clickLink('Who completed this Part A?')
   cy.logPageTitle('Who completed this Part A?')
   testData.thePersonCompletingTheForm = {} // Populates Q25 of Part A document when Probation Admin flag is set
-  cy.get(`#name`).type((testData.thePersonCompletingTheForm.name = faker.name.fullName()))
+  cy.get(`#name`).type((testData.thePersonCompletingTheForm.name = faker.person.fullName()))
   cy.get('#email').type(
-    (testData.thePersonCompletingTheForm.email = `${faker.internet.userName().toLowerCase()}@justice.gov.uk`)
+    (testData.thePersonCompletingTheForm.email = `${faker.internet.username().toLowerCase()}@justice.gov.uk`)
   )
   cy.get(`#telephone`).type((testData.thePersonCompletingTheForm.telephone = faker.phone.number('01277 ### ###')))
   cy.get(`#region`).select(
     (testData.thePersonCompletingTheForm.region = faker.helpers.arrayElement(Object.values(Regions)))
   )
-  cy.get(`#localDeliveryUnit`).type((testData.thePersonCompletingTheForm.LDU = faker.address.cityName()))
+  cy.get(`#localDeliveryUnit`).type((testData.thePersonCompletingTheForm.LDU = faker.location.city()))
 
   cy.selectRadio('Is this person the probation practitioner', 'No')
   cy.clickButton('Continue')
@@ -844,27 +844,27 @@ function completeWhoCompletedThisPartAInformation() {
 function completePractitionerForPartAInformation() {
   cy.logPageTitle(`Practitioner for ${this.offenderName}`)
   testData.offenderManager = {} // Populates Q26 of Part A document when Probation Admin flag is set
-  cy.get(`#name`).type((testData.offenderManager.name = faker.name.fullName()))
-  cy.get(`#email`).type((testData.offenderManager.email = `${faker.internet.userName().toLowerCase()}@justice.gov.uk`))
-  cy.get(`#telephone`).type((testData.offenderManager.telephone = faker.phone.number('012## ### ###')))
+  cy.get(`#name`).type((testData.offenderManager.name = faker.person.fullName()))
+  cy.get(`#email`).type((testData.offenderManager.email = `${faker.internet.username().toLowerCase()}@justice.gov.uk`))
+  cy.get(`#telephone`).type((testData.offenderManager.telephone = faker.phone.number({ style: 'mobile' })))
   cy.clickButton('Continue')
 }
 
 function completeRevocationOrderContactInformation() {
   cy.clickLink('Where should the revocation order be sent?')
   cy.logPageTitle('Where should the revocation order be sent?')
-  cy.get(`#email_0`).type(`${faker.internet.userName().toLowerCase()}@justice.gov.uk`)
+  cy.get(`#email_0`).type(`${faker.internet.username().toLowerCase()}@justice.gov.uk`)
   cy.clickButton('Add another email')
-  cy.get(`#email_1`).type(`${faker.internet.userName().toLowerCase()}@justice.gov.uk`)
+  cy.get(`#email_1`).type(`${faker.internet.username().toLowerCase()}@justice.gov.uk`)
   cy.clickButton('Continue')
 }
 
 function completePPCSResponsesContactInformation() {
   cy.clickLink('Where should PPCS respond with questions?')
   cy.logPageTitle('Where should PPCS respond with questions?')
-  cy.get(`#email_0`).type(`${faker.internet.userName().toLowerCase()}@justice.gov.uk`)
+  cy.get(`#email_0`).type(`${faker.internet.username().toLowerCase()}@justice.gov.uk`)
   cy.clickButton('Add another email')
-  cy.get(`#email_1`).type(`${faker.internet.userName().toLowerCase()}@justice.gov.uk`)
+  cy.get(`#email_1`).type(`${faker.internet.username().toLowerCase()}@justice.gov.uk`)
   cy.clickButton('Continue')
 }
 

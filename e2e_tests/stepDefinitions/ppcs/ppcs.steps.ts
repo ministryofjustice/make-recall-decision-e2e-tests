@@ -231,6 +231,11 @@ Then(
   selectRandomRadio('.govuk-radios') // Forced to select by class at the moment as no id
   cy.clickButton('Continue')
 
+  cy.clickLinkById('edit-cro', editText)
+  cy.pageHeading().should('equal', 'Edit CRO')
+  cy.get('#cro').clear().type('12345/67A')
+  cy.clickButton('Continue')
+
   cy.clickButton('Continue')
 
   if (custodyGroup === CustodyGroup.DETERMINATE) {
@@ -255,9 +260,10 @@ Then(
 
       completeFileUpload()
 
+
       addMinute()
 
-      cy.pageHeading().should('contain', 'Double check your booking')
+      cy.pageHeading().should('contain', 'Check the sentence and offence details for')
       cy.clickButton('Continue')
 
       cy.pageHeading().should('contain', 'Book ')
