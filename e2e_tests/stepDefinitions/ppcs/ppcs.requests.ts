@@ -48,7 +48,7 @@ export const startRecallRecommendationStatusRequest: () => UpdateRecommendationS
 
 export const postPORecallRecommendationRequest: () => UpdateRecommendationRequest = () => {
     const decisionDateTime = faker.date.recent(7) // Some time within the last week
-  const govUkEmail = `${faker.internet.userName().toLowerCase()}@justice.gov.uk`
+  const govUkEmail = `${faker.internet.username().toLowerCase()}@justice.gov.uk`
   const decisionDateTimeReduced = [
         decisionDateTime.getFullYear(),
         decisionDateTime.getMonth() + 1,
@@ -57,7 +57,7 @@ export const postPORecallRecommendationRequest: () => UpdateRecommendationReques
         decisionDateTime.getMinutes()
     ]
     let selectedVulnerabilities: { value: string, details?: string}[]
-    switch(faker.datatype.number({ min: 1, max: 3})) {
+    switch(faker.number.int({ min: 1, max: 3})) {
         case 1:
             selectedVulnerabilities = [{
                 value: OPTIONS.vulnerabilities[0].value
@@ -116,7 +116,7 @@ export const postPORecallRecommendationRequest: () => UpdateRecommendationReques
             allOptions: OPTIONS.YESNONAOptions
         },
         localPoliceContact: {
-            contactName: faker.name.fullName(),
+            contactName: faker.person.fullName(),
             emailAddress: faker.internet.email()
         },
         isUnderIntegratedOffenderManagement : {
@@ -134,7 +134,7 @@ export const postPORecallRecommendationRequest: () => UpdateRecommendationReques
             riskToKnownAdult: faker.helpers.arrayElement(OPTIONS.roshOptions)
         },
         whoCompletedPartA: {
-            name: faker.name.fullName(),
+            name: faker.person.fullName(),
             email: govUkEmail,
             region: 'N54',
             telephone: faker.phone.number(),

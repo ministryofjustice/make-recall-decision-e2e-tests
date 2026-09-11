@@ -29,6 +29,15 @@ const completeFileUpload = () => {
   cy.clickLink('Continue')
 }
 
+const addMinute = () => {
+  cy.pageHeading().should('contain', 'Add a minute for')
+  cy.get('#minute')
+    .should('exist')
+    .clear()
+    .type('Updated minute text for the recall decision')
+  cy.clickButton('Continue')
+}
+
 const LOCAL_TEST_PPCS_CRN = 'X738925'
 
 let ppcsTestData: {
@@ -222,6 +231,11 @@ Then(
   selectRandomRadio('.govuk-radios') // Forced to select by class at the moment as no id
   cy.clickButton('Continue')
 
+  cy.clickLinkById('edit-cro', editText)
+  cy.pageHeading().should('equal', 'Edit CRO')
+  cy.get('#cro').clear().type('12345/67A')
+  cy.clickButton('Continue')
+
   cy.clickButton('Continue')
 
   if (custodyGroup === CustodyGroup.DETERMINATE) {
@@ -246,12 +260,15 @@ Then(
 
       completeFileUpload()
 
-      cy.pageHeading().should('contain', 'Double check your booking')
+
+      addMinute()
+
+      cy.pageHeading().should('contain', 'Check the sentence and offence details for')
       cy.clickButton('Continue')
 
       cy.pageHeading().should('contain', 'Book ')
-        cy.pageHeading().should('contain', 'onto PPUD')
-        cy.clickButton('Continue')
+      cy.pageHeading().should('contain', 'onto PPUD')
+      cy.clickButton('Continue')
     } else if (ppudRecordState === PPUDRecordState.NEW) {
       cy.pageHeading().should('equal', 'Select a matching index offence in PPUD')
       selectRandomAutocompleteOption('indexOffence')
@@ -263,6 +280,8 @@ Then(
 
       completeFileUpload()
 
+      addMinute()
+      
       cy.pageHeading().should('contain', 'Your recall booking - ')
       cy.clickButton('Continue')
 
@@ -300,8 +319,7 @@ Then(
 
 Then('the {custodyGroup} booking reports successfully sent to PPUD', function (custodyGroup: CustodyGroup) {
   if ([CustodyGroup.DETERMINATE, CustodyGroup.INDETERMINATE].includes(custodyGroup)) {
-    // Temporary commented out below line, for build fix. Uncomment after build fixes
-   // cy.pageHeading().should('contain', 'Booked onto PPUD')
+   cy.pageHeading().should('contain', 'Booked onto PPUD')
   } else {
     cy.contains(`Unexpected custody group encountered: ${custodyGroup}`).should('exist')
   }
