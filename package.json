@@ -94,7 +94,7 @@
     "@sentry/node": "^7.29.0",
     "@sentry/tracing": "^7.29.0",
     "@types/express-serve-static-core": "^4.17.33",
-    "@types/qs": "^6.9.7",
+    "@types/qs": "^6.15.1",
     "agentkeepalive": "^4.2.1",
     "applicationinsights": "^2.9.8",
     "body-parser": "^1.20.1",
@@ -209,6 +209,7 @@
       "diff": "8.0.3",
       "serialize-javascript": "7.0.5"
     },
+    "qs": "6.16.0",
     "yaml": "2.8.3"
   },
   "overridesComments": {
