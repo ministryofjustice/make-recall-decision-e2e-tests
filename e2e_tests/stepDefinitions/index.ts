@@ -89,7 +89,7 @@ defineParameterType({
 })
 
 Before(() => {
-  openApp({ flagRecommendationsPage: 1, flagDeleteRecommendation: 1 })
+  openApp({ flagRecommendationsPage: 1, flagDeleteRecommendation: 1, newStandardLicenceConditions: 1 })
 })
 
 After(function () {

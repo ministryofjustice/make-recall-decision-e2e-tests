@@ -10,6 +10,7 @@ export function loginAndSearchCrn(userType: UserType) {
         {
             flagRecommendationsPage: 1,
             flagDeleteRecommendation: 1,
+            newStandardLicenceConditions: 1,
         },
         userType
     )
