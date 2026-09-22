@@ -184,7 +184,7 @@
     "jest-html-reporter": "^3.10.2",
     "jest-junit": "^17.0.0",
     "jsonwebtoken": "^9.0.0",
-    "lint-staged": "^13.1.0",
+    "lint-staged": "^15.5.2",
     "mocha-junit-reporter": "^2.2.0",
     "multiple-cucumber-html-reporter": "^3.0.2",
     "nock": "^13.2.9",
@@ -204,12 +204,10 @@
     "csurf": {
       "cookie": "0.7.2"
     },
-    "micromatch": "4.0.8",
     "mocha": {
       "diff": "8.0.3",
       "serialize-javascript": "7.0.5"
     },
-    "qs": "6.16.0",
     "yaml": "2.8.3"
   },
   "overridesComments": {
