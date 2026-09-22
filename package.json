@@ -208,10 +208,13 @@
       "diff": "8.0.3",
       "serialize-javascript": "7.0.5"
     },
-    "yaml": "2.8.3"
+    "yaml": "2.8.3",
+    "express": {
+      "proxy-addr": "2.0.8"
+    },
+    "moment": "2.31.0"
   },
   "overridesComments": {
-    "glob": "Jest depends on babel-plugin-istanbul, which depends on an older glob version. This should be fixed soon, but overriding this until then - see https://github.com/istanbuljs/babel-plugin-istanbul/issues",
     "cookie": "csurf depends on a version of cookie with a vulnerability. Overriding here, but csurf is no longer being maintained so we should try to replace it soon. Recorded in MRD-2884."
   }
 }
