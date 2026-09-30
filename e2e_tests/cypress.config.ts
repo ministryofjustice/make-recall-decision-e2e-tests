@@ -5,7 +5,7 @@ import createEsbuildPlugin from '@badeball/cypress-cucumber-preprocessor/esbuild
 import { nodeModulesPolyfillPlugin } from 'esbuild-plugins-node-modules-polyfill'
 import installLogsPrinter from 'cypress-terminal-report/src/installLogsPrinter'
 import cypressSplit from 'cypress-split'
-import * as fs from 'node:fs'
+// import * as fs from 'node:fs'
 import { readDocX } from '../cypress_shared/plugins'
 
 export default defineConfig({
@@ -16,9 +16,7 @@ export default defineConfig({
   downloadsFolder: 'e2e_tests/downloads',
   fixturesFolder: 'e2e_tests/fixtures',
   screenshotsFolder: 'e2e_tests/screenshots',
-  videosFolder: 'e2e_tests/videos',
-  video: process.env.ENVIRONMENT !== 'local',
-  videoCompression: process.env.ENVIRONMENT !== 'local',
+  video: false, // Video disabled due to OOM issues 
   reporter: 'cypress-multi-reporters',
   reporterOptions: {
     reportDir: 'e2e_tests/reports',
@@ -67,14 +65,6 @@ export default defineConfig({
         return launchOptions
       })
 
-      on('after:spec', (spec: Cypress.Spec, results: CypressCommandLine.RunResult) => {
-        // Do we have failures?
-        if (results && results.video && results.stats.failures === 0) {
-          // delete the video if the spec passed
-          fs.unlinkSync(results.video)
-        }
-      })
-
       config.env = {
         ...process.env,
         ...config.env,
@@ -85,6 +75,7 @@ export default defineConfig({
     baseUrl: 'http://localhost:3000',
     // without this, the memory usage of our e2e dev tests was building up throughout the test run and leading to OOM
     numTestsKeptInMemory: 0,
+    experimentalMemoryManagement: true,
     excludeSpecPattern: '**/!(*.cy).ts',
     specPattern: '**/*.feature',
     supportFile: 'e2e_tests/support/index.ts',
