@@ -606,22 +606,28 @@ export const q23ProbationDetailsWithCaseAdmin = (
 ) => {
   // eslint-disable-next-line no-param-reassign
   contents = contents.substring(contents.indexOf(partASections[23]), contents.indexOf(partASections[24]))
-  expectSoftly(contents, 'Probation-Officer-Name').to.contain(
+  expectSoftly(contents, ‘Probation-Officer-Name’).to.contain(
     `Name of Probation Practitioner: ${probationPractitionerForPartADetails.name}`
   )
-  expectSoftly(contents, 'Probation-Officer-Telephone').to.contain(
+  expectSoftly(contents, 'Probation-Officer-Job-Title').to.contain(
+    `Job Title: ${probationPractitionerForPartADetails.jobTitle ?? ''}`
+  )
+  expectSoftly(contents, ‘Probation-Officer-Telephone’).to.contain(
     `Telephone Number: ${probationPractitionerForPartADetails.telephone}`
   )
-  expectSoftly(contents, 'Probation-Officer-Email').to.contain(
+  expectSoftly(contents, ‘Probation-Officer-Email’).to.contain(
     `Email Address: ${probationPractitionerForPartADetails.email}`
   )
-  expectSoftly(contents, 'Report-Author-Name').to.contain(
+  expectSoftly(contents, ‘Report-Author-Name’).to.contain(
     `Name of Report Author (if different): ${whoCompletedPartADetails.name}`
   )
-  expectSoftly(contents, 'Probation-Officer-Telephone').to.contain(
+  expectSoftly(contents, 'Report-Author-Job-Title').to.contain(
+    `Job Title: ${whoCompletedPartADetails.jobTitle ?? ''}`
+  )
+  expectSoftly(contents, ‘Probation-Officer-Telephone’).to.contain(
     `Report Author’s Telephone Number: ${whoCompletedPartADetails.telephone}`
   )
-  expectSoftly(contents, 'Probation-Officer-Email').to.contain(
+  expectSoftly(contents, ‘Probation-Officer-Email’).to.contain(
     `Report Author’s Email Address: ${whoCompletedPartADetails.email}`
   )
   expectSoftly(contents, 'Probation-Officer-Region').to.contain(`Region: ${whoCompletedPartADetails.region}`)

@@ -74,15 +74,14 @@ export enum ROSHLevels {
 }
 
 export enum LicenceConditions {
-  GOOD_BEHAVIOUR = 'Be of good behaviour and not behave in a way which undermines the purpose of the licence period;',
-  NO_OFFENCE = 'Not to commit any offence;',
-  KEEP_IN_TOUCH = 'Keep in touch with the supervising officer in accordance with instructions given by the supervising officer;',
-  SUPERVISING_OFFICER_VISIT = 'Receive visits from the supervising officer in accordance with instructions given by the supervising officer;',
-  ADDRESS_APPROVED = 'Reside permanently at an address approved by the supervising officer and obtain prior permission of the supervising officer for any stay of one or more nights at a different address;',
-  NO_WORK_UNDERTAKEN = 'Not undertake work, or a particular type of work, unless it is approved by the supervising officer and notify the supervising officer in advance of any proposal to undertake work or a particular type of work;',
-  NO_TRAVEL_OUTSIDE_UK = 'Not to travel outside the United Kingdom, the Channel Islands or the Isle of Man except with the prior permission of your supervising officer or for the purpose of immigration deportation or removal.',
-  NAME_CHANGE = 'Tell your supervising officer if you use a name which is different to the name or names which appear on your licence',
-  CONTACT_DETAILS = 'Tell your supervising officer if you change or add any contact details, including phone number or email',
+  GOOD_BEHAVIOUR = 'Behave well in a way that supports the purpose of you being on licence, and do not commit any crime.',
+  KEEP_IN_TOUCH = 'Keep in touch and meet with your supervising officer in the way they tell you to. This includes meeting them where you live.',
+  SUPERVISING_OFFICER_VISIT = 'Get permission from your supervising officer to stay at an address and if you want to stay somewhere else for one or more nights.',
+  NO_WORK_UNDERTAKEN = 'Tell your supervising officer about any new work, or a type of work, you want to do. Get their approval before you start this work',
+  NO_TRAVEL_OUTSIDE_UK = 'Get permission from your supervising officer if you want to leave the United Kingdom, Isle of Man or the Channel Islands. This does not apply if you are being deported or removed for immigration purposes.',
+  NAME_CHANGE = 'Tell your supervising officer about any names you use that are different to the names on this licence.',
+  CONTACT_DETAILS = 'Inform your supervising officer if your contact details change. For example, your phone number or email address.',
+  PASSPORT_DETAILS = 'Get permission from your supervising officer if you want to apply for a new passport. If requested, tell your supervising officer about any passports you have already.',
 }
 
 export enum WhyConsiderRecall {
