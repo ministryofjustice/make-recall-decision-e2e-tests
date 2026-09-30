@@ -609,6 +609,9 @@ export const q23ProbationDetailsWithCaseAdmin = (
   expectSoftly(contents, 'Probation-Officer-Name').to.contain(
     `Name of Probation Practitioner: ${probationPractitionerForPartADetails.name}`
   )
+  expectSoftly(contents, 'Probation-Officer-Job-Title').to.contain(
+    `Job Title: ${probationPractitionerForPartADetails.jobTitle ?? ''}`
+  )
   expectSoftly(contents, 'Probation-Officer-Telephone').to.contain(
     `Telephone Number: ${probationPractitionerForPartADetails.telephone}`
   )
@@ -617,6 +620,9 @@ export const q23ProbationDetailsWithCaseAdmin = (
   )
   expectSoftly(contents, 'Report-Author-Name').to.contain(
     `Name of Report Author (if different): ${whoCompletedPartADetails.name}`
+  )
+  expectSoftly(contents, 'Report-Author-Job-Title').to.contain(
+    `Job Title: ${whoCompletedPartADetails.jobTitle ?? ''}`
   )
   expectSoftly(contents, 'Probation-Officer-Telephone').to.contain(
     `Report Author’s Telephone Number: ${whoCompletedPartADetails.telephone}`
