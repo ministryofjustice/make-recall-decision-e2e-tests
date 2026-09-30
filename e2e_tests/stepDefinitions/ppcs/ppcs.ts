@@ -4,15 +4,14 @@ import { YESNONA } from "../../utils/standardTypes"
 type OptionValue = { text: string, value: string }
 
 export const licenseConditionsStandard: OptionValue[] = [
-    { text: "Be of good behaviour and not behave in a way which undermines the purpose of the licence period", value: "GOOD_BEHAVIOUR" },
-    { text: "Not commit any offence", value: "NO_OFFENCE" },
-    { text: "Keep in touch with the supervising officer in accordance with instructions given by the supervising officer", value: "KEEP_IN_TOUCH" },
-    { text: "Receive visits from the supervising officer in accordance with instructions given by the supervising officer", value: "SUPERVISING_OFFICER_VISIT" },
-    { text: "Reside permanently at an address approved by the supervising officer and obtain the prior permission of the supervising officer for any stay of one or more nights at a different address", value: "ADDRESS_APPROVED" },
-    { text: "Not undertake work, or a particular type of work, unless it is approved by the supervising officer and notify the supervising officer in advance of any proposal to undertake work or a particular type of work", value: "NO_WORK_UNDERTAKEN" },
-    { text: "Not travel outside the United Kingdom, the Channel Islands or the Isle of Man except with the prior permission of your supervising officer or for the purposes of immigration deportation or removal", value: "NO_TRAVEL_OUTSIDE_UK" },
-    { text: "Tell your supervising officer if you use a name which is different to the name or names which appear on your licence", value: "NAME_CHANGE" },
-    { text: "Tell your supervising officer if you change or add any contact details, including phone number or email", value: "CONTACT_DETAILS" }
+    { value: 'GOOD_BEHAVIOUR', text: 'Behave well in a way that supports the purpose of you being on licence, and do not commit any crime.' },
+    { value: 'KEEP_IN_TOUCH', text: 'Keep in touch and meet with your supervising officer in the way they tell you to. This includes meeting them where you live.'},
+    { value: 'SUPERVISING_OFFICER_VISIT', text: 'Get permission from your supervising officer to stay at an address and if you want to stay somewhere else for one or more nights.' },
+    { value: 'NO_WORK_UNDERTAKEN', text: 'Tell your supervising officer about any new work, or a type of work, you want to do. Get their approval before you start this work.' },
+    { value: 'NO_TRAVEL_OUTSIDE_UK', text: 'Get permission from your supervising officer if you want to leave the United Kingdom, Isle of Man or the Channel Islands. This does not apply if you are being deported or removed for immigration purposes.' },
+    { value: 'NAME_CHANGE', text: 'Tell your supervising officer about any names you use that are different to the names on this licence.' },
+    { value: 'CONTACT_DETAILS', text: 'Inform your supervising officer if your contact details change. For example, your phone number or email address.'},
+    { value: 'PASSPORT_DETAILS', text: 'Get permission from your supervising officer if you want to apply for a new passport. If requested, tell your supervising officer about any passports you have already.' }
 ]
 
 export const licenseConditionsAdditional : { note: string, title: string, details: string, subCatCode: string, mainCatCode: string }[] = [
