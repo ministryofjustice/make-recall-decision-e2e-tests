@@ -6,7 +6,7 @@ type OptionValue = { text: string, value: string }
 export const licenseConditionsStandard: OptionValue[] = [
     { value: 'GOOD_BEHAVIOUR', text: 'Behave well in a way that supports the purpose of you being on licence, and do not commit any crime.' },
     { value: 'KEEP_IN_TOUCH', text: 'Keep in touch and meet with your supervising officer in the way they tell you to. This includes meeting them where you live.'},
-    { value: 'SUPERVISING_OFFICER_VISIT', text: 'Get permission from your supervising officer to stay at an address and if you want to stay somewhere else for one or more nights.' },
+    { value: 'ADDRESS_APPROVED', text: 'Get permission from your supervising officer to stay at an address and if you want to stay somewhere else for one or more nights.' },
     { value: 'NO_WORK_UNDERTAKEN', text: 'Tell your supervising officer about any new work, or a type of work, you want to do. Get their approval before you start this work.' },
     { value: 'NO_TRAVEL_OUTSIDE_UK', text: 'Get permission from your supervising officer if you want to leave the United Kingdom, Isle of Man or the Channel Islands. This does not apply if you are being deported or removed for immigration purposes.' },
     { value: 'NAME_CHANGE', text: 'Tell your supervising officer about any names you use that are different to the names on this licence.' },
