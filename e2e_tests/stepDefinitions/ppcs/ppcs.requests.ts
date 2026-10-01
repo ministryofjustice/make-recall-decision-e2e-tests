@@ -135,6 +135,7 @@ export const postPORecallRecommendationRequest: () => UpdateRecommendationReques
         },
         whoCompletedPartA: {
             name: faker.person.fullName(),
+            jobTitle: 'Registered Probation Officer',
             email: govUkEmail,
             region: 'N54',
             telephone: faker.phone.number(),

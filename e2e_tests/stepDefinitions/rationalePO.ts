@@ -827,6 +827,7 @@ function completeWhoCompletedThisPartAInformation() {
   cy.logPageTitle('Who completed this Part A?')
   testData.thePersonCompletingTheForm = {} // Populates Q25 of Part A document when Probation Admin flag is set
   cy.get(`#name`).type((testData.thePersonCompletingTheForm.name = faker.person.fullName()))
+  cy.get('#jobTitle').select('Registered Probation Officer')
   cy.get('#email').type(
     (testData.thePersonCompletingTheForm.email = `${faker.internet.username().toLowerCase()}@justice.gov.uk`)
   )
@@ -845,6 +846,7 @@ function completePractitionerForPartAInformation() {
   cy.logPageTitle(`Practitioner for ${this.offenderName}`)
   testData.offenderManager = {} // Populates Q26 of Part A document when Probation Admin flag is set
   cy.get(`#name`).type((testData.offenderManager.name = faker.person.fullName()))
+  cy.get('#jobTitle').select('Probation Services Officer')
   cy.get(`#email`).type((testData.offenderManager.email = `${faker.internet.username().toLowerCase()}@justice.gov.uk`))
   cy.get(`#telephone`).type((testData.offenderManager.telephone = faker.phone.number({ style: 'mobile' })))
   cy.clickButton('Continue')
