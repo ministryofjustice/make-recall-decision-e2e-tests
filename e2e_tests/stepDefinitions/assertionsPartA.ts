@@ -43,7 +43,7 @@ const partASections = {
   22: '22. When recalling an ISP or ESP, the law requires that there is a link',
   23: '23. Probation Details – PS Probation Practitioner completing the Recall Report and Risk Assessment',
   24: '24. Endorsement of Recall Report and Risk Assessment by PS Line Manager',
-  25: '25. Authorisation and comments by Head of Service (or by delegation to at least a Band 6 Registered Probation Officer.)',
+  25: '25.  Authorisation and comments by Head of Service',
   26: '26. Attachments',
 }
 
