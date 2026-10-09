@@ -39,6 +39,8 @@ const addMinute = () => {
 }
 
 const LOCAL_TEST_PPCS_CRN = 'X738925'
+const totalSentenceLength = { years: '2', months: '3', days: '14' }
+const expectedTotalSentenceLength = '2 years, 3 months, 14 days'
 
 let ppcsTestData: {
   crn: string,
@@ -244,7 +246,10 @@ Then(
     cy.clickButton('Continue')
 
     cy.pageHeading().should('equal', 'Check the index offence and its consecutive sentences')
-    cy.clickLink('Continue')
+    cy.get('#totalSentenceLength-years').clear().type(totalSentenceLength.years)
+    cy.get('#totalSentenceLength-months').clear().type(totalSentenceLength.months)
+    cy.get('#totalSentenceLength-days').clear().type(totalSentenceLength.days)
+    cy.get('button.govuk-button').contains('Continue').click()
 
     if (ppudRecordState === PPUDRecordState.EXISTING) {
       cy.pageHeading().should('contain', 'Select or add a sentence for your booking - ')
@@ -264,6 +269,7 @@ Then(
       addMinute()
 
       cy.pageHeading().should('contain', 'Check the sentence and offence details for')
+      cy.get('[data-qa="sentenceLength"]').should('contain.text', expectedTotalSentenceLength)
       cy.clickButton('Continue')
 
       cy.pageHeading().should('contain', 'Book ')
@@ -283,6 +289,7 @@ Then(
       addMinute()
       
       cy.pageHeading().should('contain', 'Your recall booking - ')
+      cy.get('[data-qa="sentenceLength"]').should('contain.text', expectedTotalSentenceLength)
       cy.clickButton('Continue')
 
       cy.pageHeading().should('contain', 'Create new PPUD record for ')
