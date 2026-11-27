@@ -212,7 +212,8 @@
     "express": {
       "proxy-addr": "2.0.8"
     },
-    "moment": "2.31.0"
+    "moment": "2.31.0",
+    "serialize-javascript": "7.0.5"
   },
   "overridesComments": {
     "cookie": "csurf depends on a version of cookie with a vulnerability. Overriding here, but csurf is no longer being maintained so we should try to replace it soon. Recorded in MRD-2884."
