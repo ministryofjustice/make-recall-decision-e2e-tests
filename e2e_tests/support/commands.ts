@@ -78,6 +78,7 @@ Cypress.Commands.add('visitPageAndLogin', function (url, userType = UserType.PO)
   cy.get('#username').type(userDetails.username)
   cy.get('#password').type(userDetails.password, { log: false })
   cy.get('#submit').click()
+  acceptAcceptableUseStatement()
   skipEmailVerification()
   getUserDetails(url, userType)
 })
@@ -87,6 +88,16 @@ const skipEmailVerification = () => {
     const $heading = $body.find('h1.govuk-heading-l')
     if ($heading.text().trim() === 'Verify your email address') {
       $body.find('input#cancel').trigger('click')
+    }
+  })
+}
+
+const acceptAcceptableUseStatement = () => {
+  cy.get('body').then($body => {
+    const $heading = $body.find('h1.govuk-heading-l')
+    if ($heading.text().trim() === 'Acceptable use statement') {
+      $body.find('input#accept_terms').trigger('click')
+      $body.find('button#accept-terms').trigger('click')
     }
   })
 }
